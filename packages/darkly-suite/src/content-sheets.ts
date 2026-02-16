@@ -6,9 +6,8 @@
  * but routes all storage through the suite's `ds_sheets_preferences` key.
  */
 
-import { createContentScript } from '@darkly/core';
+import { createContentScript, claimPage } from '@darkly/core';
 import { sheetsPlugin } from '@darkly/site-sheets';
-import { claimPage } from './conflict-detection';
 import { getSiteConfig } from './darkly.config';
 
 const siteConfig = getSiteConfig('sheets');

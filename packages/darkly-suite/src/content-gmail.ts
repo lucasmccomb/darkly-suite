@@ -6,9 +6,8 @@
  * but routes all storage through the suite's `ds_gmail_preferences` key.
  */
 
-import { createContentScript } from '@darkly/core';
+import { createContentScript, claimPage } from '@darkly/core';
 import { gmailPlugin } from '@darkly/site-gmail';
-import { claimPage } from './conflict-detection';
 import { getSiteConfig } from './darkly.config';
 
 const siteConfig = getSiteConfig('gmail');

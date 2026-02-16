@@ -4,7 +4,9 @@
  * re-invert elements that should keep original colors (images, videos, SVG images).
  *
  * The Kix canvas (inside .kix-canvas-tile-content) is inverted along with the
- * body by default.
+ * body by default. When "Preserve Page Colors" is enabled (data-dd-page="preserve"),
+ * the canvas tiles are re-inverted to keep document pages in their original
+ * light appearance.
  */
 
 /* ============================================================
@@ -23,6 +25,19 @@
 [data-dd-theme="dark"] img,
 [data-dd-theme="dark"] video,
 [data-dd-theme="dark"] svg image {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* ============================================================
+ * 3. Preserve Page Colors toggle -- re-invert canvas to keep pages light
+ * ============================================================ */
+
+[data-dd-theme="dark"][data-dd-page="preserve"] .kix-canvas-tile-content {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* Page backgrounds in paginated mode */
+[data-dd-theme="dark"][data-dd-page="preserve"] .kix-page {
   filter: invert(1) hue-rotate(180deg) !important;
 }
 
