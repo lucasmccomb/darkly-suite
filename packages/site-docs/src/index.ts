@@ -2,6 +2,7 @@
 // Kix canvas injection, toolbar selectors, docs-overrides.css
 
 export { docsPlugin } from './plugin';
+export { DocsSettingsSection } from './ui/DocsSettingsSection';
 export { injectToolbarButton, waitForElement, removeToolbarButton } from './inject/toolbar';
 export { startCanvasObserver } from './inject/canvas-observer';
 export {

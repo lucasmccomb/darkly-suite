@@ -2,6 +2,7 @@
 // Waffle grid injection, toolbar selectors, sheets-overrides.css
 
 export { sheetsPlugin } from './plugin';
+export { SheetsSettingsSection } from './ui/SheetsSettingsSection';
 export { injectToolbarButton, waitForElement, removeToolbarButton } from './inject/toolbar';
 export { startGridObserver } from './inject/grid-observer';
 export {

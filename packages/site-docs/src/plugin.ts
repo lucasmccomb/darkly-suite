@@ -1,6 +1,7 @@
 // @darkly/site-docs — SitePlugin implementation for Google Docs
 // Custom DOM injection for toolbar, sidebar, and canvas observation.
 
+import React from 'react';
 import type {
   SitePlugin,
   ToolbarButtonOpts,
@@ -10,6 +11,7 @@ import type {
 } from '@darkly/core';
 import { injectToolbarButton } from './inject/toolbar';
 import { startCanvasObserver } from './inject/canvas-observer';
+import { DocsSettingsSection } from './ui/DocsSettingsSection';
 
 let _prefix = 'dd';
 
@@ -23,6 +25,14 @@ export const docsPlugin: SitePlugin = {
 
   async init(_engine: ThemeEngine, config: ProductConfig): Promise<void> {
     _prefix = config.prefix;
+
+    // Apply saved per-site preferences (e.g., preserve page attribute) on load
+    const siteKey = `${_prefix}_site_docs`;
+    const result = await chrome.storage.sync.get(siteKey);
+    const stored = result[siteKey];
+    if (stored?.preservePageColors) {
+      document.documentElement.setAttribute(`data-${_prefix}-page`, 'preserve');
+    }
   },
 
   async injectToolbarButton(opts: ToolbarButtonOpts): Promise<HTMLElement | null> {
@@ -43,5 +53,9 @@ export const docsPlugin: SitePlugin = {
     startCanvasObserver(() => {
       onReinject();
     });
+  },
+
+  renderProductSection(): React.ReactNode {
+    return React.createElement(DocsSettingsSection);
   },
 };
