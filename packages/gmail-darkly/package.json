@@ -1,0 +1,33 @@
+{
+  "name": "gmail-darkly",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "webpack --config webpack.dev.js --watch",
+    "build": "webpack --config webpack.prod.js",
+    "lint": "eslint src/ --ext .ts,.tsx",
+    "type-check": "tsc --noEmit",
+    "test": "echo 'Tests in @darkly/core'"
+  },
+  "dependencies": {
+    "@darkly/core": "workspace:*",
+    "@darkly/site-gmail": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "lucide-react": "^0.564.0"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.270",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "copy-webpack-plugin": "^12.0.2",
+    "css-loader": "^7.1.2",
+    "source-map-loader": "^5.0.0",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.6.3",
+    "webpack": "^5.96.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-merge": "^6.0.1"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "darkly-suite",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Unified monorepo for Gmail Darkly, Sheets Darkly, Docs Darkly, and Darkly Suite bundle",
+  "scripts": {
+    "lint": "pnpm -r lint",
+    "type-check": "pnpm -r type-check",
+    "test": "pnpm -r test",
+    "build": "pnpm -r build",
+    "dev:gmail": "pnpm --filter gmail-darkly dev",
+    "dev:sheets": "pnpm --filter sheets-darkly dev",
+    "dev:docs": "pnpm --filter docs-darkly dev",
+    "dev:suite": "pnpm --filter darkly-suite-ext dev",
+    "dev:landing": "pnpm --filter @darkly/landing dev",
+    "build:gmail": "pnpm --filter gmail-darkly build",
+    "build:sheets": "pnpm --filter sheets-darkly build",
+    "build:docs": "pnpm --filter docs-darkly build",
+    "build:suite": "pnpm --filter darkly-suite-ext build",
+    "build:landing": "pnpm --filter @darkly/landing build",
+    "clean": "pnpm -r exec -- rm -rf dist"
+  },
+  "engines": {
+    "node": ">=18",
+    "pnpm": ">=9"
+  }
+}
