@@ -1,15 +1,30 @@
 /**
  * Darkly Suite — Unified background service worker
  *
- * Handles alarms, message passing, and payment routing for all sites.
- * This is the single service_worker entry for the MV3 extension.
+ * Creates a background worker for each site (gmail, sheets, docs) so that
+ * each one manages its own per-site preferences, schedule alarms, and
+ * tab notifications. Payment and token are shared at the suite level.
+ *
+ * Per-site storage keys:
+ *   - ds_gmail_preferences
+ *   - ds_sheets_preferences
+ *   - ds_docs_preferences
  */
 
-import { config } from './darkly.config';
+import { createBackgroundWorker } from '@darkly/core';
+import type { SiteId } from '@darkly/core';
+import { config, getSiteConfig, siteConfigs } from './darkly.config';
 
-/**
- * Handle messages from content scripts across all sites.
- */
+// Initialize a background worker for each site.
+// Each worker watches its own per-site preferences key and manages
+// its own schedule alarm and tab notifications.
+const sites = Object.keys(siteConfigs) as SiteId[];
+for (const siteId of sites) {
+  const siteConfig = getSiteConfig(siteId);
+  createBackgroundWorker(siteConfig);
+}
+
+// Suite-level message handling (not site-specific)
 chrome.runtime.onMessage.addListener(
   (
     message: { type: string; url?: string; [key: string]: unknown },
@@ -28,26 +43,13 @@ chrome.runtime.onMessage.addListener(
         return true; // keep channel open for async response
 
       default:
-        console.log('[Darkly Suite] Unknown message type:', message.type);
+        // Let per-site workers handle other message types
+        break;
     }
 
     return false;
   }
 );
-
-/**
- * Schedule check alarm — evaluates whether dark mode should be active
- * based on schedule/sunset rules for each site.
- */
-chrome.alarms.create(config.alarmName, { periodInMinutes: 1 });
-
-chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name !== config.alarmName) return;
-
-  // Placeholder: once @darkly/core's createBackgroundWorker is wired up,
-  // this will evaluate schedule rules and push theme updates to each tab.
-  console.log('[Darkly Suite] Schedule check alarm fired');
-});
 
 /**
  * Extension install/update handler.
@@ -62,4 +64,4 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 });
 
-console.log(`[Darkly Suite] Background service worker initialized`);
+console.log(`[Darkly Suite] Background service worker initialized (${sites.length} sites)`);
