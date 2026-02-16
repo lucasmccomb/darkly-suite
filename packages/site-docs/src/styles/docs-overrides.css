@@ -1,0 +1,81 @@
+/* @darkly/site-docs -- Filter-based dark mode for Google Docs
+ *
+ * Core approach: invert(1) + hue-rotate(180deg) on <body>, then selectively
+ * re-invert elements that should keep original colors (images, videos, SVG images).
+ *
+ * The Kix canvas (inside .kix-canvas-tile-content) is inverted along with the
+ * body by default.
+ */
+
+/* ============================================================
+ * 1. Core inversion -- dark mode filter on body
+ * ============================================================ */
+
+[data-dd-theme="dark"] body {
+  filter: invert(1) hue-rotate(180deg) !important;
+  background-color: #fff !important;
+}
+
+/* ============================================================
+ * 2. Re-invert media elements -- keep images/video/SVG looking correct
+ * ============================================================ */
+
+[data-dd-theme="dark"] img,
+[data-dd-theme="dark"] video,
+[data-dd-theme="dark"] svg image {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* ============================================================
+ * 4. Color picker swatch re-inversion -- show accurate colors
+ * ============================================================ */
+
+[data-dd-theme="dark"] .goog-palette-colorswatch,
+[data-dd-theme="dark"] .docs-material-colorpalette-colorswatch,
+[data-dd-theme="dark"] .docs-material-colorpalette-cell {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* ============================================================
+ * 5. Extension UI isolation -- our settings panel is already dark
+ * ============================================================ */
+
+[data-dd-theme="dark"] .dd-settings-container {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* ============================================================
+ * 6. Collaboration cursors -- keep original cursor colors
+ * ============================================================ */
+
+[data-dd-theme="dark"] .kix-cursor,
+[data-dd-theme="dark"] .kix-cursor-name {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* ============================================================
+ * 8. Comment and suggestion highlights
+ * ============================================================ */
+
+[data-dd-theme="dark"] .docos-anchoreddocoview,
+[data-dd-theme="dark"] .docos-docoview-resolve-button-container {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* ============================================================
+ * 9. Scrollbar styling for dark mode
+ * Colors are PRE-INVERTED because the body filter inverts them.
+ * ============================================================ */
+
+[data-dd-theme="dark"] ::-webkit-scrollbar {
+  background: #ffffff;
+}
+
+[data-dd-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #bbbbbb;
+  border-radius: 4px;
+}
+
+[data-dd-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: #999999;
+}

@@ -1,0 +1,91 @@
+/* @darkly/site-sheets -- Filter-based dark mode for Google Sheets
+ *
+ * Core approach: invert(1) + hue-rotate(180deg) on <body>, then selectively
+ * re-invert elements that should keep original colors (images, videos, SVG images).
+ *
+ * The canvas grid (inside #waffle-grid-container) is inverted along with the body
+ * by default. When "Preserve Grid Colors" is enabled (data-sd-grid="preserve"),
+ * the canvas is re-inverted to keep the grid in its original light appearance.
+ */
+
+/* ============================================================
+ * 1. Core inversion -- dark mode filter on body
+ * ============================================================ */
+
+[data-sd-theme="dark"] body {
+  filter: invert(1) hue-rotate(180deg) !important;
+  background-color: #fff !important;
+}
+
+/* ============================================================
+ * 2. Re-invert media elements -- keep images/video/SVG looking correct
+ * ============================================================ */
+
+[data-sd-theme="dark"] img,
+[data-sd-theme="dark"] video,
+[data-sd-theme="dark"] svg image,
+[data-sd-theme="dark"] [style*="background-image"] {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* ============================================================
+ * 3. Preserve Grid Colors toggle -- re-invert canvas to keep it light
+ * ============================================================ */
+
+[data-sd-theme="dark"][data-sd-grid="preserve"] #waffle-grid-container canvas {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* Frozen pane overlays (separate canvas elements) */
+[data-sd-theme="dark"][data-sd-grid="preserve"] .frozen-left-pane canvas,
+[data-sd-theme="dark"][data-sd-grid="preserve"] .frozen-top-pane canvas,
+[data-sd-theme="dark"][data-sd-grid="preserve"] .frozen-corner-pane canvas {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* ============================================================
+ * 4. Color picker swatch re-inversion -- show accurate colors
+ * ============================================================ */
+
+[data-sd-theme="dark"] .goog-palette-colorswatch,
+[data-sd-theme="dark"] .docs-material-colorpalette-colorswatch,
+[data-sd-theme="dark"] .docs-material-colorpalette-cell {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* ============================================================
+ * 5. Extension UI isolation -- our settings panel is already dark
+ * ============================================================ */
+
+[data-sd-theme="dark"] .sd-settings-container {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* ============================================================
+ * 6. Chart re-inversion -- inline charts in the grid
+ * ============================================================ */
+
+[data-sd-theme="dark"][data-sd-grid="preserve"] .overlay-widget-host canvas {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+[data-sd-theme="dark"] .chart-editor-preview canvas {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* ============================================================
+ * 7. Scrollbar styling for dark mode
+ * ============================================================ */
+
+[data-sd-theme="dark"] ::-webkit-scrollbar {
+  background: #1a1a2e;
+}
+
+[data-sd-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #44446a;
+  border-radius: 4px;
+}
+
+[data-sd-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: #5a5a8a;
+}

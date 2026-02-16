@@ -1,0 +1,139 @@
+/* @darkly/site-gmail -- Gmail DOM Overrides (Filter-Based)
+ *
+ * Strategy: Apply a CSS filter to invert the entire page, then re-invert
+ * the few elements that look wrong (images, media, extension UI).
+ *
+ * NOTE: These selectors use the `darkly` placeholder prefix. At build time,
+ * the prefix loader transforms `darkly` to the actual product prefix
+ * ('gd' for individual, 'ds' for bundle). The data attribute selectors below
+ * use `data-gd-theme` because Gmail Darkly always uses `gd-` regardless of
+ * product. For the bundle, the webpack prefix loader will swap these.
+ */
+
+/* ============================================================
+ * 1. Core Page-Wide Inversion
+ * ============================================================ */
+
+[data-gd-theme="dark"] body {
+  filter: invert(1) hue-rotate(180deg) !important;
+  background-color: #fff !important;
+}
+
+/* ============================================================
+ * 2. Media Re-Inversion (restore original appearance)
+ * ============================================================ */
+
+[data-gd-theme="dark"] img,
+[data-gd-theme="dark"] video,
+[data-gd-theme="dark"] canvas {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+[data-gd-theme="dark"] svg image {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* Gmail logo — keep inverted for visibility on dark bg */
+[data-gd-theme="dark"] img[alt="Gmail"],
+[data-gd-theme="dark"] img[src*="googlelogo"] {
+  filter: none !important;
+}
+
+/* ============================================================
+ * 4. Extension UI Isolation
+ * ============================================================ */
+
+[data-gd-theme="dark"] .gd-settings-container {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* InboxSDK tooltip rounding */
+.inboxsdk__tooltip,
+.inboxsdk__tooltip > div,
+.inboxsdk__tooltip > div > div,
+.inboxsdk__tooltip > div > div > div {
+  border-radius: 6px !important;
+  overflow: hidden !important;
+}
+
+/* Drop shadow on mini panel */
+.inboxsdk__tooltip {
+  box-shadow: 0 2px 12px 2px rgba(26, 115, 232, 0.25) !important;
+}
+[data-gd-theme="dark"] .inboxsdk__tooltip {
+  box-shadow: 0 4px 20px 4px rgba(10, 55, 189, 0.45) !important;
+}
+
+/* Re-invert app button container in dark mode */
+[data-gd-theme="dark"] .inboxsdk__appButton {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* Prevent triple inversion of images inside re-inverted containers */
+[data-gd-theme="dark"] .gd-settings-container img {
+  filter: none !important;
+}
+
+[data-gd-theme="dark"] .inboxsdk__appButton img {
+  filter: none !important;
+}
+
+/* Sidebar icon size */
+.inboxsdk__button_iconImg {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+/* ===== 3D Coin Hover Effect ===== */
+
+.gd-coin-wrapper {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+  line-height: 0;
+}
+
+.gd-coin-edge {
+  position: absolute;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #f5c842 0%, #d4941c 50%, #8b6914 100%);
+  opacity: 0;
+  transition: opacity 150ms ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.gd-coin-face {
+  position: relative;
+  z-index: 1;
+  transition: transform 150ms ease;
+}
+
+.gd-coin-wrapper:hover .gd-coin-edge {
+  opacity: 1;
+}
+
+.gd-coin-wrapper:hover .gd-coin-face {
+  transform: translate(-1px, -1px);
+}
+
+/* Light mode: blue edge gradient */
+[data-gd-theme="light"] .gd-coin-edge,
+:root:not([data-gd-theme]) .gd-coin-edge {
+  background: linear-gradient(135deg, #4285f4 0%, #1a73e8 50%, #0d47a1 100%);
+}
+
+/* ============================================================
+ * 7. Scrollbar & Misc
+ * ============================================================ */
+
+[data-gd-theme="dark"] [aria-label="Show details"] img {
+  filter: none !important;
+}
+
+/* Emoji re-inversion */
+[data-gd-theme="dark"] img[data-emoji],
+[data-gd-theme="dark"] img[goomoji],
+[data-gd-theme="dark"] img[alt*="emoji"] {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
