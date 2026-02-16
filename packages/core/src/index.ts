@@ -1,4 +1,4 @@
-// @darkly/core — shared modules for all Darkly extensions
+// @darkly/core -- shared modules for all Darkly extensions
 
 // Types and config
 export type {
@@ -50,3 +50,47 @@ export { createBackgroundWorker } from './background/worker';
 
 // Content script factory
 export { createContentScript } from './content';
+
+// Inject modules -- UI injection into host pages
+export {
+  createToolbarDropdown,
+  getToolbarIcons,
+  wrapIconInCoin,
+  observeToolbarIcon,
+  getSidebarIcons,
+  createSidebarPanel,
+  observeSidebarIcon,
+  createDomObserver,
+  createPanelManager,
+  createSettingsContainer,
+  registerKeyboardShortcut,
+  showNotification,
+} from './inject';
+export type {
+  ToolbarButtonContext,
+  SidebarPanelOptions,
+  PanelState,
+  PanelManager,
+  KeyboardShortcutOptions,
+  NotificationType,
+  NotificationOptions,
+} from './inject';
+
+// UI components
+export {
+  MiniControlPanel,
+  SettingsPanel,
+  ThemeModeSelector,
+  DefaultConfig,
+  ScheduleConfig as ScheduleConfigComponent,
+  SunriseSunsetConfig as SunriseSunsetConfigComponent,
+  NightTintConfig as NightTintConfigComponent,
+  Paywall,
+  UpgradeBanner,
+  Toggle,
+  Slider,
+  TimeRangePicker,
+  CollapsibleSection,
+  ProBadge,
+  Wordmark,
+} from './ui';
