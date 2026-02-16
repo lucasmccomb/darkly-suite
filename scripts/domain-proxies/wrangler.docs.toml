@@ -1,0 +1,16 @@
+# Docs Darkly → Darkly Suite API proxy
+# Proxies docsdarkly.com/api/* → darklysuite.com/api/* with product=docs
+#
+# Deploy: npx wrangler deploy --config scripts/domain-proxies/wrangler.docs.toml
+
+name = "proxy-docsdarkly"
+main = "proxy-worker.js"
+compatibility_date = "2024-09-23"
+
+[vars]
+PRODUCT = "docs"
+
+# Route: only intercept /api/* requests on docsdarkly.com
+[[routes]]
+pattern = "docsdarkly.com/api/*"
+zone_name = "docsdarkly.com"
