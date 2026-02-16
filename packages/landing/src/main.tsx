@@ -1,2 +1,11 @@
-// darklysuite.com — entry point
-// Placeholder — will be populated with Vite + React + Router setup
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './styles/globals.css'
+import './styles/admin.css'
+import { App } from './App.tsx'
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
