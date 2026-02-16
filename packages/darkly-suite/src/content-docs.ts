@@ -3,26 +3,40 @@
  *
  * Injects Docs dark mode using the `dd` CSS prefix (so Docs-specific
  * override CSS works identically to the standalone Docs Darkly extension)
- * but routes all storage through the suite's `ds_` namespace.
+ * but routes all storage through the suite's `ds_docs_preferences` key.
  */
 
+import { createContentScript } from '@darkly/core';
+import { docsPlugin } from '@darkly/site-docs';
 import { claimPage } from './conflict-detection';
-import { config } from './darkly.config';
+import { getSiteConfig } from './darkly.config';
 
-const SITE_ID = 'docs';
-const CSS_PREFIX = 'dd';
-const CLAIM_ID = `ds-${SITE_ID}`;
+const siteConfig = getSiteConfig('docs');
+const CLAIM_ID = `ds-${siteConfig.prefix}`;
 
 async function init(): Promise<void> {
   if (!claimPage(CLAIM_ID)) return;
 
+  // Skip dark mode in iframes (avoid double-inversion in embedded docs)
+  if (window.self !== window.top) {
+    console.log('[Darkly Suite] Docs — skipping iframe');
+    return;
+  }
+
+  if (
+    window.location.pathname.includes('/print') ||
+    window.location.pathname.includes('/export') ||
+    window.location.pathname.includes('/preview')
+  ) {
+    console.log('[Darkly Suite] Docs — skipping print/export/preview view');
+    return;
+  }
+
   console.log(
-    `[Darkly Suite] Docs content script loaded (prefix: ${CSS_PREFIX}, storage: ${config.storageKey})`
+    `[Darkly Suite] Docs content script loaded (prefix: ${siteConfig.prefix}, storage: ${siteConfig.storageKey})`
   );
 
-  // Placeholder: the full init will be wired up once @darkly/site-docs
-  // exports its SitePlugin and @darkly/core's createContentScript is available.
-  // For now, confirm the content script loads and claims the page.
+  createContentScript(siteConfig, docsPlugin);
 }
 
 init().catch((err) =>

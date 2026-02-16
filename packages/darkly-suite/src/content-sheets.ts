@@ -3,26 +3,39 @@
  *
  * Injects Sheets dark mode using the `sd` CSS prefix (so Sheets-specific
  * override CSS works identically to the standalone Sheets Darkly extension)
- * but routes all storage through the suite's `ds_` namespace.
+ * but routes all storage through the suite's `ds_sheets_preferences` key.
  */
 
+import { createContentScript } from '@darkly/core';
+import { sheetsPlugin } from '@darkly/site-sheets';
 import { claimPage } from './conflict-detection';
-import { config } from './darkly.config';
+import { getSiteConfig } from './darkly.config';
 
-const SITE_ID = 'sheets';
-const CSS_PREFIX = 'sd';
-const CLAIM_ID = `ds-${SITE_ID}`;
+const siteConfig = getSiteConfig('sheets');
+const CLAIM_ID = `ds-${siteConfig.prefix}`;
 
 async function init(): Promise<void> {
   if (!claimPage(CLAIM_ID)) return;
 
+  // Skip dark mode in iframes (avoid double-inversion in embedded sheets)
+  if (window.self !== window.top) {
+    console.log('[Darkly Suite] Sheets — skipping iframe');
+    return;
+  }
+
+  if (
+    window.location.pathname.includes('/print') ||
+    window.location.pathname.includes('/export')
+  ) {
+    console.log('[Darkly Suite] Sheets — skipping print/export view');
+    return;
+  }
+
   console.log(
-    `[Darkly Suite] Sheets content script loaded (prefix: ${CSS_PREFIX}, storage: ${config.storageKey})`
+    `[Darkly Suite] Sheets content script loaded (prefix: ${siteConfig.prefix}, storage: ${siteConfig.storageKey})`
   );
 
-  // Placeholder: the full init will be wired up once @darkly/site-sheets
-  // exports its SitePlugin and @darkly/core's createContentScript is available.
-  // For now, confirm the content script loads and claims the page.
+  createContentScript(siteConfig, sheetsPlugin);
 }
 
 init().catch((err) =>

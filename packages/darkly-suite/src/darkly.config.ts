@@ -1,5 +1,6 @@
-import type { ProductConfig } from '@darkly/core';
+import type { ProductConfig, SiteId } from '@darkly/core';
 
+/** Suite-level config — used for payment, token, and pro-cache (shared across all sites). */
 export const config: ProductConfig = {
   productId: 'suite',
   productName: 'Darkly Suite',
@@ -12,3 +13,60 @@ export const config: ProductConfig = {
   tabUrlPattern: 'https://mail.google.com/*',
   sites: ['gmail', 'sheets', 'docs'],
 };
+
+/**
+ * Per-site config metadata for the bundle.
+ * Each site gets its own storage key (ds_{site}_preferences), CSS prefix,
+ * alarm name, and tab URL pattern — but shares the suite's token and payment.
+ */
+interface SiteConfigEntry {
+  siteId: SiteId;
+  prefix: string;
+  storageKey: string;
+  alarmName: string;
+  tabUrlPattern: string;
+}
+
+export const siteConfigs: Record<SiteId, SiteConfigEntry> = {
+  gmail: {
+    siteId: 'gmail',
+    prefix: 'gd',
+    storageKey: 'ds_gmail_preferences',
+    alarmName: 'ds-gmail-schedule-check',
+    tabUrlPattern: 'https://mail.google.com/*',
+  },
+  sheets: {
+    siteId: 'sheets',
+    prefix: 'sd',
+    storageKey: 'ds_sheets_preferences',
+    alarmName: 'ds-sheets-schedule-check',
+    tabUrlPattern: 'https://docs.google.com/spreadsheets/*',
+  },
+  docs: {
+    siteId: 'docs',
+    prefix: 'dd',
+    storageKey: 'ds_docs_preferences',
+    alarmName: 'ds-docs-schedule-check',
+    tabUrlPattern: 'https://docs.google.com/document/*',
+  },
+};
+
+/**
+ * Build a full ProductConfig for a specific site within the bundle.
+ * Inherits suite-level payment/token config but uses per-site storage and prefix.
+ */
+export function getSiteConfig(siteId: SiteId): ProductConfig {
+  const site = siteConfigs[siteId];
+  return {
+    productId: 'suite',
+    productName: `Darkly Suite (${siteId})`,
+    prefix: site.prefix,
+    storageKey: site.storageKey,
+    tokenKey: config.tokenKey,
+    proCacheKey: config.proCacheKey,
+    apiBase: config.apiBase,
+    alarmName: site.alarmName,
+    tabUrlPattern: site.tabUrlPattern,
+    sites: config.sites,
+  };
+}
