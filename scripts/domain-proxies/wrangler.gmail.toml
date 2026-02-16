@@ -1,0 +1,16 @@
+# Gmail Darkly → Darkly Suite API proxy
+# Proxies gmaildarkly.com/api/* → darklysuite.com/api/* with product=gmail
+#
+# Deploy: npx wrangler deploy --config scripts/domain-proxies/wrangler.gmail.toml
+
+name = "proxy-gmaildarkly"
+main = "proxy-worker.js"
+compatibility_date = "2024-09-23"
+
+[vars]
+PRODUCT = "gmail"
+
+# Route: only intercept /api/* requests on gmaildarkly.com
+[[routes]]
+pattern = "gmaildarkly.com/api/*"
+zone_name = "gmaildarkly.com"

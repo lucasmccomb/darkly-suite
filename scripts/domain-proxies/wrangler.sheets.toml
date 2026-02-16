@@ -1,0 +1,16 @@
+# Sheets Darkly → Darkly Suite API proxy
+# Proxies sheetsdarkly.com/api/* → darklysuite.com/api/* with product=sheets
+#
+# Deploy: npx wrangler deploy --config scripts/domain-proxies/wrangler.sheets.toml
+
+name = "proxy-sheetsdarkly"
+main = "proxy-worker.js"
+compatibility_date = "2024-09-23"
+
+[vars]
+PRODUCT = "sheets"
+
+# Route: only intercept /api/* requests on sheetsdarkly.com
+[[routes]]
+pattern = "sheetsdarkly.com/api/*"
+zone_name = "sheetsdarkly.com"
