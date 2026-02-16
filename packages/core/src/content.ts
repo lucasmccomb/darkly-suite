@@ -1,10 +1,13 @@
 import type { ProductConfig, SitePlugin } from './config';
+import type React from 'react';
 import { ThemeEngine } from './theme/engine';
 import { SystemThemeDetector } from './theme/detector';
 import * as NightTint from './theme/night-tint';
 import { initTransitions } from './theme/transitions';
 import { createPreferencesManager } from './storage/preferences';
 import { createPaymentClient } from './payment/client';
+import { createSidebarPanel } from './inject/sidebar-icon';
+import { createSettingsContainer } from './inject/settings-panel';
 import type { BaseUserPreferences } from './storage/types';
 
 function isInHourRange(startHour: number, endHour: number): boolean {
@@ -140,14 +143,45 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
       });
     }
 
+    // Build the product-specific settings section from the site plugin
+    let productSection: React.ReactNode = undefined;
+    if (sitePlugin?.renderProductSection) {
+      productSection = sitePlugin.renderProductSection(undefined, () => {});
+    }
+
+    // Create a settings sidebar container (lazily appended on first open)
+    let sidebarContainer: HTMLElement | null = null;
+    let _sidebarCleanup: (() => void) | null = null;
+    let sidebarOpen = false;
+
+    function toggleSettingsSidebar(): void {
+      if (sidebarOpen && sidebarContainer) {
+        sidebarContainer.style.display = 'none';
+        sidebarOpen = false;
+        return;
+      }
+
+      if (!sidebarContainer) {
+        sidebarContainer = createSettingsContainer(config, 'sidebar');
+        document.body.appendChild(sidebarContainer);
+        _sidebarCleanup = createSidebarPanel(config, sidebarContainer, {
+          isPro: proStatus,
+          onUpgrade: () => payment.openPaymentPage(),
+          onClose: () => toggleSettingsSidebar(),
+          renderProductSection: productSection,
+        });
+      }
+
+      sidebarContainer.style.display = '';
+      sidebarOpen = true;
+    }
+
     // Site plugin handles its own UI injection (toolbar, sidebar, etc.)
     // The plugin receives proStatus so it can show paywall if needed.
     if (sitePlugin) {
       sitePlugin.injectToolbarButton({
         isPro: proStatus,
-        onAllSettings: () => {
-          // Site plugin manages its own settings panel
-        },
+        onAllSettings: () => toggleSettingsSidebar(),
         onUpgrade: () => payment.openPaymentPage(),
       });
     }
