@@ -1,0 +1,8 @@
+/* Darkly Suite -- Core Styles
+ * Import all shared CSS files.
+ * Build-time prefix transformation replaces 'darkly-' with product prefix.
+ */
+
+@import './themes.css';
+@import './settings-panel.css';
+@import './night-tint.css';

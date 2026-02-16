@@ -1,0 +1,30 @@
+// Inject modules -- UI injection into host pages
+
+export {
+  createToolbarDropdown,
+  getToolbarIcons,
+  wrapIconInCoin,
+  observeToolbarIcon,
+} from './toolbar-button';
+export type { ToolbarButtonContext } from './toolbar-button';
+
+export {
+  getSidebarIcons,
+  createSidebarPanel,
+  observeSidebarIcon,
+} from './sidebar-icon';
+export type { SidebarPanelOptions } from './sidebar-icon';
+
+export { createDomObserver } from './dom-observer';
+
+export {
+  createPanelManager,
+  createSettingsContainer,
+} from './settings-panel';
+export type { PanelState, PanelManager } from './settings-panel';
+
+export { registerKeyboardShortcut } from './keyboard-shortcuts';
+export type { KeyboardShortcutOptions } from './keyboard-shortcuts';
+
+export { showNotification } from './notifications';
+export type { NotificationType, NotificationOptions } from './notifications';

@@ -1,0 +1,16 @@
+/* Darkly Suite -- Night Tint (Blue Light Filter)
+ * Applies a warm red/amber color matrix via SVG feColorMatrix.
+ * The SVG filter and matrix values are managed by night-tint.ts.
+ * This CSS just references the filter and handles transitions.
+ *
+ * Unlike the old sepia/saturate approach, the color matrix directly
+ * reduces blue/green channels without boosting contrast or brightness.
+ *
+ * Build-time prefix transformation: At build time, a webpack loader
+ * replaces 'darkly-' with the product-specific prefix (e.g., 'gd-').
+ */
+
+[data-darkly-tint="on"] {
+  filter: url(#darkly-night-tint-filter);
+  transition: filter 300ms ease;
+}
