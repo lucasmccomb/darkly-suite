@@ -51,6 +51,9 @@ export { createBackgroundWorker } from './background/worker';
 // Content script factory
 export { createContentScript } from './content';
 
+// Conflict detection
+export { claimPage, releasePage, getPageOwner } from './conflict-detection';
+
 // Inject modules -- UI injection into host pages
 export {
   createToolbarDropdown,

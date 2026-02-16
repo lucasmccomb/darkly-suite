@@ -5,7 +5,7 @@
  * to prevent future conflicts, logs a message, and exits.
  */
 
-import { claimPage } from './conflict-detection';
+import { claimPage } from '@darkly/core';
 
 const CLAIM_ID = 'ds-drive';
 

@@ -6,7 +6,7 @@
  * but routes all storage through the suite's `ds_` namespace.
  */
 
-import { claimPage } from './conflict-detection';
+import { claimPage } from '@darkly/core';
 import { config } from './darkly.config';
 
 const SITE_ID = 'docs';
