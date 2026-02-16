@@ -1,6 +1,8 @@
 // Foundational types for the Darkly Suite monorepo.
 // Every module is parameterized by ProductConfig — this is the key to code sharing.
 
+import type React from 'react';
+
 export type SiteId = 'gmail' | 'sheets' | 'docs';
 export type ProductId = 'gmail' | 'sheets' | 'docs' | 'suite';
 export type Plan = 'monthly' | 'yearly' | 'lifetime';
