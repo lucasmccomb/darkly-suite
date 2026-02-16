@@ -69,7 +69,7 @@ export function createPaymentClient(config: ProductConfig): PaymentClient {
 
     try {
       const token = await getToken();
-      const response = await fetch(`${apiBase}/status/${token}`);
+      const response = await fetch(`${apiBase}/status/${token}?product=${config.productId}`);
       if (!response.ok) return false;
       const data = await response.json() as { paid: boolean; plan?: string };
       await setCachedProStatus(data.paid, data.plan);
@@ -99,7 +99,7 @@ export function createPaymentClient(config: ProductConfig): PaymentClient {
 
   async function openManageSubscription(): Promise<void> {
     const token = await getToken();
-    const url = `${apiBase}/portal?token=${token}`;
+    const url = `${apiBase}/portal?token=${token}&product=${config.productId}`;
     chrome.runtime.sendMessage({ type: 'openTab', url });
   }
 
