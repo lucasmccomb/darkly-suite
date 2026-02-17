@@ -14,12 +14,12 @@
     "@darkly/site-gmail": "workspace:*",
     "@darkly/site-sheets": "workspace:*",
     "@darkly/site-docs": "workspace:*",
+    "@inboxsdk/core": "^2.2.11",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "lucide-react": "^0.564.0"
   },
   "devDependencies": {
-    "@darkly/build-tools": "workspace:*",
     "@types/chrome": "^0.0.270",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",

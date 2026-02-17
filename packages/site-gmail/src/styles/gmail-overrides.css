@@ -5,16 +5,14 @@
  *
  * NOTE: These selectors use the `darkly` placeholder prefix. At build time,
  * the prefix loader transforms `darkly` to the actual product prefix
- * ('gd' for individual, 'ds' for bundle). The data attribute selectors below
- * use `data-gd-theme` because Darkly for Gmail always uses `gd-` regardless of
- * product. For the bundle, the webpack prefix loader will swap these.
+ * ('gd' for individual, 'ds' for bundle).
  */
 
 /* ============================================================
  * 1. Core Page-Wide Inversion
  * ============================================================ */
 
-[data-gd-theme="dark"] body {
+[data-darkly-theme="dark"] body {
   filter: invert(1) hue-rotate(180deg) !important;
   background-color: #fff !important;
 }
@@ -23,19 +21,19 @@
  * 2. Media Re-Inversion (restore original appearance)
  * ============================================================ */
 
-[data-gd-theme="dark"] img,
-[data-gd-theme="dark"] video,
-[data-gd-theme="dark"] canvas {
+[data-darkly-theme="dark"] img,
+[data-darkly-theme="dark"] video,
+[data-darkly-theme="dark"] canvas {
   filter: invert(1) hue-rotate(180deg) !important;
 }
 
-[data-gd-theme="dark"] svg image {
+[data-darkly-theme="dark"] svg image {
   filter: invert(1) hue-rotate(180deg) !important;
 }
 
 /* Gmail logo — keep inverted for visibility on dark bg */
-[data-gd-theme="dark"] img[alt="Gmail"],
-[data-gd-theme="dark"] img[src*="googlelogo"] {
+[data-darkly-theme="dark"] img[alt="Gmail"],
+[data-darkly-theme="dark"] img[src*="googlelogo"] {
   filter: none !important;
 }
 
@@ -43,7 +41,7 @@
  * 4. Extension UI Isolation
  * ============================================================ */
 
-[data-gd-theme="dark"] .gd-settings-container {
+[data-darkly-theme="dark"] .darkly-settings-container {
   filter: invert(1) hue-rotate(180deg) !important;
 }
 
@@ -60,21 +58,21 @@
 .inboxsdk__tooltip {
   box-shadow: 0 2px 12px 2px rgba(26, 115, 232, 0.25) !important;
 }
-[data-gd-theme="dark"] .inboxsdk__tooltip {
+[data-darkly-theme="dark"] .inboxsdk__tooltip {
   box-shadow: 0 4px 20px 4px rgba(10, 55, 189, 0.45) !important;
 }
 
 /* Re-invert app button container in dark mode */
-[data-gd-theme="dark"] .inboxsdk__appButton {
+[data-darkly-theme="dark"] .inboxsdk__appButton {
   filter: invert(1) hue-rotate(180deg) !important;
 }
 
 /* Prevent triple inversion of images inside re-inverted containers */
-[data-gd-theme="dark"] .gd-settings-container img {
+[data-darkly-theme="dark"] .darkly-settings-container img {
   filter: none !important;
 }
 
-[data-gd-theme="dark"] .inboxsdk__appButton img {
+[data-darkly-theme="dark"] .inboxsdk__appButton img {
   filter: none !important;
 }
 
@@ -88,13 +86,13 @@
  * 7. Scrollbar & Misc
  * ============================================================ */
 
-[data-gd-theme="dark"] [aria-label="Show details"] img {
+[data-darkly-theme="dark"] [aria-label="Show details"] img {
   filter: none !important;
 }
 
 /* Emoji re-inversion */
-[data-gd-theme="dark"] img[data-emoji],
-[data-gd-theme="dark"] img[goomoji],
-[data-gd-theme="dark"] img[alt*="emoji"] {
+[data-darkly-theme="dark"] img[data-emoji],
+[data-darkly-theme="dark"] img[goomoji],
+[data-darkly-theme="dark"] img[alt*="emoji"] {
   filter: invert(1) hue-rotate(180deg) !important;
 }

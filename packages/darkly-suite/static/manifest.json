@@ -18,16 +18,19 @@
     {
       "matches": ["https://mail.google.com/*"],
       "js": ["content-gmail.js"],
+      "css": ["styles/themes.css", "styles/gmail-overrides.css", "styles/night-tint.css", "styles/settings-panel.css"],
       "run_at": "document_end"
     },
     {
       "matches": ["https://docs.google.com/spreadsheets/*"],
       "js": ["content-sheets.js"],
+      "css": ["styles/themes.css", "styles/sheets-overrides.css", "styles/night-tint.css", "styles/settings-panel.css"],
       "run_at": "document_end"
     },
     {
       "matches": ["https://docs.google.com/document/*"],
       "js": ["content-docs.js"],
+      "css": ["styles/themes.css", "styles/docs-overrides.css", "styles/night-tint.css", "styles/settings-panel.css"],
       "run_at": "document_end"
     },
     {
@@ -38,7 +41,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["icons/*"],
+      "resources": ["pageWorld.js", "icons/*"],
       "matches": [
         "https://mail.google.com/*",
         "https://docs.google.com/*",

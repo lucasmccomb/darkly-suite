@@ -4,7 +4,7 @@
  * re-invert elements that should keep original colors (images, videos, SVG images).
  *
  * The Kix canvas (inside .kix-canvas-tile-content) is inverted along with the
- * body by default. When "Preserve Page Colors" is enabled (data-dd-page="preserve"),
+ * body by default. When "Preserve Page Colors" is enabled (data-darkly-page="preserve"),
  * the canvas tiles are re-inverted to keep document pages in their original
  * light appearance.
  */
@@ -13,7 +13,7 @@
  * 1. Core inversion -- dark mode filter on body
  * ============================================================ */
 
-[data-dd-theme="dark"] body {
+[data-darkly-theme="dark"] body {
   filter: invert(1) hue-rotate(180deg) !important;
   background-color: #fff !important;
 }
@@ -22,9 +22,9 @@
  * 2. Re-invert media elements -- keep images/video/SVG looking correct
  * ============================================================ */
 
-[data-dd-theme="dark"] img,
-[data-dd-theme="dark"] video,
-[data-dd-theme="dark"] svg image {
+[data-darkly-theme="dark"] img,
+[data-darkly-theme="dark"] video,
+[data-darkly-theme="dark"] svg image {
   filter: invert(1) hue-rotate(180deg) !important;
 }
 
@@ -32,12 +32,12 @@
  * 3. Preserve Page Colors toggle -- re-invert canvas to keep pages light
  * ============================================================ */
 
-[data-dd-theme="dark"][data-dd-page="preserve"] .kix-canvas-tile-content {
+[data-darkly-theme="dark"][data-darkly-page="preserve"] .kix-canvas-tile-content {
   filter: invert(1) hue-rotate(180deg) !important;
 }
 
 /* Page backgrounds in paginated mode */
-[data-dd-theme="dark"][data-dd-page="preserve"] .kix-page {
+[data-darkly-theme="dark"][data-darkly-page="preserve"] .kix-page {
   filter: invert(1) hue-rotate(180deg) !important;
 }
 
@@ -45,9 +45,9 @@
  * 4. Color picker swatch re-inversion -- show accurate colors
  * ============================================================ */
 
-[data-dd-theme="dark"] .goog-palette-colorswatch,
-[data-dd-theme="dark"] .docs-material-colorpalette-colorswatch,
-[data-dd-theme="dark"] .docs-material-colorpalette-cell {
+[data-darkly-theme="dark"] .goog-palette-colorswatch,
+[data-darkly-theme="dark"] .docs-material-colorpalette-colorswatch,
+[data-darkly-theme="dark"] .docs-material-colorpalette-cell {
   filter: invert(1) hue-rotate(180deg) !important;
 }
 
@@ -55,8 +55,8 @@
  * 5. Extension UI isolation -- our settings panel is already dark
  * ============================================================ */
 
-[data-dd-theme="dark"] .dd-settings-container,
-[data-dd-theme="dark"] .dd-mini-panel {
+[data-darkly-theme="dark"] .darkly-settings-container,
+[data-darkly-theme="dark"] .darkly-mini-panel {
   filter: invert(1) hue-rotate(180deg) !important;
 }
 
@@ -64,8 +64,8 @@
  * 6. Collaboration cursors -- keep original cursor colors
  * ============================================================ */
 
-[data-dd-theme="dark"] .kix-cursor,
-[data-dd-theme="dark"] .kix-cursor-name {
+[data-darkly-theme="dark"] .kix-cursor,
+[data-darkly-theme="dark"] .kix-cursor-name {
   filter: invert(1) hue-rotate(180deg) !important;
 }
 
@@ -73,8 +73,8 @@
  * 8. Comment and suggestion highlights
  * ============================================================ */
 
-[data-dd-theme="dark"] .docos-anchoreddocoview,
-[data-dd-theme="dark"] .docos-docoview-resolve-button-container {
+[data-darkly-theme="dark"] .docos-anchoreddocoview,
+[data-darkly-theme="dark"] .docos-docoview-resolve-button-container {
   filter: invert(1) hue-rotate(180deg) !important;
 }
 
@@ -83,15 +83,15 @@
  * Colors are PRE-INVERTED because the body filter inverts them.
  * ============================================================ */
 
-[data-dd-theme="dark"] ::-webkit-scrollbar {
+[data-darkly-theme="dark"] ::-webkit-scrollbar {
   background: #ffffff;
 }
 
-[data-dd-theme="dark"] ::-webkit-scrollbar-thumb {
+[data-darkly-theme="dark"] ::-webkit-scrollbar-thumb {
   background: #bbbbbb;
   border-radius: 4px;
 }
 
-[data-dd-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+[data-darkly-theme="dark"] ::-webkit-scrollbar-thumb:hover {
   background: #999999;
 }

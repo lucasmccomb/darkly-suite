@@ -11,7 +11,7 @@ import { gmailPlugin } from '@darkly/site-gmail';
 import { getSiteConfig } from './darkly.config';
 
 const siteConfig = getSiteConfig('gmail');
-const CLAIM_ID = `ds-${siteConfig.prefix}`;
+const CLAIM_ID = 'ds-gmail';
 
 async function init(): Promise<void> {
   if (!claimPage(CLAIM_ID)) return;
