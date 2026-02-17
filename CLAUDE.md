@@ -82,24 +82,41 @@ darkly-suite  ← @darkly/core + all three @darkly/site-* packages
 
 The bundle uses **per-site prefixes for theme CSS** (so override CSS works unchanged) and `ds-` only for UI components and storage keys.
 
-## CRITICAL: Always Use Dev Mode
+## CRITICAL: ALWAYS Use Dev Mode for Building Extensions
 
-**Default to dev mode for ALL local development.** Only use production builds when explicitly requested.
+**NEVER use `pnpm -r build` or `pnpm --filter {pkg} build` when the user needs to test in Chrome.** Production builds enable the Stripe paywall (`__DEV_MODE__=false`), which blocks all functionality behind payment. Always use the dev commands instead.
 
-`pnpm dev:{product}` enables `__DEV_MODE__=true` which:
-- Bypasses Stripe payment gate (`isPro()` returns `true`)
-- Runs in watch mode (auto-rebuilds on save)
-- Outputs unminified code for easier debugging
+### The rule is simple:
 
-**Start a dev server at the beginning of every session** for the extension being tested. Keep it running throughout the session.
+- **For testing in Chrome** → `pnpm dev:{product}` (ALWAYS)
+- **For pre-commit verification only** → `pnpm -r build` (only to check builds pass, then immediately re-run dev mode)
 
-### Why this is critical
+### Dev commands:
 
-`pnpm -r build` and `pnpm --filter {package} build` produce **production builds** with `__DEV_MODE__=false`. This enables the Stripe paywall, which fails locally ("Failed to fetch") and blocks all extension UI behind a "Subscribe Now" screen. **Never leave a production build in `dist/` when the user is testing locally.**
+```bash
+pnpm dev:gmail                  # Gmail Darkly (dev mode, paywall disabled)
+pnpm dev:sheets                 # Sheets Darkly (dev mode, paywall disabled)
+pnpm dev:docs                   # Docs Darkly (dev mode, paywall disabled)
+pnpm dev:suite                  # Darkly Suite bundle (dev mode, paywall disabled)
+```
+
+### What dev mode does:
+
+- Sets `__DEV_MODE__=true` → bypasses Stripe payment gate (`isPro()` returns `true`)
+- Runs webpack in watch mode (auto-rebuilds on file save)
+
+### WARNING: Production builds overwrite dev builds
+
+Running `pnpm -r build` overwrites `dist/` with production output (`__DEV_MODE__=false`). If you ran `pnpm -r build` for verification, you MUST re-run `pnpm dev:{product}` afterward before the user tests in Chrome. Otherwise the extension will hit the paywall.
+
+### After building:
+
+Tell the user to refresh the extension in `chrome://extensions` (or Cmd+R on the extensions page).
+>>>>>>> f15c33a (95: Add InboxSDK background import and update CLAUDE.md dev mode instructions)
 
 ## CRITICAL: Auto-Build After Code Changes
 
-**After making ANY code changes, automatically ensure `dist/` is up to date so the user can test in Chrome immediately.** Do not wait to be asked.
+**After making ANY code changes, automatically rebuild with dev mode so the user can test in Chrome immediately.** Do not wait to be asked.
 
 ### Decision flow:
 
@@ -117,15 +134,30 @@ The bundle uses **per-site prefixes for theme CSS** (so override CSS works uncha
 | `darkly-suite/` | `darkly-suite` | `pnpm dev:suite` |
 | `landing/` | Landing page only | `pnpm dev:landing` |
 
-2. **If a dev server is already running** (watch mode via `pnpm dev:{product}`): webpack watch handles rebuilds automatically — just tell the user to refresh the extension in `chrome://extensions`.
+2. **If a dev server is already running** (watch mode): webpack watch handles rebuilds automatically — just tell the user to refresh the extension.
 
-3. **If no dev server is running**: Start one with `pnpm dev:{product}` for the primary extension being tested.
+3. **If no dev server is running**: Start one with `pnpm dev:{product}`.
 
-4. **After build completes**: Tell the user to refresh the extension in `chrome://extensions` (or Cmd+R on the extensions page).
+4. **After pre-commit verification** (`pnpm -r build`): ALWAYS re-run `pnpm dev:{product}` to restore dev mode in `dist/`.
+
+5. **After build completes**: Tell the user to refresh the extension in `chrome://extensions` (or Cmd+R on the extensions page).
 
 ### Why this matters
 
-Chrome extensions load from `dist/`. Source changes have ZERO effect until the extension is rebuilt AND refreshed in Chrome. Forgetting to rebuild wastes the user's time testing stale code.
+Chrome extensions load from `dist/`. Production builds enable the paywall. The user CANNOT test functionality with a production build unless they have a paid license. Always leave `dist/` in dev mode.
+
+## CRITICAL: Do NOT Use Chrome Browser Automation for Debugging
+
+**Never use `mcp__claude-in-chrome__*` tools to debug extension issues.** The Chrome automation extension cannot interact with or inspect other Chrome extensions. It will not work for:
+- Reading console output from content scripts
+- Inspecting extension DOM elements
+- Checking extension state
+
+Instead, debug extension issues by:
+1. **Reading the source code** to trace the execution flow
+2. **Checking the build output** (dist/ directory) for missing files
+3. **Asking the user** to check the browser console and report errors
+4. **Analyzing conflict detection** — if standalone + bundle extensions are both installed, `claimPage()` blocks the second one
 
 ## CRITICAL: Verify Before Committing
 

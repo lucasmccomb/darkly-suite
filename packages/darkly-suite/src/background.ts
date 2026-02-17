@@ -11,6 +11,11 @@
  *   - ds_docs_preferences
  */
 
+// InboxSDK requires its background handler for pageWorld.js injection via
+// chrome.scripting.registerContentScripts. Without this import, Gmail's
+// InboxSDK integration silently fails with "Couldn't inject pageWorld.js".
+import '@inboxsdk/core/background.js';
+
 import { createBackgroundWorker } from '@darkly/core';
 import type { SiteId } from '@darkly/core';
 import { config, getSiteConfig, siteConfigs } from './darkly.config';
