@@ -88,6 +88,7 @@ export {
   MiniControlPanel,
   SettingsPanel,
   ThemeModeSelector,
+  ModeDetailPanel,
   DefaultConfig,
   ScheduleConfig as ScheduleConfigComponent,
   SunriseSunsetConfig as SunriseSunsetConfigComponent,

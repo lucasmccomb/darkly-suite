@@ -3,9 +3,7 @@ import type { BaseUserPreferences, ThemeMode } from '../storage/types';
 import { DEFAULT_PREFERENCES } from '../storage/types';
 import { createPreferencesManager } from '../storage/preferences';
 import { ThemeModeSelector } from './ThemeModeSelector';
-import { DefaultConfig } from './DefaultConfig';
-import { ScheduleConfig } from './ScheduleConfig';
-import { SunriseSunsetConfig } from './SunriseSunsetConfig';
+import { ModeDetailPanel } from './ModeDetailPanel';
 import { Paywall } from './Paywall';
 import { Toggle } from './shared/Toggle';
 import { Wordmark } from './shared/Wordmark';
@@ -89,28 +87,20 @@ export function SettingsPanel({ isPro = false, onUpgrade, onClose, renderProduct
       <div className={`${p}-settings-body`}>
         {prefs.enabled && (
           <>
-            <ThemeModeSelector
-              mode={prefs.mode}
-              onChange={(mode: ThemeMode) => updatePrefs({ mode })}
-            />
-
-            <SunriseSunsetConfig
-              active={prefs.mode === 'sunrise-sunset'}
-              config={prefs.sunriseSunset}
-              onChange={(sunriseSunset) => updatePrefs({ sunriseSunset })}
-            />
-
-            <ScheduleConfig
-              active={prefs.mode === 'schedule'}
-              schedule={prefs.schedule}
-              onScheduleChange={(schedule) => updatePrefs({ schedule })}
-            />
-
-            <DefaultConfig
-              active={prefs.mode === 'light'}
-            />
-
-            {renderProductSection}
+            <div className={`${p}-settings-left`}>
+              <ThemeModeSelector
+                mode={prefs.mode}
+                onChange={(mode: ThemeMode) => updatePrefs({ mode })}
+              />
+              {renderProductSection}
+            </div>
+            <div className={`${p}-settings-right`}>
+              <ModeDetailPanel
+                mode={prefs.mode}
+                prefs={prefs}
+                updatePrefs={updatePrefs}
+              />
+            </div>
           </>
         )}
       </div>

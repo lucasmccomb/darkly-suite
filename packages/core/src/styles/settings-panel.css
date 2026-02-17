@@ -84,7 +84,7 @@
 }
 
 .darkly-modal-container {
-  max-width: 400px;
+  max-width: 560px;
   width: calc(100% - 32px);
   max-height: 80vh;
   height: auto;
@@ -157,8 +157,23 @@
   min-height: 0;
   overflow-y: auto;
   display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.darkly-settings-left {
+  flex: 0 0 200px;
+  display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.darkly-settings-right {
+  flex: 1;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .darkly-settings-title {
@@ -488,21 +503,47 @@
   accent-color: var(--darkly-accent, #1a73e8);
 }
 
-.darkly-settings-mode-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
 .darkly-settings-mode-label {
   font-size: 13px;
   font-weight: 500;
   color: var(--darkly-text-primary, #202124);
 }
 
-.darkly-settings-mode-description {
-  font-size: 11px;
+.darkly-settings-mode-option-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
   color: var(--darkly-text-secondary, #5f6368);
+}
+
+.darkly-settings-mode-option--selected .darkly-settings-mode-option-icon {
+  color: var(--darkly-accent, #1a73e8);
+}
+
+/* ===== ModeDetailPanel (right column) ===== */
+
+.darkly-settings-mode-icon-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 100%;
+}
+
+.darkly-settings-mode-icon-display svg {
+  color: var(--darkly-text-secondary, #5f6368);
+}
+
+.darkly-settings-mode-icon-label {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--darkly-text-primary, #202124);
+}
+
+.darkly-settings-detail-config {
+  width: 100%;
+  padding: 8px;
 }
 
 /* ===== Action Buttons (shared component) ===== */
