@@ -51,7 +51,7 @@ export function DocsPage() {
       <Hero
         title="Refined dark mode<br />for Google Docs"
         subtitle="Canvas-aware dark mode that styles the document editor, comments, and toolbars for comfortable writing."
-        ctaText="Get Docs Darkly"
+        ctaText="Get Darkly for Docs"
         ctaLink="#pricing"
       />
       <Features

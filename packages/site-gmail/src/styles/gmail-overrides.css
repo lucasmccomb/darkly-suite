@@ -6,7 +6,7 @@
  * NOTE: These selectors use the `darkly` placeholder prefix. At build time,
  * the prefix loader transforms `darkly` to the actual product prefix
  * ('gd' for individual, 'ds' for bundle). The data attribute selectors below
- * use `data-gd-theme` because Gmail Darkly always uses `gd-` regardless of
+ * use `data-gd-theme` because Darkly for Gmail always uses `gd-` regardless of
  * product. For the bundle, the webpack prefix loader will swap these.
  */
 

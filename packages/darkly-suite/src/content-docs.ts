@@ -2,7 +2,7 @@
  * Darkly Suite — Docs content script
  *
  * Injects Docs dark mode using the `dd` CSS prefix (so Docs-specific
- * override CSS works identically to the standalone Docs Darkly extension)
+ * override CSS works identically to the standalone Darkly for Docs extension)
  * but routes all storage through the suite's `ds_docs_preferences` key.
  */
 

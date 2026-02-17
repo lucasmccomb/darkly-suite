@@ -23,7 +23,7 @@ export function GmailPage() {
       <Hero
         title="Intelligent dark mode<br />for Gmail"
         subtitle="Automatically switch your Gmail theme to an optimized dark mode based on your machine's OS, sunset/sunrise, or a custom schedule."
-        ctaText="Get Gmail Darkly"
+        ctaText="Get Darkly for Gmail"
         ctaLink="#pricing"
       />
       <Features

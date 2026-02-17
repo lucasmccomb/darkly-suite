@@ -28,7 +28,7 @@ export function waitForElement(
 
     const timer = setTimeout(() => {
       observer.disconnect();
-      reject(new Error(`[Sheets Darkly] Timed out waiting for ${selector}`));
+      reject(new Error(`[Darkly for Sheets] Timed out waiting for ${selector}`));
     }, timeout);
 
     const observer = new MutationObserver(() => {
@@ -100,8 +100,8 @@ function createToolbarButton(onClick: () => void, prefix: string): HTMLElement {
   const button = document.createElement('div');
   button.id = BUTTON_ID;
   button.setAttribute('role', 'button');
-  button.setAttribute('aria-label', 'Sheets Darkly settings');
-  button.setAttribute('data-tooltip', 'Sheets Darkly');
+  button.setAttribute('aria-label', 'Darkly for Sheets settings');
+  button.setAttribute('data-tooltip', 'Darkly for Sheets');
   button.setAttribute('tabindex', '0');
 
   Object.assign(button.style, {
@@ -159,7 +159,7 @@ function createToolbarButton(onClick: () => void, prefix: string): HTMLElement {
 }
 
 /**
- * Inject the Sheets Darkly toolbar button into the Google Sheets header.
+ * Inject the Darkly for Sheets toolbar button into the Google Sheets header.
  * Returns the button element, or null if injection failed.
  */
 export async function injectToolbarButton(
@@ -192,7 +192,7 @@ export async function injectToolbarButton(
 
     return button;
   } catch (err) {
-    console.warn('[Sheets Darkly] Could not inject toolbar button:', err);
+    console.warn('[Darkly for Sheets] Could not inject toolbar button:', err);
     return null;
   }
 }

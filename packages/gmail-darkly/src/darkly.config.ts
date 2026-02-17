@@ -2,7 +2,7 @@ import type { ProductConfig } from '@darkly/core';
 
 export const config: ProductConfig = {
   productId: 'gmail',
-  productName: 'Gmail Darkly',
+  productName: 'Darkly for Gmail',
   prefix: 'gd',
   storageKey: 'gd_preferences',
   tokenKey: 'gd_token',

@@ -1,4 +1,4 @@
-// Gmail Darkly — Content Script Entry Point
+// Darkly for Gmail — Content Script Entry Point
 // Thin wiring that imports createContentScript from @darkly/core
 // and the gmailPlugin from @darkly/site-gmail.
 // Includes conflict detection to prevent double-injection with the bundle.

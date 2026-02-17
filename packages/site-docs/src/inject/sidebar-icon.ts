@@ -56,8 +56,8 @@ function createSidebarButton(onClick: () => void, prefix: string): HTMLElement {
   const button = document.createElement('div');
   button.id = SIDEBAR_ICON_ID;
   button.setAttribute('role', 'tab');
-  button.setAttribute('aria-label', 'Docs Darkly settings');
-  button.setAttribute('data-tooltip', 'Docs Darkly');
+  button.setAttribute('aria-label', 'Darkly for Docs settings');
+  button.setAttribute('data-tooltip', 'Darkly for Docs');
   button.setAttribute('tabindex', '0');
 
   Object.assign(button.style, {
@@ -121,7 +121,7 @@ export async function injectSidebarIcon(
     strip.appendChild(button);
     return button;
   } catch {
-    console.warn('[Docs Darkly] Companion strip not found — sidebar icon skipped');
+    console.warn('[Darkly for Docs] Companion strip not found — sidebar icon skipped');
     return null;
   }
 }

@@ -2,7 +2,7 @@
  * Darkly Suite — Sheets content script
  *
  * Injects Sheets dark mode using the `sd` CSS prefix (so Sheets-specific
- * override CSS works identically to the standalone Sheets Darkly extension)
+ * override CSS works identically to the standalone Darkly for Sheets extension)
  * but routes all storage through the suite's `ds_sheets_preferences` key.
  */
 

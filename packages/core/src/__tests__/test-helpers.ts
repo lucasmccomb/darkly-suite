@@ -8,7 +8,7 @@ import type { ProductConfig } from '../config';
 export function createMockConfig(overrides?: Partial<ProductConfig>): ProductConfig {
   return {
     productId: 'gmail',
-    productName: 'Gmail Darkly',
+    productName: 'Darkly for Gmail',
     prefix: 'gd',
     storageKey: 'gd_preferences',
     tokenKey: 'gd_token',

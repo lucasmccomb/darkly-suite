@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Unified pnpm workspace monorepo that builds **4 Chrome extensions** (Gmail Darkly, Sheets Darkly, Docs Darkly, Darkly Suite bundle) from shared code, served by a **unified landing page and payment backend** at **darklysuite.com**.
+Unified pnpm workspace monorepo that builds **4 Chrome extensions** (Darkly for Gmail, Darkly for Sheets, Darkly for Docs, Darkly Suite bundle) from shared code, served by a **unified landing page and payment backend** at **darklysuite.com**.
 
 ## Quick Start
 
@@ -58,9 +58,9 @@ Each extension has a unique CSS prefix to prevent conflicts:
 
 | Extension | Prefix | Example CSS class | Storage key |
 |-----------|--------|-------------------|-------------|
-| Gmail Darkly | `gd` | `.gd-settings-toggle` | `gd_preferences` |
-| Sheets Darkly | `sd` | `.sd-settings-toggle` | `sd_preferences` |
-| Docs Darkly | `dd` | `.dd-settings-toggle` | `dd_preferences` |
+| Darkly for Gmail | `gd` | `.gd-settings-toggle` | `gd_preferences` |
+| Darkly for Sheets | `sd` | `.sd-settings-toggle` | `sd_preferences` |
+| Darkly for Docs | `dd` | `.dd-settings-toggle` | `dd_preferences` |
 | Darkly Suite | `ds` | `.ds-settings-toggle` | `ds_gmail_preferences` |
 
 ### Three prefix resolution strategies:
