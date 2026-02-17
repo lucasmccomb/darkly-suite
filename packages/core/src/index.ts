@@ -67,6 +67,8 @@ export {
   createDomObserver,
   createPanelManager,
   createSettingsContainer,
+  createSettingsModal,
+  createMiniPanel,
   registerKeyboardShortcut,
   showNotification,
 } from './inject';
@@ -75,6 +77,7 @@ export type {
   SidebarPanelOptions,
   PanelState,
   PanelManager,
+  PanelHandle,
   KeyboardShortcutOptions,
   NotificationType,
   NotificationOptions,

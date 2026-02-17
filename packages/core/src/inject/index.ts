@@ -23,6 +23,12 @@ export {
 } from './settings-panel';
 export type { PanelState, PanelManager } from './settings-panel';
 
+export {
+  createSettingsModal,
+  createMiniPanel,
+} from './panels';
+export type { PanelHandle } from './panels';
+
 export { registerKeyboardShortcut } from './keyboard-shortcuts';
 export type { KeyboardShortcutOptions } from './keyboard-shortcuts';
 

@@ -10,7 +10,6 @@ import type {
   ThemeEngine,
   ProductConfig,
 } from '@darkly/core';
-import { createToolbarDropdown } from '@darkly/core';
 import { injectToolbarButton } from './inject/toolbar';
 import { injectSidebarIcon } from './inject/sidebar-icon';
 import { startGridObserver } from './inject/grid-observer';
@@ -18,70 +17,6 @@ import { registerKeyboardShortcuts } from './inject/keyboard-shortcuts';
 import { SheetsSettingsSection } from './ui/SheetsSettingsSection';
 
 let _prefix = 'sd';
-let _config: ProductConfig | null = null;
-
-// Toolbar dropdown state
-let _dropdownContainer: HTMLElement | null = null;
-let _dropdownCleanup: (() => void) | null = null;
-let _dropdownOpen = false;
-let _outsideClickHandler: ((e: MouseEvent) => void) | null = null;
-
-function closeDropdown(): void {
-  if (_dropdownContainer) _dropdownContainer.style.display = 'none';
-  _dropdownOpen = false;
-  if (_outsideClickHandler) {
-    document.removeEventListener('click', _outsideClickHandler);
-    _outsideClickHandler = null;
-  }
-}
-
-function toggleDropdown(anchor: HTMLElement, opts: ToolbarButtonOpts): void {
-  if (_dropdownOpen) {
-    closeDropdown();
-    return;
-  }
-
-  if (!_config) return;
-
-  if (!_dropdownContainer) {
-    _dropdownContainer = document.createElement('div');
-    _dropdownContainer.className = `${_prefix}-toolbar-dropdown-wrap`;
-    document.body.appendChild(_dropdownContainer);
-  }
-
-  // Position below the toolbar button
-  const rect = anchor.getBoundingClientRect();
-  Object.assign(_dropdownContainer.style, {
-    top: `${rect.bottom + 4}px`,
-    right: `${window.innerWidth - rect.right}px`,
-    display: '',
-  });
-
-  // Clean up previous render
-  if (_dropdownCleanup) _dropdownCleanup();
-
-  _dropdownCleanup = createToolbarDropdown(_config, _dropdownContainer, {
-    isPro: opts.isPro,
-    onAllSettings: opts.onAllSettings,
-    onUpgrade: opts.onUpgrade,
-    onClose: closeDropdown,
-  });
-
-  _dropdownOpen = true;
-
-  // Close on outside click (deferred to avoid catching the opening click)
-  _outsideClickHandler = (e: MouseEvent) => {
-    if (
-      _dropdownContainer && !_dropdownContainer.contains(e.target as Node) &&
-      !anchor.contains(e.target as Node)
-    ) {
-      closeDropdown();
-    }
-  };
-  setTimeout(() => {
-    if (_outsideClickHandler) document.addEventListener('click', _outsideClickHandler);
-  }, 0);
-}
 
 export const sheetsPlugin: SitePlugin = {
   siteId: 'sheets',
@@ -93,7 +28,6 @@ export const sheetsPlugin: SitePlugin = {
 
   async init(_engine: ThemeEngine, config: ProductConfig): Promise<void> {
     _prefix = config.prefix;
-    _config = config;
 
     // Apply saved per-site preferences (e.g., preserve grid attribute) on load
     const siteKey = `${_prefix}_site_sheets`;
@@ -105,12 +39,10 @@ export const sheetsPlugin: SitePlugin = {
   },
 
   async injectToolbarButton(opts: ToolbarButtonOpts): Promise<HTMLElement | null> {
-    let toolbarBtn: HTMLElement | null = null;
-    toolbarBtn = await injectToolbarButton(
-      { onClick: () => { if (toolbarBtn) toggleDropdown(toolbarBtn, opts); } },
+    return injectToolbarButton(
+      { onClick: opts.onAllSettings },
       _prefix,
     );
-    return toolbarBtn;
   },
 
   async injectSidebarIcon(opts: SidebarIconOpts): Promise<HTMLElement | null> {
