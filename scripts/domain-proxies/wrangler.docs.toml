@@ -1,4 +1,4 @@
-# Docs Darkly → Darkly Suite API proxy
+# Darkly for Docs → Darkly Suite API proxy
 # Proxies docsdarkly.com/api/* → darklysuite.com/api/* with product=docs
 #
 # Deploy: npx wrangler deploy --config scripts/domain-proxies/wrangler.docs.toml

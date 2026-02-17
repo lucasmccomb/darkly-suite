@@ -1,7 +1,7 @@
 /**
  * Conflict detection for Darkly extensions.
  *
- * When both a standalone extension (e.g. Gmail Darkly) and the bundle are
+ * When both a standalone extension (e.g. Darkly for Gmail) and the bundle are
  * installed, we use a `data-darkly-active` attribute on `<html>` to ensure
  * only one injects its theme. First extension to claim the page wins;
  * subsequent extensions log a warning and exit.

@@ -2,7 +2,7 @@ import type { ProductConfig } from '@darkly/core';
 
 export const config: ProductConfig = {
   productId: 'docs',
-  productName: 'Docs Darkly',
+  productName: 'Darkly for Docs',
   prefix: 'dd',
   storageKey: 'dd_preferences',
   tokenKey: 'dd_token',

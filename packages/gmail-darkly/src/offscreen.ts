@@ -1,4 +1,4 @@
-// Gmail Darkly — Offscreen Document
+// Darkly for Gmail — Offscreen Document
 // Provides geolocation access for the background service worker.
 // Service workers cannot use navigator.geolocation directly.
 

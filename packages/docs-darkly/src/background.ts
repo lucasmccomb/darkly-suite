@@ -1,4 +1,4 @@
-// Docs Darkly — Background Service Worker
+// Darkly for Docs — Background Service Worker
 // Thin wiring that imports createBackgroundWorker from @darkly/core.
 
 import { createBackgroundWorker } from '@darkly/core';

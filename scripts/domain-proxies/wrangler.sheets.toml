@@ -1,4 +1,4 @@
-# Sheets Darkly → Darkly Suite API proxy
+# Darkly for Sheets → Darkly Suite API proxy
 # Proxies sheetsdarkly.com/api/* → darklysuite.com/api/* with product=sheets
 #
 # Deploy: npx wrangler deploy --config scripts/domain-proxies/wrangler.sheets.toml

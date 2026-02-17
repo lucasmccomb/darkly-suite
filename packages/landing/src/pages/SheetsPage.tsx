@@ -51,7 +51,7 @@ export function SheetsPage() {
       <Hero
         title="Comfortable dark mode<br />for Google Sheets"
         subtitle="Grid-aware dark mode that styles cells, headers, and the formula bar without affecting your spreadsheet data."
-        ctaText="Get Sheets Darkly"
+        ctaText="Get Darkly for Sheets"
         ctaLink="#pricing"
       />
       <Features

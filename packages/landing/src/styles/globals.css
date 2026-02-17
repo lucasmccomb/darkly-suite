@@ -211,6 +211,23 @@ img {
   background: var(--color-surface);
   color: var(--color-text);
   border-color: var(--color-text-secondary);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--color-accent);
+  border: 1px solid var(--color-border);
+}
+
+.btn-outline:hover {
+  background: rgba(138, 180, 248, 0.08);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 0.8rem;
   transform: translateY(-1px);
 }
 
@@ -716,6 +733,173 @@ img {
   justify-content: center;
 }
 
+/* ===== Pricing Rows ===== */
+
+.pricing-row {
+  margin-bottom: 56px;
+}
+
+.pricing-row-head {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.pricing-row-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+.pricing-row-desc {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+/* ===== Single-App Icon Row ===== */
+
+.pricing-app-icons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.pricing-app-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-bg);
+  border: 2px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+}
+
+.pricing-app-icons--has-selection .pricing-app-icon-wrap {
+  opacity: 0.3;
+}
+
+.pricing-app-icons--has-selection .pricing-app-icon--active {
+  opacity: 1;
+  border-color: #f5c842;
+  box-shadow: 0 0 12px rgba(245, 200, 66, 0.4), 0 0 24px rgba(245, 200, 66, 0.15);
+}
+
+.pricing-icon-or {
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  text-transform: lowercase;
+}
+
+.pricing-choose-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ===== App Select Dropdown ===== */
+
+.pricing-app-select {
+  width: 100%;
+  padding: 10px 36px 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-alt);
+  color: var(--color-text);
+  font-family: var(--font-family);
+  font-size: 0.875rem;
+  cursor: pointer;
+  appearance: none;
+  color-scheme: dark;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239aa0a6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  transition: border-color var(--transition);
+}
+
+.pricing-app-select:hover {
+  border-color: var(--color-text-secondary);
+}
+
+.pricing-app-select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.pricing-app-select option {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+/* ===== App Select with Icon Overlay ===== */
+
+.pricing-app-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.pricing-app-select-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.pricing-app-select--has-icon {
+  padding-left: 36px;
+}
+
+/* ===== Disabled Button State ===== */
+
+.btn-disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* ===== Suite Card Accent ===== */
+
+.pricing-card--suite {
+  border-color: rgba(245, 200, 66, 0.2);
+}
+
+.pricing-card--suite.pricing-card--highlighted {
+  border-color: rgba(245, 200, 66, 0.6);
+  box-shadow: 0 0 60px rgba(245, 200, 66, 0.06);
+}
+
+/* ===== Suite Icon Cluster ===== */
+
+.pricing-suite-icons {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 24px;
+  border-radius: 100px;
+  border: 2px solid #f5c842;
+  box-shadow: 0 0 12px rgba(245, 200, 66, 0.35), 0 0 28px rgba(245, 200, 66, 0.12);
+}
+
+.pricing-suite-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+/* ProductCard as button reset */
+button.product-card {
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
 .pricing-features-section {
   max-width: 640px;
   margin: 0 auto;
@@ -754,6 +938,76 @@ img {
 
 .pricing-features-list li .check {
   color: var(--color-success);
+}
+
+/* ===== Comparison Table ===== */
+
+.pricing-comparison {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.pricing-comparison-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 24px;
+  color: var(--color-text);
+}
+
+.pricing-comparison-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pricing-comparison table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.pricing-comparison thead th {
+  padding: 14px 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-align: center;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.pricing-comparison thead th:first-child {
+  text-align: left;
+}
+
+.pricing-comparison thead th span {
+  display: block;
+  margin-top: 4px;
+}
+
+.pricing-comparison tbody td {
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  text-align: center;
+  border-bottom: 1px solid rgba(42, 42, 69, 0.5);
+}
+
+.pricing-comparison tbody td:first-child {
+  text-align: left;
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.pricing-comparison .check {
+  color: var(--color-success);
+}
+
+.pricing-comparison-dash {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.pricing-comparison-suite-col {
+  background: rgba(245, 200, 66, 0.04);
 }
 
 /* ============================================

@@ -21,7 +21,7 @@ export function PrivacyPage() {
             <p>
               Darkly Suite (&ldquo;Darkly&rdquo;, &ldquo;we&rdquo;, &ldquo;our&rdquo;) is a family of Chrome extensions that apply dark mode
               themes to Google apps (Gmail, Sheets, Docs). We are committed to protecting your privacy.
-              This policy covers all Darkly products: Gmail Darkly, Sheets Darkly, Docs Darkly, and the
+              This policy covers all Darkly products: Darkly for Gmail, Darkly for Sheets, Darkly for Docs, and the
               Darkly Suite bundle.
             </p>
             <p>

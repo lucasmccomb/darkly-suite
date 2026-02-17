@@ -2,7 +2,7 @@
  * Darkly Suite — Gmail content script
  *
  * Injects Gmail dark mode using the `gd` CSS prefix (so Gmail-specific
- * override CSS works identically to the standalone Gmail Darkly extension)
+ * override CSS works identically to the standalone Darkly for Gmail extension)
  * but routes all storage through the suite's `ds_gmail_preferences` key.
  */
 

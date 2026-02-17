@@ -28,7 +28,7 @@ export function waitForElement(
 
     const timer = setTimeout(() => {
       observer.disconnect();
-      reject(new Error(`[Docs Darkly] Timed out waiting for ${selector}`));
+      reject(new Error(`[Darkly for Docs] Timed out waiting for ${selector}`));
     }, timeout);
 
     const observer = new MutationObserver(() => {
@@ -100,8 +100,8 @@ function createToolbarButton(onClick: () => void, prefix: string): HTMLElement {
   const button = document.createElement('div');
   button.id = BUTTON_ID;
   button.setAttribute('role', 'button');
-  button.setAttribute('aria-label', 'Docs Darkly settings');
-  button.setAttribute('data-tooltip', 'Docs Darkly');
+  button.setAttribute('aria-label', 'Darkly for Docs settings');
+  button.setAttribute('data-tooltip', 'Darkly for Docs');
   button.setAttribute('tabindex', '0');
 
   Object.assign(button.style, {
@@ -159,7 +159,7 @@ function createToolbarButton(onClick: () => void, prefix: string): HTMLElement {
 }
 
 /**
- * Inject the Docs Darkly toolbar button into the Google Docs header.
+ * Inject the Darkly for Docs toolbar button into the Google Docs header.
  * Returns the button element, or null if injection failed.
  */
 export async function injectToolbarButton(
@@ -192,7 +192,7 @@ export async function injectToolbarButton(
 
     return button;
   } catch (err) {
-    console.warn('[Docs Darkly] Could not inject toolbar button:', err);
+    console.warn('[Darkly for Docs] Could not inject toolbar button:', err);
     return null;
   }
 }

@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react'
 import { Nav } from '../components/Nav.tsx'
 import { Hero } from '../components/Hero.tsx'
 import { Features } from '../components/Features.tsx'
@@ -7,7 +8,16 @@ import { FAQ } from '../components/FAQ.tsx'
 import { Footer } from '../components/Footer.tsx'
 import { Mail, Table2, FileText, Package } from 'lucide-react'
 
+type AppId = 'gmail' | 'sheets' | 'docs'
+
 export function HomePage() {
+  const [selectedApp, setSelectedApp] = useState<AppId | null>(null)
+
+  const selectAndScroll = useCallback((app: AppId) => {
+    setSelectedApp(app)
+    document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })
+  }, [])
+
   return (
     <>
       <Nav />
@@ -28,30 +38,33 @@ export function HomePage() {
           </div>
           <div className="products-grid">
             <ProductCard
-              name="Gmail Darkly"
+              name="Darkly for Gmail"
               description="Dark mode for Gmail with intelligent scheduling and OS theme sync."
               icon={<Mail size={28} color="#8ab4f8" strokeWidth={1.8} />}
               link="/gmail"
               price="$0.99/mo"
+              onClick={() => selectAndScroll('gmail')}
             />
             <ProductCard
-              name="Sheets Darkly"
+              name="Darkly for Sheets"
               description="Dark mode for Google Sheets with cell grid awareness and formula bar styling."
               icon={<Table2 size={28} color="#81c995" strokeWidth={1.8} />}
               link="/sheets"
               price="$0.99/mo"
+              onClick={() => selectAndScroll('sheets')}
             />
             <ProductCard
-              name="Docs Darkly"
+              name="Darkly for Docs"
               description="Dark mode for Google Docs with canvas rendering and document styling."
               icon={<FileText size={28} color="#f28b82" strokeWidth={1.8} />}
               link="/docs"
               price="$0.99/mo"
+              onClick={() => selectAndScroll('docs')}
             />
             <ProductCard
               name="Darkly Suite"
               description="All three apps in one bundle. One license, one price, full coverage."
-              icon={<Package size={28} color="#a29bfe" strokeWidth={1.8} />}
+              icon={<Package size={28} color="#f5c842" strokeWidth={1.8} />}
               link="/suite"
               price="$2.99/mo"
             />
@@ -59,7 +72,11 @@ export function HomePage() {
         </div>
       </section>
       <Features />
-      <Pricing product="suite" />
+      <Pricing
+        product="suite"
+        selectedApp={selectedApp}
+        onAppChange={setSelectedApp}
+      />
       <FAQ />
       <Footer />
     </>

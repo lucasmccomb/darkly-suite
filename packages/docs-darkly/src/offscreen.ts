@@ -1,4 +1,4 @@
-// Docs Darkly — Offscreen Document
+// Darkly for Docs — Offscreen Document
 // Provides geolocation access for the background service worker.
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
@@ -11,7 +11,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         });
       },
       (error) => {
-        console.warn('[Docs Darkly] Geolocation error:', error.message);
+        console.warn('[Darkly for Docs] Geolocation error:', error.message);
         sendResponse({ error: error.message });
       },
       {

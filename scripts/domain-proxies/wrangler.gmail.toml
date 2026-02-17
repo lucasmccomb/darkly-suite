@@ -1,4 +1,4 @@
-# Gmail Darkly → Darkly Suite API proxy
+# Darkly for Gmail → Darkly Suite API proxy
 # Proxies gmaildarkly.com/api/* → darklysuite.com/api/* with product=gmail
 #
 # Deploy: npx wrangler deploy --config scripts/domain-proxies/wrangler.gmail.toml
