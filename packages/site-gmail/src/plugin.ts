@@ -9,7 +9,8 @@ import type {
   ThemeEngine,
   ProductConfig,
 } from '@darkly/core';
-import { MiniControlPanel, SettingsPanel } from '@darkly/core';
+import { MiniControlPanel } from '@darkly/core';
+import { GmailSettingsPanel } from './ui/GmailSettingsPanel';
 import { getSDK } from './sdk/init';
 import { registerToolbarButton } from './sdk/toolbar-button';
 import { registerKeyboardShortcut } from './sdk/keyboard-shortcut';
@@ -44,7 +45,7 @@ export const gmailPlugin: SitePlugin = {
         sdk,
         { isPro: opts.isPro, onUpgrade: opts.onUpgrade },
         _config,
-        SettingsPanel,
+        GmailSettingsPanel,
       );
 
       // Register toolbar dropdown button

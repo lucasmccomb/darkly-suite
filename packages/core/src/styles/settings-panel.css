@@ -161,6 +161,12 @@
   gap: 20px;
 }
 
+/* Sidebar layout (Gmail) — single column */
+.darkly-sidebar .darkly-settings-body {
+  flex-direction: column;
+  gap: 16px;
+}
+
 .darkly-settings-left {
   flex: 0 0 200px;
   display: flex;
