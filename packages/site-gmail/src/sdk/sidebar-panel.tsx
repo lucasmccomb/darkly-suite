@@ -4,6 +4,8 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import type { InboxSDK } from '@inboxsdk/core';
+import type { ProductConfig } from '@darkly/core';
+import { DarklyProvider } from '@darkly/core';
 
 // V20 squircle logo — dark bg with brand mark.
 function sidebarIcon(variant: 'golden' | 'blue'): string {
@@ -68,7 +70,8 @@ interface SidebarPanelOptions {
 /**
  * Mount the Darkly settings panel in Gmail's sidebar using InboxSDK.
  *
- * `prefix` is the product prefix ('gd' or 'ds').
+ * `config` provides the product configuration for DarklyProvider
+ * context and CSS class name generation via `config.prefix`.
  * `SettingsPanel` is the React component to render inside the panel.
  *
  * @returns A function to open the panel, or null if mounting failed.
@@ -76,13 +79,14 @@ interface SidebarPanelOptions {
 export async function mountSettingsPanel(
   sdk: InboxSDK,
   options: SidebarPanelOptions,
-  prefix: string,
+  config: ProductConfig,
   SettingsPanel: React.FC<{
     isPro?: boolean;
     onUpgrade?: () => void;
     onClose: () => void;
   }>,
 ): Promise<(() => void) | null> {
+  const prefix = config.prefix;
   const container = document.createElement('div');
   container.className = `${prefix}-settings-container ${prefix}-sidebar`;
 
@@ -99,11 +103,13 @@ export async function mountSettingsPanel(
 
   const root = createRoot(container);
   root.render(
-    <SettingsPanel
-      isPro={options.isPro}
-      onUpgrade={options.onUpgrade}
-      onClose={() => panelView.close()}
-    />,
+    <DarklyProvider config={config}>
+      <SettingsPanel
+        isPro={options.isPro}
+        onUpgrade={options.onUpgrade}
+        onClose={() => panelView.close()}
+      />
+    </DarklyProvider>,
   );
 
   // Fix golden border corner gaps
