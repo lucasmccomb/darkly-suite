@@ -62,8 +62,20 @@
   flex-direction: column;
 }
 
+.darkly-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 320px;
+  height: 100vh;
+  z-index: 10000;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+  overflow-y: auto;
+}
+
 [data-darkly-theme="dark"] .darkly-sidebar {
   border: 1px solid #d4941c;
+  box-shadow: -2px 0 12px rgba(0, 0, 0, 0.4);
 }
 
 .darkly-settings-panel {
@@ -752,6 +764,13 @@
 
 [data-darkly-theme="dark"] .darkly-dropdown-panel {
   border: 1px solid #d4941c;
+}
+
+.darkly-toolbar-dropdown-wrap {
+  position: fixed;
+  z-index: 10001;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
 }
 
 .darkly-dropdown-loading {
