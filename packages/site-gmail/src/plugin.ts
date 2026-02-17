@@ -9,29 +9,13 @@ import type {
   ThemeEngine,
   ProductConfig,
 } from '@darkly/core';
+import { MiniControlPanel, SettingsPanel } from '@darkly/core';
 import { getSDK } from './sdk/init';
 import { registerToolbarButton } from './sdk/toolbar-button';
 import { registerKeyboardShortcut } from './sdk/keyboard-shortcut';
 import { mountSettingsPanel } from './sdk/sidebar-panel';
 
-// Minimal fallback components — the extension package provides real ones
-// via configureGmailPlugin(). These are used if no configuration is set.
-const FallbackMiniPanel: React.FC<{
-  isPro: boolean;
-  onAllSettings: () => void;
-  onUpgrade: () => void;
-  onClose: () => void;
-}> = () => null;
-
-const FallbackSettingsPanel: React.FC<{
-  isPro?: boolean;
-  onUpgrade?: () => void;
-  onClose: () => void;
-}> = () => null;
-
-let _prefix = 'gd';
-let _MiniControlPanel: typeof FallbackMiniPanel = FallbackMiniPanel;
-let _SettingsPanel: typeof FallbackSettingsPanel = FallbackSettingsPanel;
+let _config: ProductConfig | null = null;
 let _engine: ThemeEngine | null = null;
 let _openSettings: (() => void) | null = null;
 
@@ -45,11 +29,13 @@ export const gmailPlugin: SitePlugin = {
   overrideStyles: 'gmail-overrides.css',
 
   async init(engine: ThemeEngine, config: ProductConfig): Promise<void> {
-    _prefix = config.prefix;
+    _config = config;
     _engine = engine;
   },
 
   async injectToolbarButton(opts: ToolbarButtonOpts): Promise<HTMLElement | null> {
+    if (!_config) throw new Error('[Darkly/Gmail] Plugin not initialized — call init() first');
+
     try {
       const sdk = await getSDK();
 
@@ -57,8 +43,8 @@ export const gmailPlugin: SitePlugin = {
       _openSettings = await mountSettingsPanel(
         sdk,
         { isPro: opts.isPro, onUpgrade: opts.onUpgrade },
-        _prefix,
-        _SettingsPanel,
+        _config,
+        SettingsPanel,
       );
 
       // Register toolbar dropdown button
@@ -69,8 +55,8 @@ export const gmailPlugin: SitePlugin = {
           onAllSettings: () => _openSettings?.(),
           onUpgrade: opts.onUpgrade,
         },
-        _prefix,
-        _MiniControlPanel,
+        _config,
+        MiniControlPanel,
       );
 
       // Register keyboard shortcut
@@ -103,18 +89,3 @@ export const gmailPlugin: SitePlugin = {
   },
 };
 
-/**
- * Configure the Gmail plugin with custom React components.
- * Call this before createContentScript() to provide real UI components.
- */
-export function configureGmailPlugin(components: {
-  MiniControlPanel?: typeof FallbackMiniPanel;
-  SettingsPanel?: typeof FallbackSettingsPanel;
-}): void {
-  if (components.MiniControlPanel) {
-    _MiniControlPanel = components.MiniControlPanel;
-  }
-  if (components.SettingsPanel) {
-    _SettingsPanel = components.SettingsPanel;
-  }
-}

@@ -5,7 +5,8 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import type { InboxSDK } from '@inboxsdk/core';
-import type { ToolbarButtonOpts } from '@darkly/core';
+import type { ToolbarButtonOpts, ProductConfig } from '@darkly/core';
+import { DarklyProvider } from '@darkly/core';
 
 // V20 squircle brand mark — golden-on-black for dark, blue-on-white for light
 function brandIcon(variant: 'golden' | 'blue'): string {
@@ -55,15 +56,14 @@ function currentToolbarIcon(prefix: string): string {
 
 /**
  * Register the Darkly toolbar button with InboxSDK.
- * Returns the HTML element for the button (or null).
  *
- * The `prefix` param is the product prefix ('gd' or 'ds') used for
- * data attribute selectors and CSS class names.
+ * The `config` param provides the product configuration for DarklyProvider
+ * context and CSS class name generation via `config.prefix`.
  */
 export function registerToolbarButton(
   sdk: InboxSDK,
   options: ToolbarButtonOpts,
-  prefix: string,
+  config: ProductConfig,
   MiniControlPanel: React.FC<{
     isPro: boolean;
     onAllSettings: () => void;
@@ -71,6 +71,7 @@ export function registerToolbarButton(
     onClose: () => void;
   }>,
 ): void {
+  const prefix = config.prefix;
   sdk.Toolbars.addToolbarButtonForApp({
     title: 'Darkly',
     titleClass: `${prefix}-toolbar-title-hidden`,
@@ -97,18 +98,20 @@ export function registerToolbarButton(
 
       const root = createRoot(container);
       root.render(
-        <MiniControlPanel
-          isPro={options.isPro}
-          onAllSettings={() => {
-            dropdown.close();
-            options.onAllSettings();
-          }}
-          onUpgrade={() => {
-            dropdown.close();
-            options.onUpgrade();
-          }}
-          onClose={() => dropdown.close()}
-        />,
+        <DarklyProvider config={config}>
+          <MiniControlPanel
+            isPro={options.isPro}
+            onAllSettings={() => {
+              dropdown.close();
+              options.onAllSettings();
+            }}
+            onUpgrade={() => {
+              dropdown.close();
+              options.onUpgrade();
+            }}
+            onClose={() => dropdown.close()}
+          />
+        </DarklyProvider>,
       );
     },
   });
