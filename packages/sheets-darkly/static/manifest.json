@@ -12,7 +12,10 @@
     {
       "matches": ["https://docs.google.com/spreadsheets/*"],
       "css": [
-        "styles/sheets-overrides.css"
+        "styles/themes.css",
+        "styles/sheets-overrides.css",
+        "styles/night-tint.css",
+        "styles/settings-panel.css"
       ],
       "js": ["content.js"],
       "run_at": "document_end"

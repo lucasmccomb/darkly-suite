@@ -18,6 +18,9 @@ export interface ProductConfig {
   alarmName: string;
   tabUrlPattern: string;
   sites?: SiteId[];
+  /** When true, force `color-scheme: light` regardless of theme.
+   * Required for Docs to prevent Google's native dark mode from activating. */
+  forceColorSchemeLight?: boolean;
 }
 
 export interface ToolbarButtonOpts {
@@ -28,6 +31,12 @@ export interface ToolbarButtonOpts {
 
 export interface SidebarIconOpts {
   isPro: boolean;
+  onClick: () => void;
+}
+
+export interface KeyboardShortcutHandlers {
+  toggleDarkMode: () => void;
+  openSettings: () => void;
 }
 
 export interface SitePlugin {
@@ -35,8 +44,9 @@ export interface SitePlugin {
   tabUrlPattern: string;
   contentScriptMatches: string[];
   injectToolbarButton(opts: ToolbarButtonOpts): Promise<HTMLElement | null>;
-  injectSidebarIcon?(opts: SidebarIconOpts): void;
+  injectSidebarIcon?(opts: SidebarIconOpts): Promise<HTMLElement | null>;
   startDomObserver(onReinject: () => Promise<void>): void;
+  registerKeyboardShortcuts?(handlers: KeyboardShortcutHandlers): (() => void) | void;
   renderProductSection?(
     prefs: unknown,
     update: (p: unknown) => void

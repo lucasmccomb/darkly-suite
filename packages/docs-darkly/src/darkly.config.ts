@@ -10,4 +10,5 @@ export const config: ProductConfig = {
   apiBase: 'https://darklysuite.com/api',
   alarmName: 'dd-schedule-check',
   tabUrlPattern: 'https://docs.google.com/document/*',
+  forceColorSchemeLight: true,
 };

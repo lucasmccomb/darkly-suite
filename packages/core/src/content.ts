@@ -179,11 +179,34 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
     // Site plugin handles its own UI injection (toolbar, sidebar, etc.)
     // The plugin receives proStatus so it can show paywall if needed.
     if (sitePlugin) {
-      sitePlugin.injectToolbarButton({
+      const toolbarOpts = {
         isPro: proStatus,
         onAllSettings: () => toggleSettingsSidebar(),
         onUpgrade: () => payment.openPaymentPage(),
+      };
+
+      await sitePlugin.injectToolbarButton(toolbarOpts);
+
+      // Start DOM observer to re-inject toolbar when the host app rebuilds it
+      sitePlugin.startDomObserver(async () => {
+        await sitePlugin.injectToolbarButton(toolbarOpts);
       });
+
+      // Inject sidebar icon in companion app-switcher strip (Sheets/Docs)
+      if (sitePlugin.injectSidebarIcon) {
+        sitePlugin.injectSidebarIcon({
+          isPro: proStatus,
+          onClick: () => toggleSettingsSidebar(),
+        });
+      }
+
+      // Register keyboard shortcuts (Alt+Shift+D toggle, Alt+Shift+S settings)
+      if (sitePlugin.registerKeyboardShortcuts) {
+        sitePlugin.registerKeyboardShortcuts({
+          toggleDarkMode: () => engine.toggle(),
+          openSettings: () => toggleSettingsSidebar(),
+        });
+      }
     }
 
     // Listen for payment status changes

@@ -8,6 +8,7 @@ export type {
   ProductConfig,
   ToolbarButtonOpts,
   SidebarIconOpts,
+  KeyboardShortcutHandlers,
   SitePlugin,
 } from './config';
 

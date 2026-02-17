@@ -6,11 +6,14 @@ import type {
   SitePlugin,
   ToolbarButtonOpts,
   SidebarIconOpts,
+  KeyboardShortcutHandlers,
   ThemeEngine,
   ProductConfig,
 } from '@darkly/core';
 import { injectToolbarButton } from './inject/toolbar';
+import { injectSidebarIcon } from './inject/sidebar-icon';
 import { startGridObserver } from './inject/grid-observer';
+import { registerKeyboardShortcuts } from './inject/keyboard-shortcuts';
 import { SheetsSettingsSection } from './ui/SheetsSettingsSection';
 
 let _prefix = 'sd';
@@ -42,17 +45,21 @@ export const sheetsPlugin: SitePlugin = {
     );
   },
 
-  injectSidebarIcon(_opts: SidebarIconOpts): void {
-    // Sidebar icon injection is handled by the extension package's content script
-    // (sheets-darkly) which wires up the settings modal. The site package
-    // provides the inject/toolbar module; the extension package handles
-    // the full sidebar + settings panel wiring.
+  async injectSidebarIcon(opts: SidebarIconOpts): Promise<HTMLElement | null> {
+    return injectSidebarIcon(
+      { onClick: opts.onClick },
+      _prefix,
+    );
   },
 
   startDomObserver(onReinject: () => Promise<void>): void {
     startGridObserver(() => {
       onReinject();
     });
+  },
+
+  registerKeyboardShortcuts(handlers: KeyboardShortcutHandlers): () => void {
+    return registerKeyboardShortcuts(handlers);
   },
 
   renderProductSection(): React.ReactNode {
