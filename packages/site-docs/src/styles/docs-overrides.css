@@ -55,7 +55,8 @@
  * 5. Extension UI isolation -- our settings panel is already dark
  * ============================================================ */
 
-[data-dd-theme="dark"] .dd-settings-container {
+[data-dd-theme="dark"] .dd-settings-container,
+[data-dd-theme="dark"] .dd-mini-panel {
   filter: invert(1) hue-rotate(180deg) !important;
 }
 
