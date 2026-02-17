@@ -1,3 +1,4 @@
+export { ActionButton } from './ActionButton';
 export { Toggle } from './Toggle';
 export { Slider } from './Slider';
 export { TimeRangePicker } from './TimeRangePicker';

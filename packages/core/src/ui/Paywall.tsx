@@ -1,4 +1,5 @@
 import React, { useId } from 'react';
+import { ActionButton } from './shared/ActionButton';
 import { Wordmark } from './shared/Wordmark';
 import { X } from 'lucide-react';
 import { usePrefix } from '../context';
@@ -64,13 +65,9 @@ export function Paywall({ onSubscribe, onClose }: PaywallProps) {
           <div className={`${p}-paywall-plan ${p}-paywall-plan--highlight`}>$19.99/yr</div>
           <div className={`${p}-paywall-plan`}>$49.99 lifetime</div>
         </div>
-        <button
-          type="button"
-          className={`${p}-settings-button ${p}-paywall-button`}
-          onClick={onSubscribe}
-        >
+        <ActionButton fullWidth onClick={onSubscribe}>
           Subscribe Now
-        </button>
+        </ActionButton>
       </div>
     </div>
   );

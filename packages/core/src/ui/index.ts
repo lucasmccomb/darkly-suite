@@ -11,4 +11,4 @@ export { Paywall } from './Paywall';
 export { UpgradeBanner } from './UpgradeBanner';
 
 // Shared components
-export { Toggle, Slider, TimeRangePicker, CollapsibleSection, ProBadge, Wordmark } from './shared';
+export { ActionButton, Toggle, Slider, TimeRangePicker, CollapsibleSection, ProBadge, Wordmark } from './shared';
