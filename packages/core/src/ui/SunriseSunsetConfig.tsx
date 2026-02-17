@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import type { SunriseSunsetConfig as SunriseSunsetConfigType } from '../storage/types';
-import { CollapsibleSection } from './shared/CollapsibleSection';
 import { ActionButton } from './shared/ActionButton';
 import { usePrefix } from '../context';
 
 interface SunriseSunsetConfigProps {
-  active: boolean;
   config: SunriseSunsetConfigType;
   onChange: (config: SunriseSunsetConfigType) => void;
 }
@@ -16,22 +14,18 @@ function formatTime(isoString: string | null): string {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-export function SunriseSunsetConfig({ active, config, onChange }: SunriseSunsetConfigProps) {
+export function SunriseSunsetConfig({ config, onChange }: SunriseSunsetConfigProps) {
   const p = usePrefix();
   const [locationStatus, setLocationStatus] = useState<'idle' | 'requesting' | 'error'>('idle');
 
   const requestLocation = () => {
     setLocationStatus('requesting');
 
-    // Use the web Geolocation API directly. Since the content script
-    // runs on the host page, the browser shows a standard permission
-    // prompt attributed to that origin.
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
 
-        // Fetch sun times for this location, then save everything together
         chrome.runtime.sendMessage({ type: 'getSunTimes', lat, lng }, (response) => {
           onChange({
             ...config,
@@ -55,16 +49,17 @@ export function SunriseSunsetConfig({ active, config, onChange }: SunriseSunsetC
   const hasLocation = config.lat != null && config.lng != null;
 
   return (
-    <CollapsibleSection title="Sunrise / Sunset" active={active}>
+    <div className={`${p}-settings-subsection`}>
+      <h3 className={`${p}-settings-section-title`}>Sunrise / Sunset</h3>
       <p className={`${p}-settings-hint`}>
         Automatically switch themes based on local sunrise and sunset times.
       </p>
 
       {!hasLocation && (
-        <div className={`${p}-settings-subsection`}>
+        <div>
           <ActionButton
             onClick={requestLocation}
-            disabled={!active || locationStatus === 'requesting'}
+            disabled={locationStatus === 'requesting'}
           >
             {locationStatus === 'requesting' ? 'Requesting...' : 'Grant Location Access'}
           </ActionButton>
@@ -77,7 +72,7 @@ export function SunriseSunsetConfig({ active, config, onChange }: SunriseSunsetC
       )}
 
       {hasLocation && (
-        <div className={`${p}-settings-subsection`}>
+        <div>
           <div className={`${p}-settings-sun-times`}>
             <div className={`${p}-settings-sun-time`}>
               <span className={`${p}-settings-sun-time-label`}>Sunrise</span>
@@ -95,12 +90,11 @@ export function SunriseSunsetConfig({ active, config, onChange }: SunriseSunsetC
           <ActionButton
             variant="secondary"
             onClick={requestLocation}
-            disabled={!active}
           >
             Update Location
           </ActionButton>
         </div>
       )}
-    </CollapsibleSection>
+    </div>
   );
 }

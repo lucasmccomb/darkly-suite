@@ -117,7 +117,7 @@ export function createMiniPanel(
     if (container) return container;
 
     const div = document.createElement('div');
-    div.className = `${p}-mini-panel`;
+    div.className = `${p}-settings-container ${p}-mini-panel`;
     document.body.appendChild(div);
     container = div;
 

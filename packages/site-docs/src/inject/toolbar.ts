@@ -108,7 +108,6 @@ function createToolbarButton(onClick: () => void, prefix: string): HTMLElement {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    verticalAlign: 'middle',
     width: '30px',
     height: '30px',
     borderRadius: '4px',

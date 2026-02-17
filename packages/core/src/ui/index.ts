@@ -3,6 +3,7 @@
 export { MiniControlPanel } from './MiniControlPanel';
 export { SettingsPanel } from './SettingsPanel';
 export { ThemeModeSelector } from './ThemeModeSelector';
+export { ModeDetailPanel } from './ModeDetailPanel';
 export { DefaultConfig } from './DefaultConfig';
 export { ScheduleConfig } from './ScheduleConfig';
 export { SunriseSunsetConfig } from './SunriseSunsetConfig';

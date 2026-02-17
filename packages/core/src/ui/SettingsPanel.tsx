@@ -3,9 +3,7 @@ import type { BaseUserPreferences, ThemeMode } from '../storage/types';
 import { DEFAULT_PREFERENCES } from '../storage/types';
 import { createPreferencesManager } from '../storage/preferences';
 import { ThemeModeSelector } from './ThemeModeSelector';
-import { DefaultConfig } from './DefaultConfig';
-import { ScheduleConfig } from './ScheduleConfig';
-import { SunriseSunsetConfig } from './SunriseSunsetConfig';
+import { ModeDetailPanel } from './ModeDetailPanel';
 import { Paywall } from './Paywall';
 import { Toggle } from './shared/Toggle';
 import { Wordmark } from './shared/Wordmark';
@@ -86,44 +84,27 @@ export function SettingsPanel({ isPro = false, onUpgrade, onClose, renderProduct
         )}
       </div>
 
-      <div className={`${p}-settings-body`}>
-        {prefs.enabled && (
-          <>
+      {prefs.enabled && (
+        <div className={`${p}-settings-body`}>
+          <div className={`${p}-settings-left`}>
             <ThemeModeSelector
               mode={prefs.mode}
               onChange={(mode: ThemeMode) => updatePrefs({ mode })}
             />
-
-            <SunriseSunsetConfig
-              active={prefs.mode === 'sunrise-sunset'}
-              config={prefs.sunriseSunset}
-              onChange={(sunriseSunset) => updatePrefs({ sunriseSunset })}
-            />
-
-            <ScheduleConfig
-              active={prefs.mode === 'schedule'}
-              schedule={prefs.schedule}
-              onScheduleChange={(schedule) => updatePrefs({ schedule })}
-            />
-
-            <DefaultConfig
-              active={prefs.mode === 'light'}
-            />
-
             {renderProductSection}
-          </>
-        )}
-      </div>
+          </div>
+          <div className={`${p}-settings-right`}>
+            <ModeDetailPanel mode={prefs.mode} prefs={prefs} updatePrefs={updatePrefs} />
+          </div>
+        </div>
+      )}
 
       <div className={`${p}-settings-footer`}>
-        Need help?{' '}
         <a
-          href="https://darklysuite.com/support"
-          target="_blank"
-          rel="noopener noreferrer"
+          href="mailto:support@darklysuite.com"
           className={`${p}-settings-footer-link`}
         >
-          darklysuite.com/support
+          support@darklysuite.com
         </a>
       </div>
     </div>
