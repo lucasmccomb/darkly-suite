@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import type { BaseUserPreferences, ThemeMode, SunriseSunsetConfig } from '../storage/types';
 import { DEFAULT_PREFERENCES } from '../storage/types';
 import { createPreferencesManager } from '../storage/preferences';
+import { ActionButton } from './shared/ActionButton';
 import { Toggle } from './shared/Toggle';
 import { Wordmark } from './shared/Wordmark';
 import { usePrefix, useDarklyConfig } from '../context';
@@ -70,14 +71,15 @@ function CompactSunriseSunset({ config, onChange }: {
   if (!hasLocation) {
     return (
       <div className={`${p}-dropdown-section`}>
-        <button
-          type="button"
-          className={`${p}-dropdown-location-btn`}
+        <ActionButton
+          variant="ghost"
+          size="compact"
+          fullWidth
           onClick={requestLocation}
           disabled={locationStatus === 'requesting'}
         >
           {locationStatus === 'requesting' ? 'Requesting...' : 'Grant Location Access'}
-        </button>
+        </ActionButton>
         {locationStatus === 'error' && (
           <p className={`${p}-dropdown-error`}>Unable to get location.</p>
         )}
@@ -145,13 +147,9 @@ export function MiniControlPanel({ isPro, onAllSettings, onUpgrade, onClose }: M
           <p className={`${p}-dropdown-paywall-description`}>
             Dark mode with plans from $2.99/mo.
           </p>
-          <button
-            type="button"
-            className={`${p}-dropdown-paywall-button`}
-            onClick={onUpgrade}
-          >
+          <ActionButton size="compact" fullWidth onClick={onUpgrade}>
             Subscribe Now
-          </button>
+          </ActionButton>
         </div>
       </div>
     );

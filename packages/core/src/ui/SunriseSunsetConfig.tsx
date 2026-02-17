@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { SunriseSunsetConfig as SunriseSunsetConfigType } from '../storage/types';
 import { CollapsibleSection } from './shared/CollapsibleSection';
+import { ActionButton } from './shared/ActionButton';
 import { usePrefix } from '../context';
 
 interface SunriseSunsetConfigProps {
@@ -61,14 +62,12 @@ export function SunriseSunsetConfig({ active, config, onChange }: SunriseSunsetC
 
       {!hasLocation && (
         <div className={`${p}-settings-subsection`}>
-          <button
-            type="button"
-            className={`${p}-settings-button`}
+          <ActionButton
             onClick={requestLocation}
             disabled={!active || locationStatus === 'requesting'}
           >
             {locationStatus === 'requesting' ? 'Requesting...' : 'Grant Location Access'}
-          </button>
+          </ActionButton>
           {locationStatus === 'error' && (
             <p className={`${p}-settings-error`}>
               Unable to get location. Please enable location permissions.
@@ -93,14 +92,13 @@ export function SunriseSunsetConfig({ active, config, onChange }: SunriseSunsetC
               </span>
             </div>
           </div>
-          <button
-            type="button"
-            className={`${p}-settings-button ${p}-settings-button--secondary`}
+          <ActionButton
+            variant="secondary"
             onClick={requestLocation}
             disabled={!active}
           >
             Update Location
-          </button>
+          </ActionButton>
         </div>
       )}
     </CollapsibleSection>

@@ -446,13 +446,81 @@
   color: var(--darkly-text-secondary, #5f6368);
 }
 
-/* ===== Buttons ===== */
+/* ===== Action Buttons (shared component) ===== */
 
+.darkly-action-btn {
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 150ms ease, box-shadow 150ms ease;
+  border: none;
+  border-radius: 4px;
+}
+
+.darkly-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Primary — filled accent background, white text */
+.darkly-action-btn--primary {
+  padding: 8px 16px;
+  background: var(--darkly-action-bg, #1a73e8);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.darkly-action-btn--primary:hover:not(:disabled) {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Secondary — transparent, accent text, border */
+.darkly-action-btn--secondary {
+  padding: 8px 16px;
+  background: transparent;
+  color: var(--darkly-accent, #1a73e8);
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--darkly-border, #dadce0);
+}
+
+.darkly-action-btn--secondary:hover:not(:disabled) {
+  background: var(--darkly-bg-hover, #f1f3f4);
+}
+
+/* Ghost — transparent, text color, border */
+.darkly-action-btn--ghost {
+  padding: 8px 12px;
+  background: transparent;
+  color: var(--darkly-text-primary, #202124);
+  font-size: 12px;
+  font-weight: 400;
+  border: 1px solid var(--darkly-border, #dadce0);
+  border-radius: 6px;
+}
+
+.darkly-action-btn--ghost:hover:not(:disabled) {
+  background: var(--darkly-bg-hover, #f1f3f4);
+}
+
+/* Compact — smaller padding for dropdown use */
+.darkly-action-btn--compact {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* Full width */
+.darkly-action-btn--full {
+  width: 100%;
+  display: block;
+}
+
+/* Legacy aliases — point to new action-bg variable */
 .darkly-settings-button {
   padding: 8px 16px;
   border: none;
   border-radius: 4px;
-  background: var(--darkly-accent, #1a73e8);
+  background: var(--darkly-action-bg, #1a73e8);
   color: #fff;
   font-size: 13px;
   font-weight: 500;
@@ -648,7 +716,7 @@
   padding: 8px 16px;
   border: none;
   border-radius: 4px;
-  background: var(--darkly-accent, #1a73e8);
+  background: var(--darkly-action-bg, #1a73e8);
   color: #fff;
   font-size: 12px;
   font-weight: 600;

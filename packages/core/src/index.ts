@@ -91,6 +91,7 @@ export {
   NightTintConfig as NightTintConfigComponent,
   Paywall,
   UpgradeBanner,
+  ActionButton,
   Toggle,
   Slider,
   TimeRangePicker,
