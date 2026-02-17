@@ -1043,3 +1043,42 @@
 .darkly-settings-footer-link:hover {
   text-decoration: underline;
 }
+
+/* ===== 3D Coin Hover Effect for Toolbar Icons ===== */
+
+.darkly-coin-wrapper {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+  line-height: 0;
+}
+
+.darkly-coin-edge {
+  position: absolute;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #f5c842 0%, #d4941c 50%, #8b6914 100%);
+  opacity: 0;
+  transition: opacity 150ms ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.darkly-coin-face {
+  position: relative;
+  z-index: 1;
+  transition: transform 150ms ease;
+}
+
+.darkly-coin-wrapper:hover .darkly-coin-edge {
+  opacity: 1;
+}
+
+.darkly-coin-wrapper:hover .darkly-coin-face {
+  transform: translate(-1px, -1px);
+}
+
+/* Light mode: blue edge gradient */
+[data-darkly-theme="light"] .darkly-coin-edge,
+:root:not([data-darkly-theme]) .darkly-coin-edge {
+  background: linear-gradient(135deg, #4285f4 0%, #1a73e8 50%, #0d47a1 100%);
+}
