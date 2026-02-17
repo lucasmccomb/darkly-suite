@@ -5,6 +5,7 @@ import type {
   SitePlugin,
   ToolbarButtonOpts,
   SidebarIconOpts,
+  KeyboardShortcutHandlers,
   ThemeEngine,
   ProductConfig,
 } from '@darkly/core';
@@ -85,14 +86,20 @@ export const gmailPlugin: SitePlugin = {
     }
   },
 
-  injectSidebarIcon(_opts: SidebarIconOpts): void {
+  async injectSidebarIcon(_opts: SidebarIconOpts): Promise<HTMLElement | null> {
     // Sidebar panel is mounted in injectToolbarButton via InboxSDK.
     // Gmail uses InboxSDK sidebar, not custom DOM injection.
+    return null;
   },
 
   startDomObserver(_onReinject: () => Promise<void>): void {
     // InboxSDK handles DOM observation internally for Gmail.
     // No custom MutationObserver needed.
+  },
+
+  registerKeyboardShortcuts(_handlers: KeyboardShortcutHandlers): void {
+    // Gmail keyboard shortcuts are registered inside injectToolbarButton
+    // via InboxSDK's Keyboard API.
   },
 };
 

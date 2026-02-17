@@ -1,6 +1,18 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 
+const PREFIX = 'sd';
+
+// Transform generic 'darkly-' prefix in CSS to the product-specific prefix.
+// Matches the same replacements as build-tools/darkly-prefix-loader.js.
+function transformPrefix(content) {
+  return content
+    .toString()
+    .replace(/\.darkly-/g, `.${PREFIX}-`)
+    .replace(/--darkly-/g, `--${PREFIX}-`)
+    .replace(/data-darkly-/g, `data-${PREFIX}-`);
+}
+
 module.exports = {
   entry: {
     content: './src/content.ts',
@@ -47,6 +59,23 @@ module.exports = {
         {
           from: path.resolve(__dirname, '../site-sheets/src/styles'),
           to: 'styles',
+        },
+        // Shared core CSS files (themes, night-tint, settings-panel)
+        // with darkly- → sd- prefix transformation
+        {
+          from: path.resolve(__dirname, '../core/src/styles/themes.css'),
+          to: 'styles/themes.css',
+          transform: transformPrefix,
+        },
+        {
+          from: path.resolve(__dirname, '../core/src/styles/night-tint.css'),
+          to: 'styles/night-tint.css',
+          transform: transformPrefix,
+        },
+        {
+          from: path.resolve(__dirname, '../core/src/styles/settings-panel.css'),
+          to: 'styles/settings-panel.css',
+          transform: transformPrefix,
         },
         { from: 'src/offscreen.html', to: 'offscreen.html' },
       ],

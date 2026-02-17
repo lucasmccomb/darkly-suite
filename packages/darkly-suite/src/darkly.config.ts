@@ -68,5 +68,7 @@ export function getSiteConfig(siteId: SiteId): ProductConfig {
     alarmName: site.alarmName,
     tabUrlPattern: site.tabUrlPattern,
     sites: config.sites,
+    // Docs requires forced light color-scheme to prevent Google's native dark mode
+    forceColorSchemeLight: siteId === 'docs',
   };
 }

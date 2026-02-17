@@ -77,7 +77,10 @@ export class ThemeEngine {
 
   private applyThemeAttribute(theme: 'light' | 'dark'): void {
     document.documentElement.setAttribute(`data-${this.config.prefix}-theme`, theme);
-    document.documentElement.style.colorScheme = theme;
+    // Force color-scheme to 'light' when configured (e.g. Docs) to prevent
+    // Google's native dark mode from activating and conflicting with our approach.
+    document.documentElement.style.colorScheme =
+      this.config.forceColorSchemeLight ? 'light' : theme;
   }
 
   private applyPresetAttribute(name: PresetName): void {
