@@ -98,6 +98,47 @@ Then refresh the extension in `chrome://extensions`.
 - Bypasses Stripe payment gate (`isPro()` returns `true`)
 - Runs in watch mode (auto-rebuilds on save)
 
+## CRITICAL: Auto-Build After Code Changes
+
+**After making ANY code changes, automatically ensure `dist/` is up to date so the user can test in Chrome immediately.** Do not wait to be asked.
+
+### Decision flow:
+
+1. **Determine affected extension(s)** from the files changed:
+
+| Changed package | Affected extensions | Dev command |
+|-----------------|--------------------:|-------------|
+| `core/` | ALL extensions | `pnpm dev:gmail` (or whichever the user is testing) |
+| `site-gmail/` | `gmail-darkly`, `darkly-suite` | `pnpm dev:gmail` |
+| `site-sheets/` | `sheets-darkly`, `darkly-suite` | `pnpm dev:sheets` |
+| `site-docs/` | `docs-darkly`, `darkly-suite` | `pnpm dev:docs` |
+| `gmail-darkly/` | `gmail-darkly` | `pnpm dev:gmail` |
+| `sheets-darkly/` | `sheets-darkly` | `pnpm dev:sheets` |
+| `docs-darkly/` | `docs-darkly` | `pnpm dev:docs` |
+| `darkly-suite/` | `darkly-suite` | `pnpm dev:suite` |
+| `landing/` | Landing page only | `pnpm dev:landing` |
+
+2. **If a dev server is already running** (watch mode via `pnpm dev:{product}`): webpack watch handles rebuilds automatically — just tell the user to refresh the extension in `chrome://extensions`.
+
+3. **If no dev server is running**: Start one with `pnpm dev:{product}` for the primary extension being tested. Dev mode sets `__DEV_MODE__=true` which bypasses the Stripe payment gate.
+
+4. **If the user only needs a one-time build** (not watch mode): Run `pnpm --filter {package} build` for the affected extension(s).
+
+5. **After build completes**: Tell the user to refresh the extension in `chrome://extensions` (or Cmd+R on the extensions page).
+
+### Why this matters
+
+Chrome extensions load from `dist/`. Source changes have ZERO effect until the extension is rebuilt AND refreshed in Chrome. Forgetting to rebuild wastes the user's time testing stale code.
+
+## CRITICAL: Verify Before Committing
+
+Always run the full verification suite before committing:
+```bash
+pnpm -r lint && pnpm -r type-check && pnpm -r test && pnpm -r build
+```
+
+Fix any errors immediately. Never commit code that doesn't pass all checks.
+
 ## ThemeEngine Save Rules
 
 - `engine.apply()` — visual only, NEVER saves to preferences
