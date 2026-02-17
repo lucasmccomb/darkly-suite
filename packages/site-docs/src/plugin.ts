@@ -1,7 +1,6 @@
 // @darkly/site-docs — SitePlugin implementation for Google Docs
 // Custom DOM injection for toolbar, sidebar, and canvas observation.
 
-import React from 'react';
 import type {
   SitePlugin,
   ToolbarButtonOpts,
@@ -19,7 +18,6 @@ import {
   KIX_PAGE_SELECTOR,
   KIX_PAGELESS_CLASS,
 } from './inject/dom-selectors';
-import { DocsSettingsSection } from './ui/DocsSettingsSection';
 
 let _prefix = 'dd';
 let _engine: ThemeEngine | null = null;
@@ -47,14 +45,6 @@ export const docsPlugin: SitePlugin = {
 
     // Detect pageless mode after engine init
     detectPagelessMode();
-
-    // Apply saved per-site preferences (e.g., preserve page attribute) on load
-    const siteKey = `${_prefix}_site_docs`;
-    const result = await chrome.storage.sync.get(siteKey);
-    const stored = result[siteKey];
-    if (stored?.preservePageColors) {
-      document.documentElement.setAttribute(`data-${_prefix}-page`, 'preserve');
-    }
   },
 
   async injectToolbarButton(opts: ToolbarButtonOpts): Promise<HTMLElement | null> {
@@ -79,9 +69,5 @@ export const docsPlugin: SitePlugin = {
 
   registerKeyboardShortcuts(handlers: KeyboardShortcutHandlers): () => void {
     return registerKeyboardShortcuts(handlers);
-  },
-
-  renderProductSection(): React.ReactNode {
-    return React.createElement(DocsSettingsSection);
   },
 };
