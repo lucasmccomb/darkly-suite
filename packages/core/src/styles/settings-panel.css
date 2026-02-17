@@ -84,7 +84,7 @@
 }
 
 .darkly-modal-container {
-  max-width: 400px;
+  max-width: 560px;
   width: calc(100% - 32px);
   max-height: 80vh;
   height: auto;
@@ -157,8 +157,23 @@
   min-height: 0;
   overflow-y: auto;
   display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.darkly-settings-left {
+  flex: 0 0 200px;
+  display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.darkly-settings-right {
+  flex: 1;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .darkly-settings-title {
@@ -488,21 +503,47 @@
   accent-color: var(--darkly-accent, #1a73e8);
 }
 
-.darkly-settings-mode-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
 .darkly-settings-mode-label {
   font-size: 13px;
   font-weight: 500;
   color: var(--darkly-text-primary, #202124);
 }
 
-.darkly-settings-mode-description {
-  font-size: 11px;
+.darkly-settings-mode-option-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
   color: var(--darkly-text-secondary, #5f6368);
+}
+
+.darkly-settings-mode-option--selected .darkly-settings-mode-option-icon {
+  color: var(--darkly-accent, #1a73e8);
+}
+
+/* ===== ModeDetailPanel (right column) ===== */
+
+.darkly-settings-mode-icon-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 100%;
+}
+
+.darkly-settings-mode-icon-display svg {
+  color: var(--darkly-text-secondary, #5f6368);
+}
+
+.darkly-settings-mode-icon-label {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--darkly-text-primary, #202124);
+}
+
+.darkly-settings-detail-config {
+  width: 100%;
+  padding: 8px;
 }
 
 /* ===== Action Buttons (shared component) ===== */
@@ -1001,4 +1042,43 @@
 
 .darkly-settings-footer-link:hover {
   text-decoration: underline;
+}
+
+/* ===== 3D Coin Hover Effect for Toolbar Icons ===== */
+
+.darkly-coin-wrapper {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+  line-height: 0;
+}
+
+.darkly-coin-edge {
+  position: absolute;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #f5c842 0%, #d4941c 50%, #8b6914 100%);
+  opacity: 0;
+  transition: opacity 150ms ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.darkly-coin-face {
+  position: relative;
+  z-index: 1;
+  transition: transform 150ms ease;
+}
+
+.darkly-coin-wrapper:hover .darkly-coin-edge {
+  opacity: 1;
+}
+
+.darkly-coin-wrapper:hover .darkly-coin-face {
+  transform: translate(-1px, -1px);
+}
+
+/* Light mode: blue edge gradient */
+[data-darkly-theme="light"] .darkly-coin-edge,
+:root:not([data-darkly-theme]) .darkly-coin-edge {
+  background: linear-gradient(135deg, #4285f4 0%, #1a73e8 50%, #0d47a1 100%);
 }

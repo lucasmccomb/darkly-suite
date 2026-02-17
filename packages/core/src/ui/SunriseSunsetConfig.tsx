@@ -8,6 +8,8 @@ interface SunriseSunsetConfigProps {
   active: boolean;
   config: SunriseSunsetConfigType;
   onChange: (config: SunriseSunsetConfigType) => void;
+  /** When true, render without CollapsibleSection wrapper (for ModeDetailPanel) */
+  inline?: boolean;
 }
 
 function formatTime(isoString: string | null): string {
@@ -16,7 +18,7 @@ function formatTime(isoString: string | null): string {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-export function SunriseSunsetConfig({ active, config, onChange }: SunriseSunsetConfigProps) {
+export function SunriseSunsetConfig({ active, config, onChange, inline }: SunriseSunsetConfigProps) {
   const p = usePrefix();
   const [locationStatus, setLocationStatus] = useState<'idle' | 'requesting' | 'error'>('idle');
 
@@ -54,8 +56,8 @@ export function SunriseSunsetConfig({ active, config, onChange }: SunriseSunsetC
 
   const hasLocation = config.lat != null && config.lng != null;
 
-  return (
-    <CollapsibleSection title="Sunrise / Sunset" active={active}>
+  const content = (
+    <>
       <p className={`${p}-settings-hint`}>
         Automatically switch themes based on local sunrise and sunset times.
       </p>
@@ -101,6 +103,14 @@ export function SunriseSunsetConfig({ active, config, onChange }: SunriseSunsetC
           </ActionButton>
         </div>
       )}
+    </>
+  );
+
+  if (inline) return content;
+
+  return (
+    <CollapsibleSection title="Sunrise / Sunset" active={active}>
+      {content}
     </CollapsibleSection>
   );
 }
