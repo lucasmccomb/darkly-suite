@@ -11,7 +11,7 @@ import { sheetsPlugin } from '@darkly/site-sheets';
 import { getSiteConfig } from './darkly.config';
 
 const siteConfig = getSiteConfig('sheets');
-const CLAIM_ID = `ds-${siteConfig.prefix}`;
+const CLAIM_ID = 'ds-sheets';
 
 async function init(): Promise<void> {
   if (!claimPage(CLAIM_ID)) return;

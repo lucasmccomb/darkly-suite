@@ -56,9 +56,11 @@ module.exports = {
       patterns: [
         { from: 'static', to: '.' },
         // Docs-specific override CSS from @darkly/site-docs
+        // with darkly- → dd- prefix transformation
         {
-          from: path.resolve(__dirname, '../site-docs/src/styles'),
-          to: 'styles',
+          from: path.resolve(__dirname, '../site-docs/src/styles/docs-overrides.css'),
+          to: 'styles/docs-overrides.css',
+          transform: transformPrefix,
         },
         // Shared core CSS files (themes, night-tint, settings-panel)
         // with darkly- → dd- prefix transformation

@@ -8,6 +8,7 @@ module.exports = merge(common, {
   plugins: [
     new webpack.DefinePlugin({
       __DEV_MODE__: JSON.stringify(false),
+      __PRODUCT_ID__: JSON.stringify('suite'),
     }),
   ],
 });

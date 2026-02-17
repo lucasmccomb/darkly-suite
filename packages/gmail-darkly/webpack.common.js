@@ -57,9 +57,11 @@ module.exports = {
       patterns: [
         { from: 'static', to: '.' },
         // Gmail-specific override CSS from @darkly/site-gmail
+        // with darkly- → gd- prefix transformation
         {
-          from: path.resolve(__dirname, '../site-gmail/src/styles'),
-          to: 'styles',
+          from: path.resolve(__dirname, '../site-gmail/src/styles/gmail-overrides.css'),
+          to: 'styles/gmail-overrides.css',
+          transform: transformPrefix,
         },
         // Shared core CSS files (themes, night-tint, settings-panel)
         // with darkly- → gd- prefix transformation

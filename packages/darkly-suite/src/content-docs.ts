@@ -11,7 +11,7 @@ import { docsPlugin } from '@darkly/site-docs';
 import { getSiteConfig } from './darkly.config';
 
 const siteConfig = getSiteConfig('docs');
-const CLAIM_ID = `ds-${siteConfig.prefix}`;
+const CLAIM_ID = 'ds-docs';
 
 async function init(): Promise<void> {
   if (!claimPage(CLAIM_ID)) return;
