@@ -15,6 +15,7 @@ module.exports = {
         use: {
           loader: 'ts-loader',
           options: {
+            transpileOnly: true,
             compilerOptions: { noEmit: false },
           },
         },
@@ -28,8 +29,11 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
-    // Required for pnpm workspace symlinks
-    symlinks: false,
+    alias: {
+      '@darkly/core': path.resolve(__dirname, '../core/src'),
+      '@darkly/site-gmail': path.resolve(__dirname, '../site-gmail/src'),
+    },
+    modules: [path.resolve(__dirname, 'node_modules'), 'node_modules'],
   },
   output: {
     filename: '[name].js',

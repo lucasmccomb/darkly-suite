@@ -40,6 +40,7 @@ function createDarklyWebpackConfig(options) {
           use: {
             loader: 'ts-loader',
             options: {
+              transpileOnly: true,
               compilerOptions: { noEmit: false },
             },
           },
@@ -61,7 +62,6 @@ function createDarklyWebpackConfig(options) {
     },
     resolve: {
       extensions: ['.tsx', '.ts', '.js'],
-      symlinks: false,
       alias: {
         '@': path.resolve(packageDir, 'src'),
         ...alias,

@@ -253,7 +253,7 @@ describe('openManageSubscription', () => {
     const msg = chromeMock.runtime.sendMessage.mock.calls[0]![0] as { type: string; url: string };
     const token = syncStorage[mockConfig.tokenKey] as string;
     expect(msg.type).toBe('openTab');
-    expect(msg.url).toBe(`${mockConfig.apiBase}/portal?token=${token}`);
+    expect(msg.url).toBe(`${mockConfig.apiBase}/portal?token=${token}&product=${mockConfig.productId}`);
   });
 });
 
