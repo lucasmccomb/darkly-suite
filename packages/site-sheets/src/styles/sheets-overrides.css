@@ -57,7 +57,8 @@
  * 5. Extension UI isolation -- our settings panel is already dark
  * ============================================================ */
 
-[data-sd-theme="dark"] .sd-settings-container {
+[data-sd-theme="dark"] .sd-settings-container,
+[data-sd-theme="dark"] .sd-mini-panel {
   filter: invert(1) hue-rotate(180deg) !important;
 }
 

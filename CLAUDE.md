@@ -82,21 +82,20 @@ darkly-suite  ← @darkly/core + all three @darkly/site-* packages
 
 The bundle uses **per-site prefixes for theme CSS** (so override CSS works unchanged) and `ds-` only for UI components and storage keys.
 
-## CRITICAL: Chrome Extension Rebuild Required
+## CRITICAL: Always Use Dev Mode
 
-After making code changes, always run the build. Chrome extensions load from `dist/` which is NOT auto-updated.
-
-```bash
-pnpm --filter gmail-darkly build    # Rebuild specific extension
-```
-
-Then refresh the extension in `chrome://extensions`.
-
-### Dev mode
+**Default to dev mode for ALL local development.** Only use production builds when explicitly requested.
 
 `pnpm dev:{product}` enables `__DEV_MODE__=true` which:
 - Bypasses Stripe payment gate (`isPro()` returns `true`)
 - Runs in watch mode (auto-rebuilds on save)
+- Outputs unminified code for easier debugging
+
+**Start a dev server at the beginning of every session** for the extension being tested. Keep it running throughout the session.
+
+### Why this is critical
+
+`pnpm -r build` and `pnpm --filter {package} build` produce **production builds** with `__DEV_MODE__=false`. This enables the Stripe paywall, which fails locally ("Failed to fetch") and blocks all extension UI behind a "Subscribe Now" screen. **Never leave a production build in `dist/` when the user is testing locally.**
 
 ## CRITICAL: Auto-Build After Code Changes
 
@@ -120,11 +119,9 @@ Then refresh the extension in `chrome://extensions`.
 
 2. **If a dev server is already running** (watch mode via `pnpm dev:{product}`): webpack watch handles rebuilds automatically — just tell the user to refresh the extension in `chrome://extensions`.
 
-3. **If no dev server is running**: Start one with `pnpm dev:{product}` for the primary extension being tested. Dev mode sets `__DEV_MODE__=true` which bypasses the Stripe payment gate.
+3. **If no dev server is running**: Start one with `pnpm dev:{product}` for the primary extension being tested.
 
-4. **If the user only needs a one-time build** (not watch mode): Run `pnpm --filter {package} build` for the affected extension(s).
-
-5. **After build completes**: Tell the user to refresh the extension in `chrome://extensions` (or Cmd+R on the extensions page).
+4. **After build completes**: Tell the user to refresh the extension in `chrome://extensions` (or Cmd+R on the extensions page).
 
 ### Why this matters
 
@@ -132,9 +129,23 @@ Chrome extensions load from `dist/`. Source changes have ZERO effect until the e
 
 ## CRITICAL: Verify Before Committing
 
-Always run the full verification suite before committing:
+### During active development (dev server running)
+
+Use the **lightweight check** — no build step, since the dev server already validates compilation:
+```bash
+pnpm -r lint && pnpm -r type-check && pnpm -r test
+```
+
+### Before committing / pushing
+
+Run the **full verification suite** including production build:
 ```bash
 pnpm -r lint && pnpm -r type-check && pnpm -r test && pnpm -r build
+```
+
+**IMPORTANT: `pnpm -r build` overwrites `dist/` with production builds (`__DEV_MODE__=false`).** After running the full suite, you MUST restart the dev server to restore the dev build:
+```bash
+pnpm dev:{product}   # Restores __DEV_MODE__=true in dist/
 ```
 
 Fix any errors immediately. Never commit code that doesn't pass all checks.
