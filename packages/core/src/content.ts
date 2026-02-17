@@ -8,6 +8,8 @@ import { createPreferencesManager } from './storage/preferences';
 import { createPaymentClient } from './payment/client';
 import { createSidebarPanel } from './inject/sidebar-icon';
 import { createSettingsContainer } from './inject/settings-panel';
+import { createSettingsModal, createMiniPanel } from './inject/panels';
+import type { PanelHandle } from './inject/panels';
 import type { BaseUserPreferences } from './storage/types';
 
 function isInHourRange(startHour: number, endHour: number): boolean {
@@ -149,54 +151,63 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
       productSection = sitePlugin.renderProductSection(undefined, () => {});
     }
 
-    // Create a settings sidebar container (lazily appended on first open)
-    let sidebarContainer: HTMLElement | null = null;
-    let _sidebarCleanup: (() => void) | null = null;
-    let sidebarOpen = false;
+    // Create the settings modal (centered overlay with backdrop)
+    const settingsModal = createSettingsModal(config, {
+      isPro: proStatus,
+      onUpgrade: () => payment.openPaymentPage(),
+      renderProductSection: productSection,
+    });
 
-    function toggleSettingsSidebar(): void {
-      if (sidebarOpen && sidebarContainer) {
-        sidebarContainer.style.display = 'none';
-        sidebarOpen = false;
-        return;
-      }
+    const showSettings = () => {
+      if (settingsModal.isVisible()) settingsModal.hide();
+      else settingsModal.show();
+    };
 
-      if (!sidebarContainer) {
-        sidebarContainer = createSettingsContainer(config, 'sidebar');
-        document.body.appendChild(sidebarContainer);
-        _sidebarCleanup = createSidebarPanel(config, sidebarContainer, {
-          isPro: proStatus,
-          onUpgrade: () => payment.openPaymentPage(),
-          onClose: () => toggleSettingsSidebar(),
-          renderProductSection: productSection,
-        });
-      }
+    // For Sheets/Docs: create a mini panel (toolbar dropdown)
+    // Gmail uses InboxSDK's own dropdown, so no mini panel needed.
+    let miniPanel: PanelHandle | null = null;
+    let toolbarButton: HTMLElement | null = null;
 
-      sidebarContainer.style.display = '';
-      sidebarOpen = true;
+    if (sitePlugin?.injectSidebarIcon) {
+      miniPanel = createMiniPanel(config, {
+        isPro: proStatus,
+        onAllSettings: () => {
+          miniPanel!.hide();
+          settingsModal.show();
+        },
+        onUpgrade: () => payment.openPaymentPage(),
+      });
     }
 
     // Site plugin handles its own UI injection (toolbar, sidebar, etc.)
-    // The plugin receives proStatus so it can show paywall if needed.
     if (sitePlugin) {
       const toolbarOpts = {
         isPro: proStatus,
-        onAllSettings: () => toggleSettingsSidebar(),
+        onAllSettings: miniPanel
+          ? () => {
+              // Sheets/Docs: toggle mini panel anchored to toolbar button
+              if (miniPanel!.isVisible()) {
+                miniPanel!.hide();
+              } else if (toolbarButton) {
+                miniPanel!.show(toolbarButton);
+              }
+            }
+          : () => settingsModal.show(), // Gmail: "All Settings" opens modal directly
         onUpgrade: () => payment.openPaymentPage(),
       };
 
-      await sitePlugin.injectToolbarButton(toolbarOpts);
+      toolbarButton = await sitePlugin.injectToolbarButton(toolbarOpts);
 
       // Start DOM observer to re-inject toolbar when the host app rebuilds it
       sitePlugin.startDomObserver(async () => {
-        await sitePlugin.injectToolbarButton(toolbarOpts);
+        toolbarButton = await sitePlugin.injectToolbarButton(toolbarOpts);
       });
 
       // Inject sidebar icon in companion app-switcher strip (Sheets/Docs)
       if (sitePlugin.injectSidebarIcon) {
         sitePlugin.injectSidebarIcon({
           isPro: proStatus,
-          onClick: () => toggleSettingsSidebar(),
+          onClick: showSettings,
         });
       }
 
@@ -204,7 +215,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
       if (sitePlugin.registerKeyboardShortcuts) {
         sitePlugin.registerKeyboardShortcuts({
           toggleDarkMode: () => engine.toggle(),
-          openSettings: () => toggleSettingsSidebar(),
+          openSettings: showSettings,
         });
       }
     }

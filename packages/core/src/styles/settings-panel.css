@@ -62,20 +62,67 @@
   flex-direction: column;
 }
 
-.darkly-sidebar {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 320px;
-  height: 100vh;
-  z-index: 10000;
-  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
-  overflow-y: auto;
-}
-
 [data-darkly-theme="dark"] .darkly-sidebar {
   border: 1px solid #d4941c;
-  box-shadow: -2px 0 12px rgba(0, 0, 0, 0.4);
+}
+
+/* ===== Settings Modal (centered overlay) ===== */
+
+.darkly-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  animation: darkly-fade-in 200ms ease-out;
+}
+
+[data-darkly-theme="dark"] .darkly-modal-backdrop {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.darkly-modal-container {
+  max-width: 400px;
+  width: calc(100% - 32px);
+  max-height: 80vh;
+  height: auto;
+  overflow-y: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: darkly-slide-in 200ms ease-out;
+}
+
+[data-darkly-theme="dark"] .darkly-modal-container {
+  border: 2px solid #d4941c;
+  box-shadow: 0 0 40px rgba(212, 148, 28, 0.4), 0 0 80px rgba(212, 148, 28, 0.15);
+}
+
+/* ===== Mini Panel (toolbar dropdown) ===== */
+
+.darkly-mini-panel {
+  position: fixed;
+  z-index: 10000;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+  display: none;
+}
+
+[data-darkly-theme="dark"] .darkly-mini-panel {
+  border: 1px solid #d4941c;
+  box-shadow: 0 0 40px rgba(212, 148, 28, 0.4), 0 0 80px rgba(212, 148, 28, 0.15) !important;
+}
+
+@keyframes darkly-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes darkly-slide-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .darkly-settings-panel {
@@ -764,13 +811,6 @@
 
 [data-darkly-theme="dark"] .darkly-dropdown-panel {
   border: 1px solid #d4941c;
-}
-
-.darkly-toolbar-dropdown-wrap {
-  position: fixed;
-  z-index: 10001;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
 }
 
 .darkly-dropdown-loading {
