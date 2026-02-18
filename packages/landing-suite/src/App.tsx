@@ -1,5 +1,6 @@
-import { useEffect } from 'react'
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { ScrollToHash, AdminLayout, AdminLoginPage } from '@darkly/landing-shared'
+import { AdminLicensesPage, AdminDiscountsPage, AdminStatsPage } from '@darkly/landing-shared'
 import { HomePage } from './pages/HomePage.tsx'
 import { GmailPage } from './pages/GmailPage.tsx'
 import { SheetsPage } from './pages/SheetsPage.tsx'
@@ -8,26 +9,6 @@ import { SuitePage } from './pages/SuitePage.tsx'
 import { PrivacyPage } from './pages/PrivacyPage.tsx'
 import { SuccessPage } from './pages/SuccessPage.tsx'
 import { SetupPage } from './pages/SetupPage.tsx'
-import { AdminLoginPage } from './admin/pages/AdminLoginPage.tsx'
-import { AdminLayout } from './admin/AdminLayout.tsx'
-import { AdminLicensesPage } from './admin/pages/AdminLicensesPage.tsx'
-import { AdminDiscountsPage } from './admin/pages/AdminDiscountsPage.tsx'
-import { AdminStatsPage } from './admin/pages/AdminStatsPage.tsx'
-
-function ScrollToHash() {
-  const { pathname, hash } = useLocation()
-  useEffect(() => {
-    if (hash) {
-      const el = document.querySelector(hash)
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' })
-        return
-      }
-    }
-    window.scrollTo(0, 0)
-  }, [pathname, hash])
-  return null
-}
 
 export function App() {
   return (

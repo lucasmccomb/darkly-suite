@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './styles/globals.css'
-import './styles/admin.css'
+import '@darkly/landing-shared/src/styles/globals.css'
+import '@darkly/landing-shared/src/styles/admin.css'
 import { App } from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(

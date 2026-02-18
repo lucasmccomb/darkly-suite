@@ -1,9 +1,7 @@
 import { useSearchParams } from 'react-router-dom'
-import { Nav } from '../components/Nav.tsx'
-import { Footer } from '../components/Footer.tsx'
-import { Wordmark } from '../components/Wordmark.tsx'
-import { SetupGuide } from '../components/SetupGuide.tsx'
+import { Nav, Footer, Wordmark, SetupGuide } from '@darkly/landing-shared'
 import { Check } from 'lucide-react'
+import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URLS } from '../config.ts'
 
 export function SuccessPage() {
   const [searchParams] = useSearchParams()
@@ -11,7 +9,7 @@ export function SuccessPage() {
 
   return (
     <>
-      <Nav />
+      <Nav brandLabel="Suite" links={NAV_LINKS} cta={NAV_CTA} />
       <section style={{
         display: 'flex',
         alignItems: 'center',
@@ -54,10 +52,10 @@ export function SuccessPage() {
       </section>
       <section className="section" style={{ paddingTop: 0 }}>
         <div className="container">
-          <SetupGuide activeTab={product} />
+          <SetupGuide activeTab={product} storeUrls={STORE_URLS} />
         </div>
       </section>
-      <Footer />
+      <Footer brandLabel="Suite" links={FOOTER_LINKS} copyrightName={SITE_NAME} />
     </>
   )
 }

@@ -1,13 +1,7 @@
 import { useState, useCallback } from 'react'
-import { Nav } from '../components/Nav.tsx'
-import { Hero } from '../components/Hero.tsx'
-import { Features } from '../components/Features.tsx'
-import { Pricing } from '../components/Pricing.tsx'
-import { ProductCard } from '../components/ProductCard.tsx'
-import { FAQ } from '../components/FAQ.tsx'
-import { Footer } from '../components/Footer.tsx'
+import { Nav, Hero, Features, Pricing, ProductCard, FAQ, Footer, SuiteIcon } from '@darkly/landing-shared'
 import { Mail, Table2, FileText } from 'lucide-react'
-import { SuiteIcon } from '../components/SuiteIcon.tsx'
+import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URLS, individualTiers, bundleTiers, COMPARISON_FEATURES } from '../config.ts'
 
 type AppId = 'gmail' | 'sheets' | 'docs'
 
@@ -21,7 +15,7 @@ export function HomePage() {
 
   return (
     <>
-      <Nav />
+      <Nav brandLabel="Suite" links={NAV_LINKS} cta={NAV_CTA} />
       <Hero
         title="Premium dark mode<br />for Google apps"
         subtitle="Automatic dark mode scheduling, OS theme sync, and intelligent styling for Gmail, Sheets, and Docs."
@@ -77,9 +71,13 @@ export function HomePage() {
         product="suite"
         selectedApp={selectedApp}
         onAppChange={setSelectedApp}
+        individualTiers={individualTiers}
+        bundleTiers={bundleTiers}
+        comparisonFeatures={COMPARISON_FEATURES}
+        storeUrls={STORE_URLS}
       />
       <FAQ />
-      <Footer />
+      <Footer brandLabel="Suite" links={FOOTER_LINKS} copyrightName={SITE_NAME} />
     </>
   )
 }
