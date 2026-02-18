@@ -24,6 +24,7 @@ export function Nav() {
           <Link to="/sheets">Sheets</Link>
           <Link to="/docs">Docs</Link>
           <Link to="/suite">Bundle</Link>
+          <Link to="/setup">Setup</Link>
           <a href="/#pricing">Pricing</a>
           <Link to="/privacy">Privacy</Link>
         </div>

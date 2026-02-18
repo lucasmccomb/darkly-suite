@@ -47,7 +47,7 @@ async function handleCheckout(context: CFContext): Promise<Response> {
     const session = await createCheckoutSession(context.env.STRIPE_SECRET_KEY, {
       priceId,
       mode,
-      successUrl: 'https://darklysuite.com/success?session_id={CHECKOUT_SESSION_ID}',
+      successUrl: `https://darklysuite.com/success?session_id={CHECKOUT_SESSION_ID}&product=${product}`,
       cancelUrl: `https://darklysuite.com/${product === 'suite' ? '' : product}#pricing`,
       metadata: { token, plan, product },
     });

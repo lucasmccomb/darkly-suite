@@ -188,6 +188,8 @@ export function createBackgroundWorker(config: ProductConfig): void {
   chrome.runtime.onInstalled.addListener(async (details) => {
     console.log(`[${config.productName}] Extension installed:`, details.reason);
     if (details.reason === 'install') {
+      const siteBase = config.apiBase.replace(/\/api$/, '');
+      chrome.tabs.create({ url: `${siteBase}/setup?product=${config.productId}` });
       await setupAlarm();
     }
   });

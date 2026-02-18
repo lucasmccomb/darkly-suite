@@ -299,9 +299,9 @@
 .badge--monthly { background: rgba(138, 180, 248, 0.15); color: #8ab4f8; }
 .badge--yearly { background: rgba(108, 92, 231, 0.15); color: #a29bfe; }
 .badge--lifetime { background: rgba(129, 201, 149, 0.15); color: #81c995; }
-.badge--gmail { background: rgba(138, 180, 248, 0.15); color: #8ab4f8; }
+.badge--gmail { background: rgba(234, 67, 53, 0.15); color: #ea4335; }
 .badge--sheets { background: rgba(129, 201, 149, 0.15); color: #81c995; }
-.badge--docs { background: rgba(242, 139, 130, 0.15); color: #f28b82; }
+.badge--docs { background: rgba(66, 133, 244, 0.15); color: #4285f4; }
 .badge--suite { background: rgba(108, 92, 231, 0.15); color: #a29bfe; }
 
 /* Pagination */

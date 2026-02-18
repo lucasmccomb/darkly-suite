@@ -6,7 +6,8 @@ import { Pricing } from '../components/Pricing.tsx'
 import { ProductCard } from '../components/ProductCard.tsx'
 import { FAQ } from '../components/FAQ.tsx'
 import { Footer } from '../components/Footer.tsx'
-import { Mail, Table2, FileText, Package } from 'lucide-react'
+import { Mail, Table2, FileText } from 'lucide-react'
+import { SuiteIcon } from '../components/SuiteIcon.tsx'
 
 type AppId = 'gmail' | 'sheets' | 'docs'
 
@@ -40,7 +41,7 @@ export function HomePage() {
             <ProductCard
               name="Darkly for Gmail"
               description="Dark mode for Gmail with intelligent scheduling and OS theme sync."
-              icon={<Mail size={28} color="#8ab4f8" strokeWidth={1.8} />}
+              icon={<Mail size={28} color="#ea4335" strokeWidth={1.8} />}
               link="/gmail"
               price="$0.99/mo"
               onClick={() => selectAndScroll('gmail')}
@@ -56,7 +57,7 @@ export function HomePage() {
             <ProductCard
               name="Darkly for Docs"
               description="Dark mode for Google Docs with canvas rendering and document styling."
-              icon={<FileText size={28} color="#f28b82" strokeWidth={1.8} />}
+              icon={<FileText size={28} color="#4285f4" strokeWidth={1.8} />}
               link="/docs"
               price="$0.99/mo"
               onClick={() => selectAndScroll('docs')}
@@ -64,7 +65,7 @@ export function HomePage() {
             <ProductCard
               name="Darkly Suite"
               description="All three apps in one bundle. One license, one price, full coverage."
-              icon={<Package size={28} color="#f5c842" strokeWidth={1.8} />}
+              icon={<SuiteIcon size={28} />}
               link="/suite"
               price="$2.99/mo"
             />
