@@ -17,7 +17,11 @@ export function Hero({ title, subtitle, ctaText, ctaLink, badge }: HeroProps) {
         <div className="hero-icon">
           <BrandLogo glow />
         </div>
-        <h1 className="hero-title" dangerouslySetInnerHTML={{ __html: title }} />
+        <h1 className="hero-title">
+          {title.split('<br />').map((segment, i, arr) => (
+            <span key={i}>{segment}{i < arr.length - 1 && <br />}</span>
+          ))}
+        </h1>
         <p className="hero-subtitle">{subtitle}</p>
         <div className="hero-cta">
           <Link to={ctaLink} className="btn btn-primary">
