@@ -14,7 +14,6 @@
       "css": [
         "styles/themes.css",
         "styles/docs-overrides.css",
-        "styles/night-tint.css",
         "styles/settings-panel.css"
       ],
       "js": ["content.js"],

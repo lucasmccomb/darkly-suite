@@ -7,13 +7,6 @@ export interface ScheduleConfig {
   endHour: number; // 0-23
 }
 
-export interface NightTintConfig {
-  enabled: boolean;
-  startHour: number;
-  endHour: number;
-  intensity: number; // 0-100
-}
-
 export interface SunriseSunsetConfig {
   enabled: boolean;
   lat: number | null;
@@ -27,7 +20,6 @@ export interface BaseUserPreferences {
   mode: ThemeMode;
   preset: PresetName;
   schedule: ScheduleConfig;
-  nightTint: NightTintConfig;
   sunriseSunset: SunriseSunsetConfig;
   enabled: boolean;
 }
@@ -38,12 +30,6 @@ export const DEFAULT_PREFERENCES: BaseUserPreferences = {
   schedule: {
     startHour: 20,
     endHour: 7,
-  },
-  nightTint: {
-    enabled: false,
-    startHour: 22,
-    endHour: 6,
-    intensity: 50,
   },
   sunriseSunset: {
     enabled: false,

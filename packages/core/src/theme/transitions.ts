@@ -1,58 +1,67 @@
 const FADE_MS = 200;
 const SETTLE_MS = 150;
 
-let initialized = false;
-let overlayEl: HTMLDivElement | null = null;
-
-function getOverlay(): HTMLDivElement {
-  if (overlayEl) return overlayEl;
-  overlayEl = document.createElement('div');
-  overlayEl.style.cssText = [
-    'position: fixed',
-    'inset: 0',
-    'z-index: 2147483647',
-    'background: #000',
-    'opacity: 0',
-    `transition: opacity ${FADE_MS}ms ease`,
-    'pointer-events: none',
-  ].join(';');
-  return overlayEl;
+export interface TransitionManager {
+  init(): void;
+  withTransition(changeFn: () => void): void;
 }
 
-/**
- * Call once after initial page load to enable transitions on subsequent
- * theme changes. Skipped on first load to avoid FOUC.
- */
-export function initTransitions(): void {
-  initialized = true;
-}
+export function createTransitionManager(): TransitionManager {
+  let initialized = false;
+  let overlayEl: HTMLDivElement | null = null;
 
-/**
- * Wraps a theme-change callback with a fade-to-black overlay.
- * No-ops before initTransitions() is called.
- */
-export function withTransition(changeFn: () => void): void {
-  if (!initialized) {
-    changeFn();
-    return;
+  function getOverlay(): HTMLDivElement {
+    if (overlayEl) return overlayEl;
+    overlayEl = document.createElement('div');
+    overlayEl.style.cssText = [
+      'position: fixed',
+      'inset: 0',
+      'z-index: 2147483647',
+      'background: #000',
+      'opacity: 0',
+      `transition: opacity ${FADE_MS}ms ease`,
+      'pointer-events: none',
+    ].join(';');
+    return overlayEl;
   }
 
-  const overlay = getOverlay();
+  return {
+    /**
+     * Call once after initial page load to enable transitions on subsequent
+     * theme changes. Skipped on first load to avoid FOUC.
+     */
+    init(): void {
+      initialized = true;
+    },
 
-  if (!overlay.parentNode) {
-    document.documentElement.appendChild(overlay);
-  }
-  overlay.style.opacity = '0';
+    /**
+     * Wraps a theme-change callback with a fade-to-black overlay.
+     * No-ops before init() is called.
+     */
+    withTransition(changeFn: () => void): void {
+      if (!initialized) {
+        changeFn();
+        return;
+      }
 
-  // Force layout flush
-  overlay.offsetHeight; // eslint-disable-line @typescript-eslint/no-unused-expressions
+      const overlay = getOverlay();
 
-  overlay.style.opacity = '1';
-
-  setTimeout(() => {
-    changeFn();
-    setTimeout(() => {
+      if (!overlay.parentNode) {
+        document.documentElement.appendChild(overlay);
+      }
       overlay.style.opacity = '0';
-    }, SETTLE_MS);
-  }, FADE_MS);
+
+      // Force layout flush
+      overlay.offsetHeight; // eslint-disable-line @typescript-eslint/no-unused-expressions
+
+      overlay.style.opacity = '1';
+
+      setTimeout(() => {
+        changeFn();
+        setTimeout(() => {
+          overlay.style.opacity = '0';
+        }, SETTLE_MS);
+      }, FADE_MS);
+    },
+  };
 }

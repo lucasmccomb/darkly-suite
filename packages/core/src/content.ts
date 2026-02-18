@@ -2,48 +2,25 @@ import type { ProductConfig, SitePlugin } from './config';
 import type React from 'react';
 import { ThemeEngine } from './theme/engine';
 import { SystemThemeDetector } from './theme/detector';
-import * as NightTint from './theme/night-tint';
-import { initTransitions } from './theme/transitions';
+import { createTransitionManager } from './theme/transitions';
 import { createPreferencesManager } from './storage/preferences';
 import { createPaymentClient } from './payment/client';
 import { createSettingsModal, createMiniPanel } from './inject/panels';
 import type { PanelHandle } from './inject/panels';
 import type { BaseUserPreferences } from './storage/types';
 
-function isInHourRange(startHour: number, endHour: number): boolean {
-  const hour = new Date().getHours();
-  if (startHour > endHour) {
-    return hour >= startHour || hour < endHour;
-  }
-  return hour >= startHour && hour < endHour;
-}
-
 /**
  * Creates and starts a content script for the given product configuration.
  * Wires together ThemeEngine, preferences, payment, system detection,
- * night tint, schedule handling, and optional site plugin.
+ * schedule handling, and optional site plugin.
  */
 export function createContentScript(config: ProductConfig, sitePlugin?: SitePlugin): void {
-  const engine = new ThemeEngine(config);
+  const transitions = createTransitionManager();
+  const engine = new ThemeEngine(config, transitions.withTransition);
   const prefs = createPreferencesManager(config);
   const payment = createPaymentClient(config);
   let detector: SystemThemeDetector | null = null;
   let detectorUnsub: (() => void) | null = null;
-
-  NightTint.init(config);
-
-  function evaluateNightTint(p: BaseUserPreferences): void {
-    if (!p.nightTint.enabled) {
-      NightTint.disable();
-      return;
-    }
-    const active = isInHourRange(p.nightTint.startHour, p.nightTint.endHour);
-    if (active) {
-      NightTint.enable(p.nightTint.intensity);
-    } else {
-      NightTint.disable();
-    }
-  }
 
   async function checkSchedule(): Promise<boolean> {
     return new Promise((resolve) => {
@@ -82,7 +59,6 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
   async function applyMode(p: BaseUserPreferences): Promise<void> {
     if (!p.enabled) {
       engine.apply('light');
-      NightTint.disable();
       stopSystemDetection();
       return;
     }
@@ -112,8 +88,6 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
         break;
       }
     }
-
-    evaluateNightTint(p);
   }
 
   async function init(): Promise<void> {
@@ -130,7 +104,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
       const currentPrefs = await prefs.load();
       await applyMode(currentPrefs);
 
-      initTransitions();
+      transitions.init();
 
       prefs.onChange(async (newPrefs) => {
         await applyMode(newPrefs);
@@ -223,7 +197,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
       if (paid) {
         const currentPrefs = await prefs.load();
         await applyMode(currentPrefs);
-        initTransitions();
+        transitions.init();
 
         prefs.onChange(async (newPrefs) => {
           await applyMode(newPrefs);

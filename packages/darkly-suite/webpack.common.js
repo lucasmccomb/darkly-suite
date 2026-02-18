@@ -68,11 +68,6 @@ module.exports = {
           transform: transformPrefix,
         },
         {
-          from: path.resolve(__dirname, '../core/src/styles/night-tint.css'),
-          to: 'styles/night-tint.css',
-          transform: transformPrefix,
-        },
-        {
           from: path.resolve(__dirname, '../core/src/styles/settings-panel.css'),
           to: 'styles/settings-panel.css',
           transform: transformPrefix,
