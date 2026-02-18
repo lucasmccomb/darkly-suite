@@ -1,0 +1,142 @@
+name: Deploy Landing Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/landing-shared/**'
+      - 'packages/landing-suite/**'
+      - 'packages/landing-gmail/**'
+  workflow_dispatch:
+    inputs:
+      deploy-all:
+        description: 'Deploy all landing pages'
+        type: boolean
+        default: false
+      deploy-gmail:
+        description: 'Deploy landing-gmail → gmaildarkly.com'
+        type: boolean
+        default: false
+      deploy-suite:
+        description: 'Deploy landing-suite → darklysuite.com'
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploy-landing-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  detect-changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      landing-gmail: ${{ steps.changes.outputs.landing-gmail }}
+      landing-suite: ${{ steps.changes.outputs.landing-suite }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Determine which landing pages to deploy
+        id: changes
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            if [[ "${{ inputs.deploy-all }}" == "true" ]]; then
+              echo "landing-gmail=true" >> $GITHUB_OUTPUT
+              echo "landing-suite=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+            echo "landing-gmail=${{ inputs.deploy-gmail }}" >> $GITHUB_OUTPUT
+            echo "landing-suite=${{ inputs.deploy-suite }}" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          CHANGED=$(git diff --name-only HEAD~1 HEAD)
+
+          SHARED_CHANGED=false
+          if echo "$CHANGED" | grep -q '^packages/landing-shared/'; then
+            SHARED_CHANGED=true
+            echo "landing-shared changed — all landing pages will deploy"
+          fi
+
+          GMAIL_CHANGED=false
+          if echo "$CHANGED" | grep -q '^packages/landing-gmail/' || [[ "$SHARED_CHANGED" == "true" ]]; then
+            GMAIL_CHANGED=true
+          fi
+
+          SUITE_CHANGED=false
+          if echo "$CHANGED" | grep -q '^packages/landing-suite/' || [[ "$SHARED_CHANGED" == "true" ]]; then
+            SUITE_CHANGED=true
+          fi
+
+          echo "landing-gmail=$GMAIL_CHANGED" >> $GITHUB_OUTPUT
+          echo "landing-suite=$SUITE_CHANGED" >> $GITHUB_OUTPUT
+
+          echo "Deploy targets: gmail=$GMAIL_CHANGED suite=$SUITE_CHANGED (shared=$SHARED_CHANGED)"
+
+  deploy-gmail:
+    name: Deploy gmaildarkly.com
+    needs: detect-changes
+    if: needs.detect-changes.outputs.landing-gmail == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build landing-gmail
+        run: pnpm --filter @darkly/landing-gmail build
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=gmail-darkly
+          workingDirectory: packages/landing-gmail
+
+  deploy-suite:
+    name: Deploy darklysuite.com
+    needs: detect-changes
+    if: needs.detect-changes.outputs.landing-suite == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build landing-suite
+        run: pnpm --filter @darkly/landing-suite build
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=darkly-suite
+          workingDirectory: packages/landing-suite
