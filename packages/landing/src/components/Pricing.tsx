@@ -302,7 +302,7 @@ export function Pricing({ product, selectedApp, onAppChange, features = defaultF
                     <span>Darkly for Docs</span>
                   </th>
                   <th className="pricing-comparison-suite-col">
-                    <SuiteIcon size={18} />
+                    <SuiteIcon size={28} variant="fan" />
                     <span>Darkly Suite</span>
                   </th>
                 </tr>
