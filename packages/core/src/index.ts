@@ -46,7 +46,8 @@ export type { SunTimes } from './geo/sun-times';
 export { DarklyProvider, usePrefix, useDarklyConfig } from './context';
 
 // Background worker factory
-export { createBackgroundWorker } from './background/worker';
+export { createBackgroundWorker, createSiteWorker } from './background/worker';
+export type { SiteWorkerHandlers } from './background/worker';
 
 // Content script factory
 export { createContentScript } from './content';
