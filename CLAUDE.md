@@ -112,7 +112,6 @@ Running `pnpm -r build` overwrites `dist/` with production output (`__DEV_MODE__
 ### After building:
 
 Tell the user to refresh the extension in `chrome://extensions` (or Cmd+R on the extensions page).
->>>>>>> f15c33a (95: Add InboxSDK background import and update CLAUDE.md dev mode instructions)
 
 ## CRITICAL: Auto-Build After Code Changes
 
