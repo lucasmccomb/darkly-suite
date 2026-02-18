@@ -8,6 +8,7 @@ export const config: ProductConfig = {
   tokenKey: 'gd_token',
   proCacheKey: 'gd_pro_cache',
   apiBase: 'https://darklysuite.com/api',
+  siteBase: 'https://gmaildarkly.com',
   alarmName: 'gd-schedule-check',
   tabUrlPattern: 'https://mail.google.com/*',
 };
