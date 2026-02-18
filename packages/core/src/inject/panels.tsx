@@ -27,6 +27,7 @@ export function createSettingsModal(
   let root: Root | null = null;
   let visible = false;
   let escHandler: ((e: KeyboardEvent) => void) | null = null;
+  let previousFocus: HTMLElement | null = null;
 
   function ensureDOM(): HTMLDivElement {
     if (backdrop) return backdrop;
@@ -63,6 +64,7 @@ export function createSettingsModal(
 
   const handle: PanelHandle = {
     show() {
+      previousFocus = document.activeElement as HTMLElement | null;
       const b = ensureDOM();
       b.style.display = 'flex';
       visible = true;
@@ -78,6 +80,10 @@ export function createSettingsModal(
       if (escHandler) {
         document.removeEventListener('keydown', escHandler);
         escHandler = null;
+      }
+      if (previousFocus && typeof previousFocus.focus === 'function') {
+        previousFocus.focus();
+        previousFocus = null;
       }
     },
 
@@ -112,6 +118,7 @@ export function createMiniPanel(
   let outsideHandler: ((e: MouseEvent) => void) | null = null;
   let escHandler: ((e: KeyboardEvent) => void) | null = null;
   let currentAnchor: HTMLElement | null = null;
+  let previousFocus: HTMLElement | null = null;
 
   function ensureDOM(): HTMLDivElement {
     if (container) return container;
@@ -166,6 +173,7 @@ export function createMiniPanel(
 
   const handle: PanelHandle = {
     show(anchor?: HTMLElement) {
+      previousFocus = document.activeElement as HTMLElement | null;
       const div = ensureDOM();
       if (anchor) {
         currentAnchor = anchor;
@@ -195,6 +203,10 @@ export function createMiniPanel(
       if (container) container.style.display = 'none';
       visible = false;
       removeListeners();
+      if (previousFocus && typeof previousFocus.focus === 'function') {
+        previousFocus.focus();
+        previousFocus = null;
+      }
     },
 
     isVisible() {
