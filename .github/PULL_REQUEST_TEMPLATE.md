@@ -20,7 +20,7 @@
 - [ ] `sheets-darkly` (extension)
 - [ ] `docs-darkly` (extension)
 - [ ] `darkly-suite-ext` (bundle extension)
-- [ ] `@darkly/landing` (darklysuite.com)
+- [ ] `@darkly/landing-suite` (darklysuite.com)
 
 ## Test plan
 

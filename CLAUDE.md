@@ -47,7 +47,7 @@ packages/
   sheets-darkly/         Individual Sheets extension
   docs-darkly/           Individual Docs extension
   darkly-suite/          Darkly Suite bundle extension
-  landing/               darklysuite.com (Vite + React + Cloudflare Pages)
+  landing-suite/         darklysuite.com (Vite + React + Cloudflare Pages)
 ```
 
 ## Architecture: How Code Sharing Works
@@ -139,7 +139,7 @@ Then tell the user to load/refresh the extension in `chrome://extensions` (or Cm
 | `sheets-darkly/` | `sheets-darkly` | `pnpm dev:sheets` |
 | `docs-darkly/` | `docs-darkly` | `pnpm dev:docs` |
 | `darkly-suite/` | `darkly-suite` | `pnpm dev:suite` |
-| `landing/` | Landing page only | `pnpm dev:landing` |
+| `landing-suite/` | Landing page only | `pnpm dev:landing` |
 
 2. **If a dev server is already running** (watch mode): webpack watch handles rebuilds automatically — just tell the user to refresh the extension.
 
@@ -221,7 +221,7 @@ interface ProductConfig {
 ## Landing Page
 
 ```bash
-cd packages/landing
+cd packages/landing-suite
 pnpm dev                                    # Local development
 npx wrangler pages dev dist --d1=DB         # Test with D1 locally
 ```
@@ -241,7 +241,7 @@ When both a standalone extension and the bundle are installed:
 
 ## Environment Variables (Cloudflare Pages)
 
-See `packages/landing/wrangler.toml` for binding configuration. Required vars:
+See `packages/landing-suite/wrangler.toml` for binding configuration. Required vars:
 - `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
 - 12× `STRIPE_PRICE_{PRODUCT}_{PLAN}` (e.g., `STRIPE_PRICE_GMAIL_YEARLY`)
 - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`
