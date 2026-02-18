@@ -14,6 +14,7 @@ export function createMockConfig(overrides?: Partial<ProductConfig>): ProductCon
     tokenKey: 'gd_token',
     proCacheKey: 'gd_pro_cache',
     apiBase: 'https://darklysuite.com/api',
+    siteBase: 'https://gmaildarkly.com',
     alarmName: 'gd_alarm',
     tabUrlPattern: '*://mail.google.com/*',
     ...overrides,
