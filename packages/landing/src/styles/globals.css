@@ -481,6 +481,19 @@ img {
 .suite-icon-pill {
   display: inline-flex;
   align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  border: 2px solid #f5c842;
+  background: var(--color-accent-dim);
+  box-shadow: 0 0 12px rgba(245, 200, 66, 0.35), 0 0 28px rgba(245, 200, 66, 0.12);
+}
+
+.product-card-icon > .suite-icon-pill {
+  border: none;
+  background: none;
+  box-shadow: none;
+  padding: 0;
   gap: 12px;
 }
 
