@@ -73,8 +73,11 @@ describe('status/[token] — GET', () => {
     const response = await onRequestGet(context);
     expect(response.status).toBe(200);
 
-    const body = await response.json() as { paid: boolean };
+    const body = await response.json() as { paid: boolean; plan: null; product: null; expiresAt: null };
     expect(body.paid).toBe(false);
+    expect(body.plan).toBeNull();
+    expect(body.product).toBeNull();
+    expect(body.expiresAt).toBeNull();
   });
 
   it('returns 400 for an invalid token format', async () => {
