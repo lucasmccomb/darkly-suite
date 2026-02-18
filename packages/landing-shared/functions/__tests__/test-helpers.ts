@@ -20,6 +20,7 @@ export interface MockD1PreparedStatement {
 
 export interface MockD1Database {
   prepare: jest.Mock;
+  batch: jest.Mock;
   _statement: MockD1PreparedStatement;
 }
 
@@ -37,6 +38,13 @@ export function createMockD1(): MockD1Database {
 
   const db: MockD1Database = {
     prepare: jest.fn().mockReturnValue(statement),
+    // batch() executes an array of prepared statements and returns their results.
+    // Default: returns success with count=1 for rate limiting reads.
+    batch: jest.fn().mockResolvedValue([
+      { success: true },          // cleanup
+      { success: true },          // upsert
+      { results: [{ count: 1 }], success: true }, // read
+    ]),
     _statement: statement,
   };
 
