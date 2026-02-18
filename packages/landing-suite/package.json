@@ -1,5 +1,5 @@
 {
-  "name": "@darkly/landing",
+  "name": "@darkly/landing-suite",
   "version": "1.0.0",
   "description": "Landing page and payment backend for darklysuite.com",
   "private": true,
