@@ -111,7 +111,15 @@ Running `pnpm -r build` overwrites `dist/` with production output (`__DEV_MODE__
 
 ### After building:
 
-Tell the user to refresh the extension in `chrome://extensions` (or Cmd+R on the extensions page).
+Always provide the **full dist path starting from `~`** so the user can navigate to it in Finder:
+
+```
+~/code/darkly-suite-repos/{worktree}/packages/{extension}/dist/
+```
+
+For example: `~/code/darkly-suite-repos/darkly-suite-0/packages/gmail-darkly/dist/`
+
+Then tell the user to load/refresh the extension in `chrome://extensions` (or Cmd+R on the extensions page).
 
 ## CRITICAL: Auto-Build After Code Changes
 
@@ -139,7 +147,7 @@ Tell the user to refresh the extension in `chrome://extensions` (or Cmd+R on the
 
 4. **After pre-commit verification** (`pnpm -r build`): ALWAYS re-run `pnpm dev:{product}` to restore dev mode in `dist/`.
 
-5. **After build completes**: Tell the user to refresh the extension in `chrome://extensions` (or Cmd+R on the extensions page).
+5. **After build completes**: Provide the **full dist path starting from `~`** (e.g., `~/code/darkly-suite-repos/darkly-suite-0/packages/gmail-darkly/dist/`) and tell the user to load/refresh the extension in `chrome://extensions` (or Cmd+R on the extensions page).
 
 ### Why this matters
 
