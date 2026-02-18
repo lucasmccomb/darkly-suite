@@ -4,6 +4,7 @@ import { createPreferencesManager } from '../storage/preferences';
 import { getSunTimes } from '../geo/sun-times';
 import { shouldBeDark as isInScheduleRange } from '../theme/scheduler';
 import type { BaseUserPreferences } from '../storage/types';
+import type { SunTimes } from '../geo/sun-times';
 
 function isDarkBySunTimes(sunrise: Date, sunset: Date): boolean {
   const now = new Date();
@@ -11,15 +12,41 @@ function isDarkBySunTimes(sunrise: Date, sunset: Date): boolean {
 }
 
 /**
- * Creates and starts a background service worker for the given product.
- * Handles: alarms, schedule checking, message passing, payment init, geolocation.
+ * Handlers exposed by a site worker. Used by the bundle to build a single
+ * unified message listener instead of registering N separate listeners.
  */
-export function createBackgroundWorker(config: ProductConfig): void {
+export interface SiteWorkerHandlers {
+  readonly config: ProductConfig;
+  getScheduleStatus(): Promise<{ shouldBeDark: boolean }>;
+  getSunTimes(lat: number, lng: number): Promise<SunTimes | null>;
+  getProStatus(): Promise<{ paid: boolean }>;
+  getLocation(): Promise<{ lat: number; lng: number } | { error: string }>;
+  handleAlarm(): Promise<void>;
+  setupAlarm(): Promise<void>;
+}
+
+/**
+ * Derive a per-site sun times cache key from the storage key.
+ * Standalone: gd_preferences → gd_sun_times_cache
+ * Bundle:     ds_gmail_preferences → ds_gmail_sun_times_cache
+ */
+function sunCacheKeyFrom(storageKey: string): string {
+  return storageKey.replace(/_preferences$/, '_sun_times_cache');
+}
+
+/**
+ * Creates a site worker that exposes handler functions without registering
+ * any Chrome event listeners. Sets up payment init and prefs.onChange
+ * (both correctly scoped by their respective storage keys).
+ *
+ * Used by the bundle's background.ts to avoid duplicate listeners.
+ * Standalone extensions should use createBackgroundWorker() instead.
+ */
+export function createSiteWorker(config: ProductConfig): SiteWorkerHandlers {
   const payment = createPaymentClient(config);
   const prefs = createPreferencesManager(config);
-  const sunCacheKey = `${config.prefix}_sun_times_cache`;
+  const sunCacheKey = sunCacheKeyFrom(config.storageKey);
 
-  // Initialize payment token
   payment.initPayment();
 
   async function getScheduleStatus(): Promise<{ shouldBeDark: boolean }> {
@@ -84,7 +111,7 @@ export function createBackgroundWorker(config: ProductConfig): void {
     await readyPromise;
   }
 
-  async function getGeolocation(): Promise<{ lat: number; lng: number } | { error: string }> {
+  async function getLocation(): Promise<{ lat: number; lng: number } | { error: string }> {
     try {
       await ensureOffscreenDocument();
     } catch (err) {
@@ -106,7 +133,6 @@ export function createBackgroundWorker(config: ProductConfig): void {
     });
   }
 
-  // Alarm management
   async function setupAlarm(): Promise<void> {
     const current = await prefs.load();
     if (current.mode === 'schedule' || current.mode === 'sunrise-sunset') {
@@ -116,7 +142,6 @@ export function createBackgroundWorker(config: ProductConfig): void {
     }
   }
 
-  // Notify content scripts
   async function notifyContentScripts(dark: boolean): Promise<void> {
     const tabs = await chrome.tabs.query({ url: config.tabUrlPattern });
     for (const tab of tabs) {
@@ -131,17 +156,65 @@ export function createBackgroundWorker(config: ProductConfig): void {
     }
   }
 
-  // Event listeners
-  chrome.alarms.onAlarm.addListener(async (alarm) => {
-    if (alarm.name === config.alarmName) {
+  async function handleAlarm(): Promise<void> {
+    const status = await getScheduleStatus();
+    await notifyContentScripts(status.shouldBeDark);
+  }
+
+  async function getProStatus(): Promise<{ paid: boolean }> {
+    try {
+      const paid = await payment.isPro();
+      return { paid };
+    } catch {
+      return { paid: false };
+    }
+  }
+
+  async function getSunTimesHandler(lat: number, lng: number): Promise<SunTimes | null> {
+    return getSunTimes(lat, lng, sunCacheKey);
+  }
+
+  // Prefs.onChange is correctly scoped by storageKey — safe to register per-site
+  prefs.onChange(async (newPrefs: BaseUserPreferences) => {
+    if (newPrefs.mode === 'schedule' || newPrefs.mode === 'sunrise-sunset') {
+      await chrome.alarms.create(config.alarmName, { periodInMinutes: 1 });
       const status = await getScheduleStatus();
       await notifyContentScripts(status.shouldBeDark);
+    } else {
+      await chrome.alarms.clear(config.alarmName);
+    }
+  });
+
+  return {
+    config,
+    getScheduleStatus,
+    getSunTimes: getSunTimesHandler,
+    getProStatus,
+    getLocation,
+    handleAlarm,
+    setupAlarm,
+  };
+}
+
+/**
+ * Creates and starts a background service worker for the given product.
+ * Registers Chrome event listeners for messages, alarms, and install events.
+ *
+ * Use this for standalone extensions (one call = one listener set).
+ * For the bundle, use createSiteWorker() and register a unified listener.
+ */
+export function createBackgroundWorker(config: ProductConfig): void {
+  const worker = createSiteWorker(config);
+
+  chrome.alarms.onAlarm.addListener(async (alarm) => {
+    if (alarm.name === config.alarmName) {
+      await worker.handleAlarm();
     }
   });
 
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (message.type === 'getScheduleStatus') {
-      getScheduleStatus().then(sendResponse);
+      worker.getScheduleStatus().then(sendResponse);
       return true;
     }
 
@@ -152,7 +225,7 @@ export function createBackgroundWorker(config: ProductConfig): void {
         sendResponse(null);
         return true;
       }
-      getSunTimes(lat, lng, sunCacheKey).then((times) => {
+      worker.getSunTimes(lat, lng).then((times) => {
         if (times) {
           sendResponse({
             sunrise: times.sunrise.toISOString(),
@@ -166,14 +239,12 @@ export function createBackgroundWorker(config: ProductConfig): void {
     }
 
     if (message.type === 'getProStatus') {
-      payment.isPro()
-        .then((paid) => sendResponse({ paid }))
-        .catch(() => sendResponse({ paid: false }));
+      worker.getProStatus().then(sendResponse);
       return true;
     }
 
     if (message.type === 'getLocation') {
-      getGeolocation().then(sendResponse);
+      worker.getLocation().then(sendResponse);
       return true;
     }
 
@@ -191,17 +262,7 @@ export function createBackgroundWorker(config: ProductConfig): void {
       if (typeof __DEV_MODE__ === 'undefined' || !__DEV_MODE__) {
         chrome.tabs.create({ url: `${config.siteBase}/setup?product=${config.productId}` });
       }
-      await setupAlarm();
-    }
-  });
-
-  prefs.onChange(async (newPrefs: BaseUserPreferences) => {
-    if (newPrefs.mode === 'schedule' || newPrefs.mode === 'sunrise-sunset') {
-      await chrome.alarms.create(config.alarmName, { periodInMinutes: 1 });
-      const status = await getScheduleStatus();
-      await notifyContentScripts(status.shouldBeDark);
-    } else {
-      await chrome.alarms.clear(config.alarmName);
+      await worker.setupAlarm();
     }
   });
 }
