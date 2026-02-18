@@ -1,9 +1,5 @@
-import { Nav } from '../components/Nav.tsx'
-import { Hero } from '../components/Hero.tsx'
-import { Features } from '../components/Features.tsx'
-import { Pricing } from '../components/Pricing.tsx'
-import { FAQ } from '../components/FAQ.tsx'
-import { Footer } from '../components/Footer.tsx'
+import { Nav, Hero, Features, Pricing, FAQ, Footer } from '@darkly/landing-shared'
+import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URLS, individualTiers, bundleTiers } from '../config.ts'
 
 const suiteFeatures = [
   'Dark mode for Gmail, Sheets, and Docs',
@@ -19,7 +15,7 @@ const suiteFeatures = [
 export function SuitePage() {
   return (
     <>
-      <Nav />
+      <Nav brandLabel="Suite" links={NAV_LINKS} cta={NAV_CTA} />
       <Hero
         title="The complete dark mode<br />suite for Google"
         subtitle="One extension, one license. Premium dark mode for Gmail, Sheets, and Docs with automatic scheduling and OS sync."
@@ -30,9 +26,9 @@ export function SuitePage() {
         sectionTitle="Everything in one package"
         sectionSubtitle="The Darkly Suite gives you dark mode for all Google apps with unified settings."
       />
-      <Pricing product="suite" features={suiteFeatures} />
+      <Pricing product="suite" features={suiteFeatures} individualTiers={individualTiers} bundleTiers={bundleTiers} storeUrls={STORE_URLS} />
       <FAQ />
-      <Footer />
+      <Footer brandLabel="Suite" links={FOOTER_LINKS} copyrightName={SITE_NAME} />
     </>
   )
 }

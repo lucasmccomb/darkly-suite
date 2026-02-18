@@ -1,10 +1,6 @@
-import { Nav } from '../components/Nav.tsx'
-import { Hero } from '../components/Hero.tsx'
-import { Features } from '../components/Features.tsx'
-import { Pricing } from '../components/Pricing.tsx'
-import { FAQ } from '../components/FAQ.tsx'
-import { Footer } from '../components/Footer.tsx'
+import { Nav, Hero, Features, Pricing, FAQ, Footer } from '@darkly/landing-shared'
 import { Table2, Sunset, Clock, Settings } from 'lucide-react'
+import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URLS, individualTiers } from '../config.ts'
 
 const sheetsFeatureItems = [
   {
@@ -47,7 +43,7 @@ const sheetsFeatures = [
 export function SheetsPage() {
   return (
     <>
-      <Nav />
+      <Nav brandLabel="Suite" links={NAV_LINKS} cta={NAV_CTA} />
       <Hero
         title="Comfortable dark mode<br />for Google Sheets"
         subtitle="Grid-aware dark mode that styles cells, headers, and the formula bar without affecting your spreadsheet data."
@@ -59,9 +55,9 @@ export function SheetsPage() {
         sectionTitle="Designed for spreadsheets"
         sectionSubtitle="Darkly understands the Sheets layout and styles every element for comfortable use."
       />
-      <Pricing product="sheets" features={sheetsFeatures} />
+      <Pricing product="sheets" features={sheetsFeatures} individualTiers={individualTiers} storeUrls={STORE_URLS} />
       <FAQ />
-      <Footer />
+      <Footer brandLabel="Suite" links={FOOTER_LINKS} copyrightName={SITE_NAME} />
     </>
   )
 }

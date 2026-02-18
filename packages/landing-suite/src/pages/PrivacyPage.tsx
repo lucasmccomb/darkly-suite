@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom'
 import { ChevronLeft } from 'lucide-react'
-import { Nav } from '../components/Nav.tsx'
-import { Footer } from '../components/Footer.tsx'
+import { Nav, Footer } from '@darkly/landing-shared'
+import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME } from '../config.ts'
 
 export function PrivacyPage() {
   return (
     <>
-      <Nav />
+      <Nav brandLabel="Suite" links={NAV_LINKS} cta={NAV_CTA} />
       <section className="privacy">
         <div className="container">
           <Link to="/" className="privacy-back">
@@ -116,7 +116,7 @@ export function PrivacyPage() {
           </div>
         </div>
       </section>
-      <Footer />
+      <Footer brandLabel="Suite" links={FOOTER_LINKS} copyrightName={SITE_NAME} />
     </>
   )
 }
