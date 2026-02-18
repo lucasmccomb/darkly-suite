@@ -8,7 +8,7 @@ import { FileText, Sunset, Clock, Settings } from 'lucide-react'
 
 const docsFeatureItems = [
   {
-    icon: <FileText size={28} color="#f28b82" strokeWidth={1.8} />,
+    icon: <FileText size={28} color="#4285f4" strokeWidth={1.8} />,
     iconClass: 'feature-icon--sunset',
     title: 'Canvas-Aware Rendering',
     description: 'Dark mode that works with the Kix editor canvas. Document text, menus, and toolbars are all styled.',

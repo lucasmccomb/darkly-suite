@@ -1,5 +1,6 @@
-import { Check, Mail, Table2, FileText, Package } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Check, Mail, Table2, FileText } from 'lucide-react'
+import { SuiteIcon } from './SuiteIcon.tsx'
+import { STORE_URLS } from '../constants.ts'
 
 interface PricingTier {
   plan: string
@@ -35,7 +36,7 @@ const individualTiers = (product: string): PricingTier[] => [
     subtitle: 'Cancel anytime',
     highlighted: false,
     cta: 'Get Started',
-    link: `/${product}`,
+    link: STORE_URLS[product as keyof typeof STORE_URLS] ?? `/${product}`,
   },
   {
     plan: 'Yearly',
@@ -45,7 +46,7 @@ const individualTiers = (product: string): PricingTier[] => [
     highlighted: true,
     badge: 'Best Value',
     cta: 'Get Started',
-    link: `/${product}`,
+    link: STORE_URLS[product as keyof typeof STORE_URLS] ?? `/${product}`,
   },
   {
     plan: 'Lifetime',
@@ -54,7 +55,7 @@ const individualTiers = (product: string): PricingTier[] => [
     subtitle: 'One-time payment',
     highlighted: false,
     cta: 'Get Started',
-    link: `/${product}`,
+    link: STORE_URLS[product as keyof typeof STORE_URLS] ?? `/${product}`,
   },
 ]
 
@@ -66,7 +67,7 @@ const bundleTiers: PricingTier[] = [
     subtitle: 'Cancel anytime',
     highlighted: false,
     cta: 'Get the Suite',
-    link: '/suite',
+    link: STORE_URLS.suite,
   },
   {
     plan: 'Yearly',
@@ -76,7 +77,7 @@ const bundleTiers: PricingTier[] = [
     highlighted: true,
     badge: 'Best Value',
     cta: 'Get the Suite',
-    link: '/suite',
+    link: STORE_URLS.suite,
   },
   {
     plan: 'Lifetime',
@@ -85,7 +86,7 @@ const bundleTiers: PricingTier[] = [
     subtitle: 'One-time payment',
     highlighted: false,
     cta: 'Get the Suite',
-    link: '/suite',
+    link: STORE_URLS.suite,
   },
 ]
 
@@ -147,9 +148,9 @@ export function Pricing({ product, selectedApp, onAppChange, features = defaultF
                   {tier.period && <span>{tier.period}</span>}
                 </div>
                 <div className="pricing-subtitle">{tier.subtitle}</div>
-                <Link to={tier.link} className="btn btn-primary">
+                <a href={tier.link} className="btn btn-primary" target="_blank" rel="noopener noreferrer">
                   {tier.cta}
-                </Link>
+                </a>
               </div>
             ))}
           </div>
@@ -197,9 +198,9 @@ export function Pricing({ product, selectedApp, onAppChange, features = defaultF
                 {tier.badge && <span className="pricing-badge">{tier.badge}</span>}
                 <div className="pricing-plan">{tier.plan}</div>
                 <div className="pricing-suite-icons">
-                  <Mail size={22} color="#8ab4f8" strokeWidth={1.8} />
+                  <Mail size={22} color="#ea4335" strokeWidth={1.8} />
                   <Table2 size={22} color="#81c995" strokeWidth={1.8} />
-                  <FileText size={22} color="#f28b82" strokeWidth={1.8} />
+                  <FileText size={22} color="#4285f4" strokeWidth={1.8} />
                 </div>
                 <div className="pricing-suite-label">Gmail, Sheets & Docs</div>
                 <div className="pricing-price">
@@ -207,9 +208,9 @@ export function Pricing({ product, selectedApp, onAppChange, features = defaultF
                   {tier.period && <span>{tier.period}</span>}
                 </div>
                 <div className="pricing-subtitle">{tier.subtitle}</div>
-                <Link to="/suite" className="btn btn-primary">
+                <a href={STORE_URLS.suite} className="btn btn-primary" target="_blank" rel="noopener noreferrer">
                   Get the Suite
-                </Link>
+                </a>
               </div>
             ))}
           </div>
@@ -231,7 +232,7 @@ export function Pricing({ product, selectedApp, onAppChange, features = defaultF
                 <div className="pricing-choose-label">Choose 1</div>
                 <div className={`pricing-app-icons ${selectedApp ? 'pricing-app-icons--has-selection' : ''}`}>
                   <span className={`pricing-app-icon-wrap ${selectedApp === 'gmail' ? 'pricing-app-icon--active' : ''}`}>
-                    <Mail size={24} color="#8ab4f8" strokeWidth={1.8} />
+                    <Mail size={24} color="#ea4335" strokeWidth={1.8} />
                   </span>
                   <span className="pricing-icon-or">or</span>
                   <span className={`pricing-app-icon-wrap ${selectedApp === 'sheets' ? 'pricing-app-icon--active' : ''}`}>
@@ -239,7 +240,7 @@ export function Pricing({ product, selectedApp, onAppChange, features = defaultF
                   </span>
                   <span className="pricing-icon-or">or</span>
                   <span className={`pricing-app-icon-wrap ${selectedApp === 'docs' ? 'pricing-app-icon--active' : ''}`}>
-                    <FileText size={24} color="#f28b82" strokeWidth={1.8} />
+                    <FileText size={24} color="#4285f4" strokeWidth={1.8} />
                   </span>
                 </div>
                 <div className="pricing-price">
@@ -250,9 +251,9 @@ export function Pricing({ product, selectedApp, onAppChange, features = defaultF
                 <div className="pricing-app-select-wrapper">
                   {selectedApp && (
                     <span className="pricing-app-select-icon">
-                      {selectedApp === 'gmail' && <Mail size={16} color="#8ab4f8" strokeWidth={1.8} />}
+                      {selectedApp === 'gmail' && <Mail size={16} color="#ea4335" strokeWidth={1.8} />}
                       {selectedApp === 'sheets' && <Table2 size={16} color="#81c995" strokeWidth={1.8} />}
-                      {selectedApp === 'docs' && <FileText size={16} color="#f28b82" strokeWidth={1.8} />}
+                      {selectedApp === 'docs' && <FileText size={16} color="#4285f4" strokeWidth={1.8} />}
                     </span>
                   )}
                   <select
@@ -267,12 +268,12 @@ export function Pricing({ product, selectedApp, onAppChange, features = defaultF
                   </select>
                 </div>
                 {selectedApp ? (
-                  <Link to={`/${selectedApp}`} className="btn btn-primary">
-                    {selectedApp === 'gmail' && <Mail size={16} color="#8ab4f8" strokeWidth={1.8} />}
+                  <a href={STORE_URLS[selectedApp]} className="btn btn-primary" target="_blank" rel="noopener noreferrer">
+                    {selectedApp === 'gmail' && <Mail size={16} color="#ea4335" strokeWidth={1.8} />}
                     {selectedApp === 'sheets' && <Table2 size={16} color="#81c995" strokeWidth={1.8} />}
-                    {selectedApp === 'docs' && <FileText size={16} color="#f28b82" strokeWidth={1.8} />}
+                    {selectedApp === 'docs' && <FileText size={16} color="#4285f4" strokeWidth={1.8} />}
                     Get {APP_NAMES[selectedApp]}
-                  </Link>
+                  </a>
                 ) : (
                   <span className="btn btn-primary btn-disabled">Get Single App</span>
                 )}
@@ -289,7 +290,7 @@ export function Pricing({ product, selectedApp, onAppChange, features = defaultF
                 <tr>
                   <th></th>
                   <th>
-                    <Mail size={18} color="#8ab4f8" strokeWidth={1.8} />
+                    <Mail size={18} color="#ea4335" strokeWidth={1.8} />
                     <span>Darkly for Gmail</span>
                   </th>
                   <th>
@@ -297,11 +298,11 @@ export function Pricing({ product, selectedApp, onAppChange, features = defaultF
                     <span>Darkly for Sheets</span>
                   </th>
                   <th>
-                    <FileText size={18} color="#f28b82" strokeWidth={1.8} />
+                    <FileText size={18} color="#4285f4" strokeWidth={1.8} />
                     <span>Darkly for Docs</span>
                   </th>
                   <th className="pricing-comparison-suite-col">
-                    <Package size={18} color="#f5c842" strokeWidth={1.8} />
+                    <SuiteIcon size={18} />
                     <span>Darkly Suite</span>
                   </th>
                 </tr>

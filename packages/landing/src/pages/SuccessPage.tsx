@@ -1,18 +1,22 @@
+import { useSearchParams } from 'react-router-dom'
 import { Nav } from '../components/Nav.tsx'
 import { Footer } from '../components/Footer.tsx'
 import { Wordmark } from '../components/Wordmark.tsx'
+import { SetupGuide } from '../components/SetupGuide.tsx'
 import { Check } from 'lucide-react'
 
 export function SuccessPage() {
+  const [searchParams] = useSearchParams()
+  const product = searchParams.get('product')
+
   return (
     <>
       <Nav />
       <section style={{
-        minHeight: '60vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '120px 24px 80px',
+        padding: '120px 24px 48px',
       }}>
         <div style={{
           textAlign: 'center',
@@ -42,27 +46,15 @@ export function SuccessPage() {
             fontSize: '1.1rem',
             color: 'var(--color-text-secondary)',
             lineHeight: 1.6,
-            marginBottom: 32,
           }}>
-            Your payment was successful. Pro features are now active --
-            head back to your Google apps and enjoy the premium dark mode experience.
+            Your payment was successful. Follow the steps below to get started
+            with your premium dark mode experience.
           </p>
-          <a
-            href="https://mail.google.com"
-            style={{
-              display: 'inline-block',
-              padding: '14px 32px',
-              background: 'linear-gradient(135deg, var(--color-accent), var(--color-purple))',
-              color: '#fff',
-              fontWeight: 600,
-              fontSize: '1rem',
-              borderRadius: 'var(--radius)',
-              textDecoration: 'none',
-              transition: 'var(--transition)',
-            }}
-          >
-            Open Gmail
-          </a>
+        </div>
+      </section>
+      <section className="section" style={{ paddingTop: 0 }}>
+        <div className="container">
+          <SetupGuide activeTab={product} />
         </div>
       </section>
       <Footer />

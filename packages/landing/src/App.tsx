@@ -7,6 +7,7 @@ import { DocsPage } from './pages/DocsPage.tsx'
 import { SuitePage } from './pages/SuitePage.tsx'
 import { PrivacyPage } from './pages/PrivacyPage.tsx'
 import { SuccessPage } from './pages/SuccessPage.tsx'
+import { SetupPage } from './pages/SetupPage.tsx'
 import { AdminLoginPage } from './admin/pages/AdminLoginPage.tsx'
 import { AdminLayout } from './admin/AdminLayout.tsx'
 import { AdminLicensesPage } from './admin/pages/AdminLicensesPage.tsx'
@@ -40,6 +41,7 @@ export function App() {
         <Route path="/suite" element={<SuitePage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/success" element={<SuccessPage />} />
+        <Route path="/setup" element={<SetupPage />} />
         <Route path="/admin" element={<AdminLoginPage />} />
         <Route element={<AdminLayout />}>
           <Route path="/admin/licenses" element={<AdminLicensesPage />} />
