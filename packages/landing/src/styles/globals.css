@@ -1010,6 +1010,11 @@ button.product-card {
   text-align: left;
 }
 
+.pricing-comparison thead th svg,
+.pricing-comparison thead th .suite-icon-pill {
+  height: 28px;
+}
+
 .pricing-comparison thead th span {
   display: block;
   margin-top: 4px;
