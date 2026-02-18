@@ -19,7 +19,7 @@ beforeEach(() => {
 describe('ThemeEngine', () => {
   describe('constructor and init', () => {
     it('initializes with system mode defaults (light theme)', async () => {
-      const engine = new ThemeEngine(mockConfig);
+      const engine = new ThemeEngine(mockConfig, (fn) => fn());
       await engine.init();
 
       expect(document.documentElement.getAttribute(`data-${mockConfig.prefix}-theme`)).toBe('light');
@@ -29,7 +29,7 @@ describe('ThemeEngine', () => {
     it('restores dark mode from stored preferences', async () => {
       syncStorage[mockConfig.storageKey] = { mode: 'dark', preset: 'default' };
 
-      const engine = new ThemeEngine(mockConfig);
+      const engine = new ThemeEngine(mockConfig, (fn) => fn());
       await engine.init();
 
       expect(document.documentElement.getAttribute(`data-${mockConfig.prefix}-theme`)).toBe('dark');
@@ -39,7 +39,7 @@ describe('ThemeEngine', () => {
     it('restores preset from stored preferences', async () => {
       syncStorage[mockConfig.storageKey] = { mode: 'dark', preset: 'nord' };
 
-      const engine = new ThemeEngine(mockConfig);
+      const engine = new ThemeEngine(mockConfig, (fn) => fn());
       await engine.init();
 
       expect(document.documentElement.getAttribute(`data-${mockConfig.prefix}-preset`)).toBe('nord');
@@ -48,7 +48,7 @@ describe('ThemeEngine', () => {
 
   describe('apply', () => {
     it('sets theme attribute on document element', async () => {
-      const engine = new ThemeEngine(mockConfig);
+      const engine = new ThemeEngine(mockConfig, (fn) => fn());
       await engine.init();
 
       engine.apply('dark');
@@ -58,7 +58,7 @@ describe('ThemeEngine', () => {
 
     it('does not re-apply same theme', async () => {
       syncStorage[mockConfig.storageKey] = { mode: 'dark', preset: 'default' };
-      const engine = new ThemeEngine(mockConfig);
+      const engine = new ThemeEngine(mockConfig, (fn) => fn());
       await engine.init();
 
       const attrBefore = document.documentElement.getAttribute(`data-${mockConfig.prefix}-theme`);
@@ -69,7 +69,7 @@ describe('ThemeEngine', () => {
     });
 
     it('does NOT save to preferences', async () => {
-      const engine = new ThemeEngine(mockConfig);
+      const engine = new ThemeEngine(mockConfig, (fn) => fn());
       await engine.init();
       chromeMock.storage.sync.set.mockClear();
 
@@ -81,7 +81,7 @@ describe('ThemeEngine', () => {
 
   describe('toggle', () => {
     it('toggles from light to dark', async () => {
-      const engine = new ThemeEngine(mockConfig);
+      const engine = new ThemeEngine(mockConfig, (fn) => fn());
       await engine.init();
 
       engine.toggle();
@@ -91,7 +91,7 @@ describe('ThemeEngine', () => {
 
     it('toggles from dark to light', async () => {
       syncStorage[mockConfig.storageKey] = { mode: 'dark', preset: 'default' };
-      const engine = new ThemeEngine(mockConfig);
+      const engine = new ThemeEngine(mockConfig, (fn) => fn());
       await engine.init();
 
       engine.toggle();
@@ -100,7 +100,7 @@ describe('ThemeEngine', () => {
     });
 
     it('saves mode to preferences', async () => {
-      const engine = new ThemeEngine(mockConfig);
+      const engine = new ThemeEngine(mockConfig, (fn) => fn());
       await engine.init();
       chromeMock.storage.sync.set.mockClear();
 
@@ -117,7 +117,7 @@ describe('ThemeEngine', () => {
 
   describe('applyPreset', () => {
     it('sets preset attribute on document element', async () => {
-      const engine = new ThemeEngine(mockConfig);
+      const engine = new ThemeEngine(mockConfig, (fn) => fn());
       await engine.init();
 
       engine.applyPreset('nord');
@@ -127,7 +127,7 @@ describe('ThemeEngine', () => {
 
     it('does not re-apply same preset', async () => {
       syncStorage[mockConfig.storageKey] = { mode: 'dark', preset: 'nord' };
-      const engine = new ThemeEngine(mockConfig);
+      const engine = new ThemeEngine(mockConfig, (fn) => fn());
       await engine.init();
 
       const attrBefore = document.documentElement.getAttribute(`data-${mockConfig.prefix}-preset`);
@@ -139,7 +139,7 @@ describe('ThemeEngine', () => {
 
     it('removes preset attribute when switching to default', async () => {
       syncStorage[mockConfig.storageKey] = { mode: 'dark', preset: 'nord' };
-      const engine = new ThemeEngine(mockConfig);
+      const engine = new ThemeEngine(mockConfig, (fn) => fn());
       await engine.init();
 
       engine.applyPreset('default');
@@ -148,7 +148,7 @@ describe('ThemeEngine', () => {
     });
 
     it('does NOT save to preferences', async () => {
-      const engine = new ThemeEngine(mockConfig);
+      const engine = new ThemeEngine(mockConfig, (fn) => fn());
       await engine.init();
       chromeMock.storage.sync.set.mockClear();
 
@@ -161,7 +161,7 @@ describe('ThemeEngine', () => {
   describe('prefix parameterization', () => {
     it('uses the config prefix for theme attributes', async () => {
       const sheetsConfig = createMockConfig({ prefix: 'sd', storageKey: 'sd_preferences' });
-      const engine = new ThemeEngine(sheetsConfig);
+      const engine = new ThemeEngine(sheetsConfig, (fn) => fn());
       await engine.init();
 
       engine.apply('dark');
@@ -173,7 +173,7 @@ describe('ThemeEngine', () => {
 
     it('uses the config prefix for preset attributes', async () => {
       const docsConfig = createMockConfig({ prefix: 'dd', storageKey: 'dd_preferences' });
-      const engine = new ThemeEngine(docsConfig);
+      const engine = new ThemeEngine(docsConfig, (fn) => fn());
       await engine.init();
 
       engine.applyPreset('nord');
@@ -185,7 +185,7 @@ describe('ThemeEngine', () => {
   describe('setGridPreference', () => {
     it('sets grid preserve attribute with config prefix', async () => {
       const sheetsConfig = createMockConfig({ prefix: 'sd', storageKey: 'sd_preferences' });
-      const engine = new ThemeEngine(sheetsConfig);
+      const engine = new ThemeEngine(sheetsConfig, (fn) => fn());
       await engine.init();
 
       engine.setGridPreference(true);
@@ -199,7 +199,7 @@ describe('ThemeEngine', () => {
   describe('setPagelessMode', () => {
     it('sets pageless mode attribute with config prefix', async () => {
       const docsConfig = createMockConfig({ prefix: 'dd', storageKey: 'dd_preferences' });
-      const engine = new ThemeEngine(docsConfig);
+      const engine = new ThemeEngine(docsConfig, (fn) => fn());
       await engine.init();
 
       engine.setPagelessMode(true);

@@ -7,7 +7,6 @@ export { ModeDetailPanel } from './ModeDetailPanel';
 export { DefaultConfig } from './DefaultConfig';
 export { ScheduleConfig } from './ScheduleConfig';
 export { SunriseSunsetConfig } from './SunriseSunsetConfig';
-export { NightTintConfig } from './NightTintConfig';
 export { Paywall } from './Paywall';
 export { UpgradeBanner } from './UpgradeBanner';
 

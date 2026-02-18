@@ -18,15 +18,14 @@ export { getPreset, PRESETS, DEFAULT_DARK_VARIABLES } from './theme/presets';
 export type { ThemePreset } from './theme/presets';
 export { SystemThemeDetector } from './theme/detector';
 export { shouldBeDark } from './theme/scheduler';
-export { withTransition, initTransitions } from './theme/transitions';
-export * as NightTint from './theme/night-tint';
+export { createTransitionManager } from './theme/transitions';
+export type { TransitionManager } from './theme/transitions';
 
 // Storage
 export type {
   ThemeMode,
   PresetName,
   ScheduleConfig,
-  NightTintConfig,
   SunriseSunsetConfig,
   BaseUserPreferences,
 } from './storage/types';
@@ -92,7 +91,6 @@ export {
   DefaultConfig,
   ScheduleConfig as ScheduleConfigComponent,
   SunriseSunsetConfig as SunriseSunsetConfigComponent,
-  NightTintConfig as NightTintConfigComponent,
   Paywall,
   UpgradeBanner,
   ActionButton,

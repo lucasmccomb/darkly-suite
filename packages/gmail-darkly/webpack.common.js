@@ -63,16 +63,11 @@ module.exports = {
           to: 'styles/gmail-overrides.css',
           transform: transformPrefix,
         },
-        // Shared core CSS files (themes, night-tint, settings-panel)
+        // Shared core CSS files (themes, settings-panel)
         // with darkly- → gd- prefix transformation
         {
           from: path.resolve(__dirname, '../core/src/styles/themes.css'),
           to: 'styles/themes.css',
-          transform: transformPrefix,
-        },
-        {
-          from: path.resolve(__dirname, '../core/src/styles/night-tint.css'),
-          to: 'styles/night-tint.css',
           transform: transformPrefix,
         },
         {

@@ -2,17 +2,18 @@ import type { PresetName } from '../storage/types';
 import type { ProductConfig } from '../config';
 import { createPreferencesManager } from '../storage/preferences';
 import { getPreset } from './presets';
-import { withTransition } from './transitions';
 
 export class ThemeEngine {
   private config: ProductConfig;
   private currentTheme: 'light' | 'dark' = 'light';
   private currentPreset: PresetName = 'default';
   private prefs: ReturnType<typeof createPreferencesManager>;
+  private withTransition: (changeFn: () => void) => void;
 
-  constructor(config: ProductConfig) {
+  constructor(config: ProductConfig, withTransition: (changeFn: () => void) => void) {
     this.config = config;
     this.prefs = createPreferencesManager(config);
+    this.withTransition = withTransition;
   }
 
   async init(): Promise<void> {
@@ -28,7 +29,7 @@ export class ThemeEngine {
 
   apply(theme: 'light' | 'dark'): void {
     if (theme === this.currentTheme) return;
-    withTransition(() => {
+    this.withTransition(() => {
       this.currentTheme = theme;
       this.applyThemeAttribute(theme);
     });
@@ -43,7 +44,7 @@ export class ThemeEngine {
   applyPreset(name: PresetName): void {
     if (name === this.currentPreset) return;
     this.currentPreset = name;
-    withTransition(() => {
+    this.withTransition(() => {
       if (name === 'default') {
         this.removePreset();
       } else {
