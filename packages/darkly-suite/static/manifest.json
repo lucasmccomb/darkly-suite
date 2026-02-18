@@ -9,7 +9,8 @@
     "https://docs.google.com/spreadsheets/*",
     "https://docs.google.com/document/*",
     "https://drive.google.com/*",
-    "https://darklysuite.com/*"
+    "https://darklysuite.com/*",
+    "https://api.sunrise-sunset.org/*"
   ],
   "background": {
     "service_worker": "background.js"
