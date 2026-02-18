@@ -12,7 +12,8 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "type-check": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.functions.json"
+    "type-check": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.functions.json",
+    "test": "jest"
   },
   "dependencies": {
     "lucide-react": "^0.564.0",
@@ -22,8 +23,11 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260212.0",
+    "@types/jest": "^30.0.0",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
     "typescript": "~5.9.3"
   }
 }
