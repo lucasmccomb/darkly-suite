@@ -13,7 +13,8 @@ pnpm dev:gmail                  # Dev mode for Gmail extension
 pnpm dev:sheets                 # Dev mode for Sheets extension
 pnpm dev:docs                   # Dev mode for Docs extension
 pnpm dev:suite                  # Dev mode for Darkly Suite bundle
-pnpm dev:landing                # Dev mode for landing page
+pnpm dev:landing                # Dev mode for darklysuite.com
+pnpm dev:landing-gmail          # Dev mode for gmaildarkly.com
 ```
 
 ## Pre-Push Verification
@@ -47,7 +48,9 @@ packages/
   sheets-darkly/         Individual Sheets extension
   docs-darkly/           Individual Docs extension
   darkly-suite/          Darkly Suite bundle extension
+  landing-shared/        @darkly/landing-shared — shared landing components & backend
   landing-suite/         darklysuite.com (Vite + React + Cloudflare Pages)
+  landing-gmail/         gmaildarkly.com (Vite + React, marketing only)
 ```
 
 ## Architecture: How Code Sharing Works

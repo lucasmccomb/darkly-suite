@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { BrandLogo } from './BrandLogo.tsx'
 import { ShieldCheck } from 'lucide-react'
@@ -8,14 +9,15 @@ interface HeroProps {
   ctaText: string
   ctaLink: string
   badge?: string
+  icon?: ReactNode
 }
 
-export function Hero({ title, subtitle, ctaText, ctaLink, badge }: HeroProps) {
+export function Hero({ title, subtitle, ctaText, ctaLink, badge, icon }: HeroProps) {
   return (
     <section className="hero">
       <div className="hero-content">
         <div className="hero-icon">
-          <BrandLogo glow />
+          {icon ?? <BrandLogo glow />}
         </div>
         <h1 className="hero-title">
           {title.split('<br />').map((segment, i, arr) => (
