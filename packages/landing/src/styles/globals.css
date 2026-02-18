@@ -501,27 +501,20 @@ img {
 
 .suite-icon-fan {
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
   position: relative;
+  vertical-align: middle;
   border: 2px solid #f5c842;
   border-radius: 8px;
   background: var(--color-accent-dim);
   box-shadow: 0 0 10px rgba(245, 200, 66, 0.3);
+  padding: 4px;
 }
 
 .suite-icon-fan-card {
   position: absolute;
   display: flex;
-  transform-origin: 50% 100%;
-}
-
-.suite-icon-fan-card--left {
-  transform: rotate(-15deg);
-}
-
-.suite-icon-fan-card--right {
-  transform: rotate(15deg);
+  align-items: center;
+  justify-content: center;
 }
 
 .product-card-name {
@@ -1038,8 +1031,14 @@ button.product-card {
 }
 
 .pricing-comparison thead th svg,
-.pricing-comparison thead th .suite-icon-pill {
+.pricing-comparison thead th .suite-icon-pill,
+.pricing-comparison thead th .suite-icon-fan {
   height: 28px;
+}
+
+.pricing-comparison thead th .suite-icon-fan {
+  height: auto;
+  margin: 0 auto;
 }
 
 .pricing-comparison thead th span {
