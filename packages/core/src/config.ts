@@ -15,6 +15,7 @@ export interface ProductConfig {
   tokenKey: string;
   proCacheKey: string;
   apiBase: string;
+  siteBase: string;
   alarmName: string;
   tabUrlPattern: string;
   sites?: SiteId[];

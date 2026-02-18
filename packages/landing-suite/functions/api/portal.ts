@@ -1,17 +1,18 @@
 import type { Env, License } from './_shared/types.ts';
 import { isValidToken, isValidProduct } from './_shared/types.ts';
-import { corsHeaders, handleOptions } from './_shared/cors.ts';
+import { corsHeaders, handleOptions, parseExtensionIds } from './_shared/cors.ts';
 import { createPortalSession } from './_shared/stripe.ts';
 
 type CFContext = EventContext<Env, string, unknown>;
 
 export const onRequestOptions: PagesFunction<Env> = async (context: CFContext) => {
-  return handleOptions(context.request);
+  return handleOptions(context.request, parseExtensionIds(context.env.ALLOWED_EXTENSION_IDS));
 };
 
 async function handlePortal(context: CFContext): Promise<Response> {
   const origin = context.request.headers.get('Origin') ?? undefined;
-  const headers: HeadersInit = { ...corsHeaders(origin), 'Content-Type': 'application/json' };
+  const extIds = parseExtensionIds(context.env.ALLOWED_EXTENSION_IDS);
+  const headers: HeadersInit = { ...corsHeaders(origin, extIds), 'Content-Type': 'application/json' };
 
   const url = new URL(context.request.url);
   const token = url.searchParams.get('token');
@@ -57,7 +58,7 @@ async function handlePortal(context: CFContext): Promise<Response> {
 
     return new Response(null, {
       status: 303,
-      headers: { ...corsHeaders(origin), Location: portalSession.url },
+      headers: { ...corsHeaders(origin, extIds), Location: portalSession.url },
     });
   } catch (err) {
     console.error('[portal] Failed to create portal session:', err);

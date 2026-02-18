@@ -27,6 +27,9 @@ export interface Env {
   GOOGLE_CLIENT_SECRET: string;
   ADMIN_EMAIL: string;
   SESSION_SECRET: string;
+  // CORS — comma-separated list of allowed Chrome extension IDs (stable CWS IDs)
+  // When unset, all chrome-extension:// origins are allowed (for local development)
+  ALLOWED_EXTENSION_IDS?: string;
 }
 
 export interface License {

@@ -1,16 +1,17 @@
 import type { Env, License } from '../_shared/types.ts';
 import { isValidToken, isValidProduct } from '../_shared/types.ts';
-import { corsHeaders, handleOptions } from '../_shared/cors.ts';
+import { corsHeaders, handleOptions, parseExtensionIds } from '../_shared/cors.ts';
 
 type CFContext = EventContext<Env, string, unknown>;
 
 export const onRequestOptions: PagesFunction<Env> = async (context: CFContext) => {
-  return handleOptions(context.request);
+  return handleOptions(context.request, parseExtensionIds(context.env.ALLOWED_EXTENSION_IDS));
 };
 
 export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
   const origin = context.request.headers.get('Origin') ?? undefined;
-  const headers: HeadersInit = { ...corsHeaders(origin), 'Content-Type': 'application/json' };
+  const extIds = parseExtensionIds(context.env.ALLOWED_EXTENSION_IDS);
+  const headers: HeadersInit = { ...corsHeaders(origin, extIds), 'Content-Type': 'application/json' };
 
   const token = context.params.token as string;
   const url = new URL(context.request.url);

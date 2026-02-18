@@ -8,6 +8,7 @@ export const config: ProductConfig = {
   tokenKey: 'dd_token',
   proCacheKey: 'dd_pro_cache',
   apiBase: 'https://darklysuite.com/api',
+  siteBase: 'https://darklysuite.com',
   alarmName: 'dd-schedule-check',
   tabUrlPattern: 'https://docs.google.com/document/*',
   forceColorSchemeLight: true,
