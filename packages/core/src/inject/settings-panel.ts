@@ -26,7 +26,7 @@ export interface PanelManager {
   onStateChange(cb: (state: PanelState) => void): () => void;
 }
 
-export function createPanelManager(config: ProductConfig): PanelManager {
+export function createPanelManager(_config: ProductConfig): PanelManager {
   const state: PanelState = { miniOpen: false, sidebarOpen: false };
   const listeners = new Set<(state: PanelState) => void>();
 

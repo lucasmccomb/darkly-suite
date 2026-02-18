@@ -1,6 +1,7 @@
 {
   "name": "darkly-suite-ext",
   "version": "1.0.0",
+  "description": "Bundle Chrome extension providing dark mode for Gmail, Sheets, and Docs",
   "private": true,
   "scripts": {
     "dev": "webpack --config webpack.dev.js --watch",

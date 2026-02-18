@@ -6,8 +6,6 @@ import * as NightTint from './theme/night-tint';
 import { initTransitions } from './theme/transitions';
 import { createPreferencesManager } from './storage/preferences';
 import { createPaymentClient } from './payment/client';
-import { createSidebarPanel } from './inject/sidebar-icon';
-import { createSettingsContainer } from './inject/settings-panel';
 import { createSettingsModal, createMiniPanel } from './inject/panels';
 import type { PanelHandle } from './inject/panels';
 import type { BaseUserPreferences } from './storage/types';

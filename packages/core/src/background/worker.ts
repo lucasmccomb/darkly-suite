@@ -147,6 +147,11 @@ export function createBackgroundWorker(config: ProductConfig): void {
 
     if (message.type === 'getSunTimes') {
       const { lat, lng } = message;
+      if (typeof lat !== 'number' || typeof lng !== 'number' ||
+          lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+        sendResponse(null);
+        return true;
+      }
       getSunTimes(lat, lng, sunCacheKey).then((times) => {
         if (times) {
           sendResponse({

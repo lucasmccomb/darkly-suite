@@ -1,6 +1,7 @@
 {
   "name": "@darkly/landing",
   "version": "1.0.0",
+  "description": "Landing page and payment backend for darklysuite.com",
   "private": true,
   "type": "module",
   "scripts": {

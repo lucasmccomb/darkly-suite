@@ -1,6 +1,7 @@
 {
   "name": "sheets-darkly",
   "version": "1.0.0",
+  "description": "Chrome extension providing dark mode for Google Sheets",
   "private": true,
   "scripts": {
     "dev": "webpack --config webpack.dev.js --watch",

@@ -57,9 +57,9 @@ async function handleCheckout(context: CFContext): Promise<Response> {
       headers: { ...headers, Location: session.url },
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error';
+    console.error('[checkout] Failed to create checkout session:', err);
     return new Response(
-      JSON.stringify({ error: 'Failed to create checkout session', detail: message }),
+      JSON.stringify({ error: 'Failed to create checkout session' }),
       { status: 500, headers: { ...headers, 'Content-Type': 'application/json' } },
     );
   }

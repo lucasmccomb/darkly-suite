@@ -55,9 +55,9 @@ export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
       { status: 200, headers },
     );
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error';
+    console.error('[status] Database query failed:', err);
     return new Response(
-      JSON.stringify({ error: 'Database query failed', detail: message }),
+      JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers },
     );
   }
