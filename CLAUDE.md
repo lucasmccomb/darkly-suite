@@ -114,7 +114,7 @@ Running `pnpm -r build` overwrites `dist/` with production output (`__DEV_MODE__
 Always provide the **full dist path starting from `~`** so the user can navigate to it in Finder:
 
 ```
-~/code/darkly-suite-repos/{worktree}/packages/{extension}/dist/
+~/code/darkly-suite-repos/{clone}/packages/{extension}/dist/
 ```
 
 For example: `~/code/darkly-suite-repos/darkly-suite-0/packages/gmail-darkly/dist/`
