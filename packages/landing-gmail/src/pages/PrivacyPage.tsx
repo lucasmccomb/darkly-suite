@@ -6,7 +6,7 @@ import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME } from '../config.ts'
 export function PrivacyPage() {
   return (
     <>
-      <Nav links={NAV_LINKS} cta={NAV_CTA} />
+      <Nav brandLabel="for Gmail" links={NAV_LINKS} cta={NAV_CTA} />
       <section className="privacy">
         <div className="container">
           <Link to="/" className="privacy-back">
@@ -125,6 +125,7 @@ export function PrivacyPage() {
         </div>
       </section>
       <Footer
+        brandLabel="for Gmail"
         links={FOOTER_LINKS}
         copyrightName={SITE_NAME}
         trademarkText="Gmail is a trademark of Google LLC. Darkly is not affiliated with or endorsed by Google."

@@ -15,7 +15,7 @@ export const NAV_LINKS = [
   { to: '/privacy', label: 'Privacy' },
 ]
 
-export const NAV_CTA = { to: '/#pricing', label: 'Get Darkly' }
+export const NAV_CTA = { to: '/#pricing', label: 'Get Darkly for Gmail' }
 
 export const FOOTER_LINKS = [
   { to: STORE_URL, label: 'Chrome Web Store', external: true },
@@ -68,7 +68,7 @@ export const individualTiers = (): PricingTier[] => [
     period: '/mo',
     subtitle: 'Cancel anytime',
     highlighted: false,
-    cta: 'Get Started',
+    cta: 'Get Darkly for Gmail',
     link: STORE_URL,
   },
   {
@@ -78,7 +78,7 @@ export const individualTiers = (): PricingTier[] => [
     subtitle: 'Save 16%',
     highlighted: true,
     badge: 'Best Value',
-    cta: 'Get Started',
+    cta: 'Get Darkly for Gmail',
     link: STORE_URL,
   },
   {
@@ -87,7 +87,7 @@ export const individualTiers = (): PricingTier[] => [
     period: '',
     subtitle: 'One-time payment',
     highlighted: false,
-    cta: 'Get Started',
+    cta: 'Get Darkly for Gmail',
     link: STORE_URL,
   },
 ]
