@@ -4,7 +4,7 @@
   "description": "Dark mode for Gmail with OS theme sync, sunset scheduling, and schedule mode. Settings right inside Gmail.",
   "version": "1.0.0",
   "permissions": ["storage", "alarms", "offscreen", "scripting"],
-  "host_permissions": ["https://mail.google.com/*", "https://darklysuite.com/*"],
+  "host_permissions": ["https://mail.google.com/*", "https://darklysuite.com/*", "https://api.sunrise-sunset.org/*"],
   "background": {
     "service_worker": "background.js"
   },
