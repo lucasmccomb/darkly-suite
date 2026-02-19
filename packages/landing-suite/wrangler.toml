@@ -4,6 +4,7 @@ pages_build_output_dir = "dist"
 
 [vars]
 SITE_URL = "https://darklysuite.com"
+SITE_URL_GMAIL = "https://gmaildarkly.com"
 # Stripe price IDs (sandbox — swap for live IDs when launching)
 STRIPE_PRICE_GMAIL_MONTHLY = "price_1T2ZhWJY6QkfGXSJEACPhWhv"
 STRIPE_PRICE_GMAIL_YEARLY = "price_1T2ZjQJY6QkfGXSJJ9rFh6Fc"
