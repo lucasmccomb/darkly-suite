@@ -20,8 +20,6 @@ const heroScreenshots: ScreenshotImage[] = [
 
 const featureScreenshots: ScreenshotImage[] = [
   { src: '/images/screenshots/panel-views.jpg', alt: 'All Darkly theme modes — Schedule, Default, Sunrise/Sunset, and System' },
-  { src: '/images/screenshots/inbox-dark-mini-panel.jpg', alt: 'Gmail dark mode with Darkly mini panel showing quick theme controls' },
-  { src: '/images/screenshots/marketing-tile.jpg', alt: 'Darkly for Gmail — save your eyes with intelligent dark mode' },
 ]
 
 export function GmailPage() {
