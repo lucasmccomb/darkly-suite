@@ -1592,3 +1592,461 @@ button.product-card {
     justify-content: center;
   }
 }
+
+/* ============================================
+   Logo Design Exploration
+   ============================================ */
+
+.logo-explorer {
+  padding: 120px 0 80px;
+  min-height: 100vh;
+}
+
+.logo-explorer-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.logo-explorer-header .section-subtitle {
+  margin: 0 auto;
+}
+
+/* ── Final Logo Showcase ── */
+
+.logo-final-section {
+  margin-bottom: 56px;
+  padding: 40px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 0 40px rgba(138, 180, 248, 0.06);
+}
+
+.logo-final-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+  color: var(--color-accent);
+}
+
+.logo-final-subtitle {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 32px;
+}
+
+.logo-final-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+
+.logo-final-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.logo-final-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+}
+
+.logo-final-swatches {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.logo-swatch--lg {
+  width: 120px;
+  height: 120px;
+}
+
+.logo-swatch--lg svg {
+  width: 72px;
+  height: 72px;
+}
+
+.logo-final-sizes {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+}
+
+/* ── Wordmark ── */
+
+.logo-final-wordmark {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border);
+}
+
+.logo-wordmark-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.logo-wordmark-swatch {
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.logo-wordmark {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 0;
+}
+
+.logo-wordmark-d {
+  display: inline-block;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  position: relative;
+  top: -2px;
+  left: 10px;
+  margin-right: 0;
+}
+
+.logo-wordmark-d svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.logo-wordmark-text {
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--logo-deep-start, #f5c842), var(--logo-deep-end, #d4941c));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.2;
+}
+
+/* ── Logo Grid ── */
+
+.logo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.logo-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  transition: all 0.3s ease;
+}
+
+.logo-card:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(138, 180, 248, 0.08);
+}
+
+.logo-card-number {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-accent);
+  margin-bottom: 4px;
+}
+
+.logo-card-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  letter-spacing: -0.01em;
+}
+
+.logo-card-desc {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.logo-card-note {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin-bottom: 20px;
+}
+
+.logo-card-swatches {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.logo-swatch {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  position: relative;
+}
+
+.logo-swatch svg {
+  width: 44px;
+  height: 44px;
+}
+
+.logo-swatch--dark {
+  background: #0a0a1a;
+  color: #e8eaed;
+  --logo-accent: #8ab4f8;
+  --logo-accent2: #6c5ce7;
+  --logo-deep-start: #f5c842;
+  --logo-deep-end: #d4941c;
+  --logo-deep-bg: #0a0a1a;
+}
+
+.logo-swatch--gray {
+  background: #5f6368;
+  color: #ffffff;
+  --logo-accent: #8ab4f8;
+  --logo-accent2: #aecbfa;
+  --logo-deep-start: #f5c842;
+  --logo-deep-end: #d4941c;
+  --logo-deep-bg: #0a0a1a;
+}
+
+.logo-swatch--light {
+  background: #f1f3f4;
+  color: #1a1a2e;
+  --logo-accent: #6c5ce7;
+  --logo-accent2: #8ab4f8;
+  --logo-deep-start: #2e5ba8;
+  --logo-deep-end: #1a2d6b;
+  --logo-deep-bg: #ffffff;
+  border-color: #d0d0d0;
+}
+
+.logo-swatch--white {
+  background: #ffffff;
+  color: #1a1a2e;
+  --logo-accent: #6c5ce7;
+  --logo-accent2: #8ab4f8;
+  --logo-deep-start: #2e5ba8;
+  --logo-deep-end: #1a2d6b;
+  --logo-deep-bg: #ffffff;
+  border-color: #e0e0e0;
+}
+
+.logo-card-sizes {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.logo-size-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.logo-size-item svg {
+  color: var(--color-text);
+  --logo-accent: var(--color-accent);
+  --logo-accent2: var(--color-purple);
+}
+
+.logo-size-label {
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+/* Gmail Sidebar Mock */
+.gmail-mock-section {
+  margin-top: 64px;
+}
+
+.gmail-mock-section h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+
+.gmail-mock-section p {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 24px;
+}
+
+.gmail-mock-container {
+  background: #f6f8fc;
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.gmail-mock-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.gmail-mock-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e8eaed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gmail-mock-circle svg {
+  width: 20px;
+  height: 20px;
+  color: #1a1a2e;
+  --logo-accent: #6c5ce7;
+  --logo-accent2: #8ab4f8;
+}
+
+.gmail-mock-label {
+  font-size: 0.7rem;
+  color: #5f6368;
+  font-weight: 500;
+  text-align: center;
+  max-width: 72px;
+}
+
+/* Size Comparison Section */
+.size-comparison-section {
+  margin-top: 64px;
+}
+
+.size-comparison-section h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  letter-spacing: -0.01em;
+}
+
+.size-comparison-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.size-comparison-row:first-child {
+  border-top: 1px solid var(--color-border);
+}
+
+.size-comparison-name {
+  width: 160px;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.size-comparison-sizes {
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+}
+
+.size-comparison-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.size-comparison-cell svg {
+  color: var(--color-text);
+  --logo-accent: var(--color-accent);
+  --logo-accent2: var(--color-purple);
+}
+
+/* Marketing Tile */
+.marketing-tile-section {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--color-border);
+}
+
+.marketing-tile-section h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.marketing-tile-section p {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 16px;
+}
+
+.marketing-tile-wrapper {
+  display: inline-block;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+@media (max-width: 768px) {
+  .logo-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .logo-card-swatches {
+    gap: 8px;
+  }
+
+  .logo-swatch {
+    width: 68px;
+    height: 68px;
+  }
+
+  .logo-swatch svg {
+    width: 36px;
+    height: 36px;
+  }
+
+  .size-comparison-name {
+    width: 100px;
+    font-size: 0.75rem;
+  }
+
+  .size-comparison-sizes {
+    gap: 16px;
+  }
+
+  .gmail-mock-container {
+    gap: 16px;
+    padding: 20px;
+  }
+}

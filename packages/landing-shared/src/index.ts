@@ -10,6 +10,10 @@ export { Nav } from './components/Nav.tsx'
 export { Footer } from './components/Footer.tsx'
 export { Pricing } from './components/Pricing.tsx'
 export { SetupGuide } from './components/SetupGuide.tsx'
+export { PromoTile } from './components/PromoTile.tsx'
+
+// Pages
+export { LogoDesignPage } from './pages/LogoDesignPage.tsx'
 
 // Utilities
 export { ScrollToHash } from './ScrollToHash.tsx'
