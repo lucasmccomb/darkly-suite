@@ -56,7 +56,7 @@ export function Paywall({ onSubscribe, onClose, prices }: PaywallProps) {
             >
               <span className={`${p}-paywall-plan-name`}>{plan.name}</span>
               <span className={`${p}-paywall-plan-price`}>
-                {plan.price}<span className={`${p}-paywall-plan-period`}>{plan.period}</span>
+                {prices?.[plan.id] ?? plan.price}<span className={`${p}-paywall-plan-period`}>{plan.period}</span>
               </span>
               <span className={`${p}-paywall-plan-subtitle`}>{plan.subtitle}</span>
             </button>
