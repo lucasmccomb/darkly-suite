@@ -19,7 +19,7 @@ export const NAV_LINKS = [
   { to: '/docs', label: 'Docs' },
   { to: '/suite', label: 'Bundle' },
   { to: '/setup', label: 'Setup' },
-  { to: '/#pricing', label: 'Pricing', external: true },
+  { to: '/#pricing', label: 'Pricing' },
   { to: '/privacy', label: 'Privacy' },
 ]
 

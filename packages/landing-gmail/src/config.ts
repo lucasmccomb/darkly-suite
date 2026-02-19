@@ -9,9 +9,9 @@ export const STORE_URL = 'https://chromewebstore.google.com/detail/darkly-for-gm
 export const SITE_NAME = 'Darkly for Gmail'
 
 export const NAV_LINKS = [
-  { to: '/#features', label: 'Features', external: true },
-  { to: '/#pricing', label: 'Pricing', external: true },
-  { to: '/#faq', label: 'FAQ', external: true },
+  { to: '/#features', label: 'Features' },
+  { to: '/#pricing', label: 'Pricing' },
+  { to: '/#faq', label: 'FAQ' },
   { to: '/privacy', label: 'Privacy' },
 ]
 
