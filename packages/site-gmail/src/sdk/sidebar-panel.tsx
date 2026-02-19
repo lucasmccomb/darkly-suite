@@ -65,7 +65,7 @@ function swapSidebarIcon(prefix: string): void {
 interface SidebarPanelOptions {
   isPro?: boolean;
   prices?: import('@darkly/core').PriceInfo;
-  onUpgrade?: () => void;
+  onUpgrade?: (plan?: 'monthly' | 'yearly' | 'lifetime') => void;
 }
 
 /**
@@ -84,7 +84,7 @@ export async function mountSettingsPanel(
   SettingsPanel: React.FC<{
     isPro?: boolean;
     prices?: import('@darkly/core').PriceInfo;
-    onUpgrade?: () => void;
+    onUpgrade?: (plan?: 'monthly' | 'yearly' | 'lifetime') => void;
     onClose: () => void;
   }>,
 ): Promise<(() => void) | null> {

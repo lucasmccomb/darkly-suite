@@ -14,7 +14,7 @@ import type { PriceInfo } from '../payment/client';
 interface SettingsPanelProps {
   isPro?: boolean;
   prices?: PriceInfo;
-  onUpgrade?: () => void;
+  onUpgrade?: (plan?: 'monthly' | 'yearly' | 'lifetime') => void;
   onClose?: () => void;
   /** Render prop for product-specific settings sections */
   renderProductSection?: React.ReactNode;
