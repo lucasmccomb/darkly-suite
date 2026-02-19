@@ -950,7 +950,7 @@ export function LogoDesignPage({
               <h3>Gmail</h3>
               <p>440 x 280 — Dark background, logo, tagline.</p>
               <div className="marketing-tile-wrapper">
-                <PromoTile tagline="Dark mode for Gmail" />
+                <PromoTile />
               </div>
             </div>
           </div>
