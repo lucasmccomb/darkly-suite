@@ -42,7 +42,9 @@ Write a justification for each permission in `manifest.json`. Be specific about 
 ### Test instructions
 - Max 500 characters
 - Include a promo code for free access (see Step 2)
-- Describe the actual UI flow accurately
+- Include test card number (`4242 4242 4242 4242`) — Stripe requires a card even with 100% off promo codes on subscriptions (coupon is `duration: once`, so future billing needs a payment method)
+- Describe the actual UI flow accurately — test the extension yourself first and write instructions that match the real behavior
+- You can edit test instructions after submission without resubmitting
 
 ---
 
@@ -66,7 +68,10 @@ stripe post /v1/promotion_codes \
   -d max_redemptions=1
 ```
 
-**Important:** If Stripe is in test mode during submission, recreate the promo code in live mode before publishing.
+**Important:**
+- If Stripe is in test mode during submission, recreate the promo code in live mode before publishing.
+- The coupon is `duration: once` on subscriptions, so Stripe will still require a payment method. Test instructions must include the test card number (`4242 4242 4242 4242`).
+- Also create a second promo code for your own testing (e.g., `DARKLYTEST{PRODUCT}2026`).
 
 ---
 
@@ -136,6 +141,8 @@ Verify the zip contains: `manifest.json`, JS bundles, CSS, icons.
 
 Paste content from `test-instructions.txt` into the **Test instructions** page under Access.
 
+Test instructions can be edited after submission without resubmitting — the review continues with updated instructions.
+
 ---
 
 ## Step 9: Submit
@@ -149,13 +156,17 @@ Paste content from `test-instructions.txt` into the **Test instructions** page u
 
 ## Post-Approval
 
-Once approved (check developer dashboard for status):
+Google sends an email when the review is complete (approved or rejected). Status also visible in the Developer Dashboard under the Status tab.
+
+Once approved:
 
 1. Switch Stripe to live mode (if not already)
 2. Recreate promo code in live mode
 3. Verify `darklysuite.com/api/status` works with live keys
 4. Click **Publish** in the developer dashboard
-5. Staged versions expire after 30 days if not published
+5. Staged versions expire after **30 days** if not published — don't wait too long
+
+If rejected, the email includes the reason. Fix and resubmit.
 
 ---
 
