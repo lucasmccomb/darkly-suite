@@ -8,7 +8,11 @@ export function ScrollToHash() {
       const el = document.querySelector(hash)
       if (el) {
         el.scrollIntoView({ behavior: 'smooth' })
-        return
+        // Re-scroll after images load and layout settles
+        const timer = setTimeout(() => {
+          el.scrollIntoView({ behavior: 'smooth' })
+        }, 400)
+        return () => clearTimeout(timer)
       }
     }
     window.scrollTo(0, 0)
