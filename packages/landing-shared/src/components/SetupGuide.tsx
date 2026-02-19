@@ -67,7 +67,17 @@ function GmailGuide({ storeUrls }: { storeUrls: Record<string, string> }) {
         </p>
       </Step>
 
-      <Step number={2} title="Open Gmail">
+      <Step number={2} title="Choose a plan">
+        <p>
+          Darkly for Gmail requires a subscription to activate. Open the extension in Gmail
+          and choose from Monthly, Yearly, or Lifetime plans. You can also subscribe from
+          the{' '}
+          <a href="/#pricing">pricing section</a>
+          {' '}on this site.
+        </p>
+      </Step>
+
+      <Step number={3} title="Open Gmail">
         <p>
           Navigate to{' '}
           <a href="https://mail.google.com" target="_blank" rel="noopener noreferrer">
@@ -78,7 +88,7 @@ function GmailGuide({ storeUrls }: { storeUrls: Record<string, string> }) {
         </p>
       </Step>
 
-      <Step number={3} title="Set Gmail's theme to Default">
+      <Step number={4} title="Set Gmail's theme to Default">
         <div className="setup-callout">
           <div className="setup-callout-icon">
             <AlertTriangle size={20} />
@@ -107,7 +117,7 @@ function GmailGuide({ storeUrls }: { storeUrls: Record<string, string> }) {
         </div>
       </Step>
 
-      <Step number={4} title="Toggle dark mode">
+      <Step number={5} title="Toggle dark mode">
         <p>
           Click the <strong>Darkly icon</strong> in Gmail&apos;s toolbar. The mini control panel
           lets you toggle dark mode on or off instantly. You can also use the keyboard shortcut
@@ -115,7 +125,7 @@ function GmailGuide({ storeUrls }: { storeUrls: Record<string, string> }) {
         </p>
       </Step>
 
-      <Step number={5} title="Choose your preferred mode">
+      <Step number={6} title="Choose your preferred mode">
         <p>
           Open the full settings panel by clicking the Darkly icon in the Gmail sidebar (right side).
           Choose from:
@@ -128,7 +138,7 @@ function GmailGuide({ storeUrls }: { storeUrls: Record<string, string> }) {
         </ul>
       </Step>
 
-      <Step number={6} title="You're all set">
+      <Step number={7} title="You're all set">
         <p>
           Darkly remembers your settings across sessions. Head to{' '}
           <a href="https://mail.google.com" target="_blank" rel="noopener noreferrer">
