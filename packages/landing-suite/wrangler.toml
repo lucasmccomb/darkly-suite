@@ -7,5 +7,5 @@ SITE_URL = "https://darklysuite.com"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "darkly-suite-payments"
-database_id = "placeholder-set-after-d1-creation"
+database_name = "darkly-suite-db"
+database_id = "da5dbede-9d2a-4549-8100-4b03b56dd820"

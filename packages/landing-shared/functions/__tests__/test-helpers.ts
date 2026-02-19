@@ -76,7 +76,6 @@ export function createMockEnv(overrides: Partial<Env> = {}): Env {
     GOOGLE_CLIENT_ID: 'test-client-id.apps.googleusercontent.com',
     GOOGLE_CLIENT_SECRET: 'test-client-secret',
     ADMIN_EMAIL: 'admin@example.com',
-    SESSION_SECRET: 'test-session-secret',
     ...overrides,
   };
 }
