@@ -7,9 +7,11 @@ import { Toggle } from './shared/Toggle';
 import { Wordmark } from './shared/Wordmark';
 import { usePrefix, useDarklyConfig } from '../context';
 import { Moon, Monitor, SunMoon, Palette, Sunrise, Sunset, Settings, ChevronRight, X, type LucideIcon } from 'lucide-react';
+import type { PriceInfo } from '../payment/client';
 
 interface MiniControlPanelProps {
   isPro: boolean;
+  prices?: PriceInfo;
   onAllSettings: () => void;
   onUpgrade: () => void;
   onClose: () => void;
@@ -101,7 +103,7 @@ function CompactSunriseSunset({ config, onChange }: {
   );
 }
 
-export function MiniControlPanel({ isPro, onAllSettings, onUpgrade, onClose }: MiniControlPanelProps) {
+export function MiniControlPanel({ isPro, prices, onAllSettings, onUpgrade, onClose }: MiniControlPanelProps) {
   const p = usePrefix();
   const config = useDarklyConfig();
   const [prefs, setPrefs] = useState<BaseUserPreferences>(DEFAULT_PREFERENCES);
@@ -145,7 +147,7 @@ export function MiniControlPanel({ isPro, onAllSettings, onUpgrade, onClose }: M
         <div className={`${p}-dropdown-paywall`}>
           <p className={`${p}-dropdown-paywall-title`}>Subscribe to use <Wordmark /></p>
           <p className={`${p}-dropdown-paywall-description`}>
-            Dark mode with plans from $0.99/mo.
+            Dark mode with plans from {prices?.monthly ?? '$0.99'}/mo.
           </p>
           <ActionButton size="compact" fullWidth onClick={onUpgrade}>
             Subscribe Now

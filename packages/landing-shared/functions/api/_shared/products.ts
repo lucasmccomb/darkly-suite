@@ -1,4 +1,5 @@
 import type { Env, ProductId, Plan } from './types.ts';
+import { retrievePrice } from './stripe.ts';
 
 /**
  * Product price registry.
@@ -28,4 +29,40 @@ export function getPriceId(env: Env, product: ProductId, plan: Plan): string {
   }
 
   return priceId;
+}
+
+export interface ProductPrices {
+  monthly: string;
+  yearly: string;
+  lifetime: string;
+}
+
+function formatCents(cents: number): string {
+  const dollars = cents / 100;
+  return dollars % 1 === 0
+    ? `$${dollars}`
+    : `$${dollars.toFixed(2)}`;
+}
+
+/**
+ * Fetches all 3 plan prices for a product from Stripe and returns
+ * formatted display strings (e.g. "$0.99", "$9.99", "$29.99").
+ */
+export async function getProductPrices(
+  env: Env,
+  product: ProductId,
+): Promise<ProductPrices> {
+  const plans: Plan[] = ['monthly', 'yearly', 'lifetime'];
+  const results = await Promise.all(
+    plans.map((plan) => {
+      const priceId = getPriceId(env, product, plan);
+      return retrievePrice(env.STRIPE_SECRET_KEY, priceId);
+    }),
+  );
+
+  return {
+    monthly: formatCents(results[0].unit_amount),
+    yearly: formatCents(results[1].unit_amount),
+    lifetime: formatCents(results[2].unit_amount),
+  };
 }

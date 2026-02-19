@@ -35,7 +35,7 @@ export type { PreferencesManager } from './storage/preferences';
 
 // Payment
 export { createPaymentClient } from './payment/client';
-export type { PaymentClient } from './payment/client';
+export type { PaymentClient, PriceInfo } from './payment/client';
 export { isPro, canUseFeature } from './payment/gates';
 
 // Geo

@@ -26,6 +26,7 @@ export interface ProductConfig {
 
 export interface ToolbarButtonOpts {
   isPro: boolean;
+  prices?: import('./payment/client').PriceInfo;
   onAllSettings: () => void;
   onUpgrade: () => void;
 }

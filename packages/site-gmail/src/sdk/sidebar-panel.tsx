@@ -64,6 +64,7 @@ function swapSidebarIcon(prefix: string): void {
 
 interface SidebarPanelOptions {
   isPro?: boolean;
+  prices?: import('@darkly/core').PriceInfo;
   onUpgrade?: () => void;
 }
 
@@ -82,6 +83,7 @@ export async function mountSettingsPanel(
   config: ProductConfig,
   SettingsPanel: React.FC<{
     isPro?: boolean;
+    prices?: import('@darkly/core').PriceInfo;
     onUpgrade?: () => void;
     onClose: () => void;
   }>,
@@ -106,6 +108,7 @@ export async function mountSettingsPanel(
     <DarklyProvider config={config}>
       <SettingsPanel
         isPro={options.isPro}
+        prices={options.prices}
         onUpgrade={options.onUpgrade}
         onClose={() => panelView.close()}
       />

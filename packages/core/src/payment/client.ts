@@ -1,8 +1,15 @@
 import type { ProductConfig } from '../config';
 
+export interface PriceInfo {
+  monthly: string;
+  yearly: string;
+  lifetime: string;
+}
+
 interface ProCache {
   paid: boolean;
   plan?: string;
+  prices?: PriceInfo;
   checkedAt: number;
 }
 
@@ -23,6 +30,7 @@ export interface PaymentClient {
   getToken(): Promise<string>;
   initPayment(): Promise<void>;
   isPro(): Promise<boolean>;
+  getPrices(): Promise<PriceInfo | null>;
   onPaymentStatusChange(callback: (paid: boolean) => void): void;
   openPaymentPage(plan?: 'monthly' | 'yearly' | 'lifetime'): Promise<void>;
   openManageSubscription(): Promise<void>;
@@ -44,16 +52,16 @@ export function createPaymentClient(config: ProductConfig): PaymentClient {
     await getToken();
   }
 
-  async function getCachedProStatus(): Promise<boolean | null> {
+  async function getCachedProStatus(): Promise<ProCache | null> {
     const result = await chrome.storage.local.get(proCacheKey);
     const cache = result[proCacheKey] as ProCache | undefined;
     if (!cache) return null;
     if (Date.now() - cache.checkedAt > CACHE_TTL_MS) return null;
-    return cache.paid;
+    return cache;
   }
 
-  async function setCachedProStatus(paid: boolean, plan?: string): Promise<void> {
-    const cache: ProCache = { paid, plan, checkedAt: Date.now() };
+  async function setCachedProStatus(paid: boolean, plan?: string, prices?: PriceInfo): Promise<void> {
+    const cache: ProCache = { paid, plan, checkedAt: Date.now(), ...(prices && { prices }) };
     await chrome.storage.local.set({ [proCacheKey]: cache });
   }
 
@@ -65,19 +73,24 @@ export function createPaymentClient(config: ProductConfig): PaymentClient {
     if (typeof __DEV_MODE__ !== 'undefined' && __DEV_MODE__) return true;
 
     const cached = await getCachedProStatus();
-    if (cached !== null) return cached;
+    if (cached !== null) return cached.paid;
 
     try {
       const token = await getToken();
       const response = await fetch(`${apiBase}/status/${token}?product=${config.productId}`);
       if (!response.ok) return false;
-      const data = await response.json() as { paid: boolean; plan?: string };
-      await setCachedProStatus(data.paid, data.plan);
+      const data = await response.json() as { paid: boolean; plan?: string; prices?: PriceInfo };
+      await setCachedProStatus(data.paid, data.plan, data.prices);
       return data.paid;
     } catch (err) {
       console.warn('[Darkly] Failed to check Pro status:', err);
       return false;
     }
+  }
+
+  async function getPrices(): Promise<PriceInfo | null> {
+    const cached = await getCachedProStatus();
+    return cached?.prices ?? null;
   }
 
   function onPaymentStatusChange(callback: (paid: boolean) => void): void {
@@ -112,6 +125,7 @@ export function createPaymentClient(config: ProductConfig): PaymentClient {
     getToken,
     initPayment,
     isPro,
+    getPrices,
     onPaymentStatusChange,
     openPaymentPage,
     openManageSubscription,

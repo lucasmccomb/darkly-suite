@@ -280,3 +280,64 @@ describe('refreshProStatus', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('getPrices', () => {
+  beforeEach(async () => {
+    await client.initPayment();
+  });
+
+  it('returns prices from cache after isPro populates them', async () => {
+    fetchMock.mockResolvedValueOnce(new Response(
+      JSON.stringify({
+        paid: false,
+        prices: { monthly: '$0.99', yearly: '$9.99', lifetime: '$29.99' },
+      }),
+      { status: 200 },
+    ) as unknown as globalThis.Response);
+
+    await client.isPro();
+    const prices = await client.getPrices();
+
+    expect(prices).toEqual({
+      monthly: '$0.99',
+      yearly: '$9.99',
+      lifetime: '$29.99',
+    });
+  });
+
+  it('returns null when API response omits prices', async () => {
+    fetchMock.mockResolvedValueOnce(new Response(
+      JSON.stringify({ paid: false }),
+      { status: 200 },
+    ) as unknown as globalThis.Response);
+
+    await client.isPro();
+    const prices = await client.getPrices();
+
+    expect(prices).toBeNull();
+  });
+
+  it('returns null when no cache exists', async () => {
+    const prices = await client.getPrices();
+    expect(prices).toBeNull();
+  });
+
+  it('returns cached prices within TTL', async () => {
+    // Seed cache with prices
+    localStorage[mockConfig.proCacheKey] = {
+      paid: true,
+      plan: 'yearly',
+      prices: { monthly: '$1.99', yearly: '$14.99', lifetime: '$39.99' },
+      checkedAt: Date.now(),
+    };
+
+    const prices = await client.getPrices();
+
+    expect(prices).toEqual({
+      monthly: '$1.99',
+      yearly: '$14.99',
+      lifetime: '$39.99',
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
