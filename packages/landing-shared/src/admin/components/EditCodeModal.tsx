@@ -6,61 +6,21 @@ const PRODUCTS = ['gmail', 'sheets', 'docs', 'suite'] as const
 interface EditCodeModalProps {
   open: boolean
   onClose: () => void
-  onSave: (id: number, patch: EditCodePatch) => Promise<void>
-  code: EditableCode | null
-}
-
-export interface EditableCode {
-  id: number
-  code: string
-  product: string | null
-  expires_at: string | null
-  max_uses: number | null
-  active: number
-}
-
-export interface EditCodePatch {
-  active?: boolean
-  expires_at?: string | null
-  product?: string[]
-  max_uses?: number | null
-}
-
-function parseProducts(product: string | null): string[] {
-  if (!product) return []
-  try {
-    const parsed = JSON.parse(product)
-    if (Array.isArray(parsed)) return parsed
-  } catch { /* not JSON */ }
-  return [product]
-}
-
-function toDateInputValue(iso: string | null): string {
-  if (!iso) return ''
-  return iso.slice(0, 10)
+  onSave: (id: string, patch: { product?: string }) => Promise<void>
+  code: { id: string; code: string; product: string | null } | null
 }
 
 export function EditCodeModal({ open, onClose, onSave, code }: EditCodeModalProps) {
-  const [products, setProducts] = useState<string[]>([])
-  const [expiresAt, setExpiresAt] = useState('')
-  const [maxUses, setMaxUses] = useState('')
+  const [product, setProduct] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
   // Reset form when code changes
-  const [prevId, setPrevId] = useState<number | null>(null)
+  const [prevId, setPrevId] = useState<string | null>(null)
   if (code && code.id !== prevId) {
     setPrevId(code.id)
-    setProducts(parseProducts(code.product))
-    setExpiresAt(toDateInputValue(code.expires_at))
-    setMaxUses(code.max_uses != null ? code.max_uses.toString() : '')
+    setProduct(code.product ?? '')
     setError('')
-  }
-
-  function toggleProduct(p: string) {
-    setProducts((prev) =>
-      prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p],
-    )
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -69,14 +29,8 @@ export function EditCodeModal({ open, onClose, onSave, code }: EditCodeModalProp
     setSaving(true)
     setError('')
 
-    const patch: EditCodePatch = {
-      product: products,
-      expires_at: expiresAt ? new Date(expiresAt).toISOString() : null,
-      max_uses: maxUses ? parseInt(maxUses, 10) : null,
-    }
-
     try {
-      await onSave(code.id, patch)
+      await onSave(code.id, { product: product || undefined })
       onClose()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save')
@@ -92,41 +46,16 @@ export function EditCodeModal({ open, onClose, onSave, code }: EditCodeModalProp
 
         <div className="admin-form-row">
           <label>Product Scope</label>
-          <div className="admin-checkbox-group">
+          <select
+            value={product}
+            onChange={(e) => setProduct(e.target.value)}
+            className="admin-select"
+          >
+            <option value="">All products</option>
             {PRODUCTS.map((p) => (
-              <label key={p} className="admin-checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={products.includes(p)}
-                  onChange={() => toggleProduct(p)}
-                />
-                {p}
-              </label>
+              <option key={p} value={p}>{p}</option>
             ))}
-          </div>
-        </div>
-
-        <div className="admin-form-row admin-form-row--inline">
-          <label>
-            Expiration
-            <input
-              type="date"
-              value={expiresAt}
-              onChange={(e) => setExpiresAt(e.target.value)}
-              className="admin-input"
-            />
-          </label>
-          <label>
-            Max Uses
-            <input
-              type="number"
-              min="1"
-              value={maxUses}
-              onChange={(e) => setMaxUses(e.target.value)}
-              placeholder="Unlimited"
-              className="admin-input"
-            />
-          </label>
+          </select>
         </div>
 
         <div className="admin-share-actions">

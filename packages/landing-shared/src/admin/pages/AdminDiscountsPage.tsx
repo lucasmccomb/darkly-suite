@@ -1,24 +1,21 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { Copy, Check, Send, Pencil, Trash2, ToggleLeft, ToggleRight } from 'lucide-react'
 import { ShareCodeModal } from '../components/ShareCodeModal.tsx'
-import { EditCodeModal, type EditCodePatch, type EditableCode } from '../components/EditCodeModal.tsx'
+import { EditCodeModal } from '../components/EditCodeModal.tsx'
 
 const PRODUCTS = ['gmail', 'sheets', 'docs', 'suite'] as const
 
 interface DiscountCode {
-  id: number
+  id: string
   code: string
+  active: boolean
   discount_type: 'percent' | 'fixed'
   discount_value: number
   product: string | null
-  active: number
-  max_uses: number | null
-  use_count: number
-  used_by_email: string | null
-  used_at: string | null
+  max_redemptions: number | null
+  times_redeemed: number
   expires_at: string | null
   created_at: string
-  stripe_promo_code_id: string | null
 }
 
 interface CodesResponse {
@@ -34,9 +31,9 @@ export function AdminDiscountsPage() {
   const [creating, setCreating] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [error, setError] = useState('')
-  const [copiedId, setCopiedId] = useState<number | null>(null)
+  const [copiedId, setCopiedId] = useState<string | null>(null)
   const [shareCode, setShareCode] = useState<DiscountCode | null>(null)
-  const [editCode, setEditCode] = useState<EditableCode | null>(null)
+  const [editCode, setEditCode] = useState<DiscountCode | null>(null)
 
   // Filters
   const [search, setSearch] = useState('')
@@ -48,7 +45,7 @@ export function AdminDiscountsPage() {
   const [code, setCode] = useState('')
   const [discountType, setDiscountType] = useState<'free' | 'percent' | 'fixed'>('free')
   const [discountValue, setDiscountValue] = useState('')
-  const [productScopes, setProductScopes] = useState<string[]>([])
+  const [productScope, setProductScope] = useState('')
   const [expiresAt, setExpiresAt] = useState('')
   const [maxUses, setMaxUses] = useState('')
   const [bulkCount, setBulkCount] = useState('')
@@ -85,7 +82,7 @@ export function AdminDiscountsPage() {
       discount_value: isFree ? 100 : parseInt(discountValue, 10),
     }
     if (code.trim()) body.code = code.trim().toUpperCase()
-    if (productScopes.length > 0) body.product = productScopes
+    if (productScope) body.product = productScope
     if (expiresAt) body.expires_at = new Date(expiresAt).toISOString()
     if (maxUses) body.max_uses = parseInt(maxUses, 10)
     if (bulkCount && parseInt(bulkCount, 10) > 1) body.count = parseInt(bulkCount, 10)
@@ -100,7 +97,7 @@ export function AdminDiscountsPage() {
     if (res.ok) {
       setCode('')
       setDiscountValue('')
-      setProductScopes([])
+      setProductScope('')
       setExpiresAt('')
       setMaxUses('')
       setBulkCount('')
@@ -123,7 +120,7 @@ export function AdminDiscountsPage() {
     if (res.ok) fetchCodes()
   }
 
-  async function handleEditSave(id: number, patch: EditCodePatch) {
+  async function handleEditSave(id: string, patch: { product?: string }) {
     const res = await fetch(`/api/admin/discount-codes?id=${id}`, {
       method: 'PATCH',
       credentials: 'same-origin',
@@ -138,7 +135,7 @@ export function AdminDiscountsPage() {
   }
 
   async function handleDelete(dc: DiscountCode) {
-    if (!confirm(`Delete code ${dc.code}? This cannot be undone.`)) return
+    if (!confirm(`Deactivate code ${dc.code}? (Stripe promo codes cannot be deleted)`)) return
     const res = await fetch(`/api/admin/discount-codes?id=${dc.id}`, {
       method: 'DELETE',
       credentials: 'same-origin',
@@ -150,12 +147,6 @@ export function AdminDiscountsPage() {
     await navigator.clipboard.writeText(dc.code)
     setCopiedId(dc.id)
     setTimeout(() => setCopiedId(null), 2000)
-  }
-
-  function toggleProductScope(p: string) {
-    setProductScopes((prev) =>
-      prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p],
-    )
   }
 
   const bulkActive = parseInt(bulkCount, 10) > 1
@@ -222,22 +213,19 @@ export function AdminDiscountsPage() {
             </label>
           </div>
           <div className="admin-form-row">
-            <label>Product Scope</label>
-            <div className="admin-checkbox-group">
-              {PRODUCTS.map((p) => (
-                <label key={p} className="admin-checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={productScopes.includes(p)}
-                    onChange={() => toggleProductScope(p)}
-                  />
-                  {p}
-                </label>
-              ))}
-              <span className="admin-checkbox-hint">
-                {productScopes.length === 0 ? 'All products' : ''}
-              </span>
-            </div>
+            <label>
+              Product Scope
+              <select
+                value={productScope}
+                onChange={(e) => setProductScope(e.target.value)}
+                className="admin-select"
+              >
+                <option value="">All products</option>
+                {PRODUCTS.map((p) => (
+                  <option key={p} value={p}>{p}</option>
+                ))}
+              </select>
+            </label>
           </div>
           <div className="admin-form-row admin-form-row--inline">
             <label>
@@ -256,7 +244,7 @@ export function AdminDiscountsPage() {
                 min="1"
                 value={maxUses}
                 onChange={(e) => setMaxUses(e.target.value)}
-                placeholder="Single use"
+                placeholder="Unlimited"
                 className="admin-input"
               />
             </label>
@@ -270,7 +258,7 @@ export function AdminDiscountsPage() {
       <div className="admin-filters">
         <input
           type="text"
-          placeholder="Search by code or email..."
+          placeholder="Search by code..."
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1) }}
           className="admin-search"
@@ -318,7 +306,7 @@ export function AdminDiscountsPage() {
                   <tr key={dc.id} className={dc.active ? '' : 'admin-row-inactive'}>
                     <td className="admin-code-cell">{dc.code}</td>
                     <td>{formatDiscount(dc)}</td>
-                    <td>{renderProduct(dc.product)}</td>
+                    <td>{dc.product ?? 'All'}</td>
                     <td>
                       <span className={`badge badge--${getCodeStatus(dc)}`}>
                         {getCodeStatus(dc)}
@@ -358,16 +346,16 @@ export function AdminDiscountsPage() {
                         <button
                           className="admin-icon-btn"
                           onClick={() => setEditCode(dc)}
-                          title="Edit code"
-                          aria-label="Edit code"
+                          title="Edit product scope"
+                          aria-label="Edit product scope"
                         >
                           <Pencil size={16} />
                         </button>
                         <button
                           className="admin-icon-btn admin-icon-btn--danger"
                           onClick={() => handleDelete(dc)}
-                          title="Delete code"
-                          aria-label="Delete code"
+                          title="Deactivate code"
+                          aria-label="Deactivate code"
                         >
                           <Trash2 size={16} />
                         </button>
@@ -409,24 +397,15 @@ export function AdminDiscountsPage() {
 
 function getCodeStatus(dc: DiscountCode): string {
   if (!dc.active) return 'inactive'
-  if (dc.max_uses != null && dc.use_count >= dc.max_uses) return 'exhausted'
-  if (dc.max_uses == null && dc.used_at) return 'used'
+  if (dc.max_redemptions != null && dc.times_redeemed >= dc.max_redemptions) return 'exhausted'
   if (dc.expires_at && new Date(dc.expires_at) < new Date()) return 'expired'
+  if (dc.times_redeemed > 0) return 'used'
   return 'available'
 }
 
 function renderUsage(dc: DiscountCode): string {
-  if (dc.max_uses != null) return `${dc.use_count}/${dc.max_uses}`
-  return dc.used_at ? '1 used' : '--'
-}
-
-function renderProduct(product: string | null): string {
-  if (!product) return 'All'
-  try {
-    const parsed = JSON.parse(product)
-    if (Array.isArray(parsed)) return parsed.join(', ')
-  } catch { /* not JSON */ }
-  return product
+  if (dc.max_redemptions != null) return `${dc.times_redeemed}/${dc.max_redemptions}`
+  return dc.times_redeemed > 0 ? `${dc.times_redeemed} used` : '--'
 }
 
 function formatDiscount(dc: DiscountCode): string {

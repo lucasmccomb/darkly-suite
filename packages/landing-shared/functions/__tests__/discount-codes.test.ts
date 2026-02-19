@@ -1,7 +1,8 @@
 /**
- * Tests for admin/discount-codes.ts — CRUD endpoints for discount code management.
+ * Tests for admin/discount-codes.ts — Stripe-backed CRUD endpoints.
  *
- * Tests: paginated GET with filters, bulk POST, PATCH (edit/toggle), DELETE.
+ * All discount code data lives in Stripe (promotion codes + coupons).
+ * The admin panel is a thin UI wrapper around Stripe's API.
  */
 
 import { createMockContext, createMockEnv } from './test-helpers';
@@ -29,15 +30,12 @@ import {
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** Create an admin-authenticated context with the given request. */
 function createAdminContext(request: Request, envOverrides?: Partial<ReturnType<typeof createMockEnv>>) {
   const ctx = createMockContext({
     request,
     env: envOverrides,
   });
 
-  // Mock admin session — requireAdmin calls db.prepare(SELECT admin_sessions).bind(cookie).first()
-  // Make first() return a session so requireAdmin returns null (authorized)
   const db = ctx.env.DB as unknown as MockD1Database;
   db._statement.first.mockResolvedValue({ id: 1, session_token: 'tok', email: 'admin@example.com', expires_at: '2099-01-01' });
 
@@ -52,6 +50,30 @@ function adminRequest(url: string, init?: RequestInit): Request {
       ...(init?.headers ?? {}),
     },
   });
+}
+
+function makeStripePromo(overrides: Record<string, unknown> = {}) {
+  return {
+    id: 'promo_test1',
+    code: 'TESTCODE',
+    object: 'promotion_code',
+    active: true,
+    created: Math.floor(Date.now() / 1000),
+    expires_at: null,
+    max_redemptions: null,
+    times_redeemed: 0,
+    metadata: {},
+    coupon: {
+      id: 'coupon_test1',
+      percent_off: 50,
+      amount_off: null,
+      currency: null,
+      duration: 'once',
+      name: 'Darkly 50% off',
+      valid: true,
+    },
+    ...overrides,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -70,63 +92,94 @@ describe('GET /api/admin/discount-codes', () => {
     expect(response.status).toBe(401);
   });
 
-  it('returns paginated codes', async () => {
-    const ctx = createAdminContext(
-      adminRequest('https://darklysuite.com/api/admin/discount-codes?page=1&limit=25'),
+  it('returns paginated codes from Stripe', async () => {
+    const promos = [
+      makeStripePromo({ id: 'promo_1', code: 'CODE1' }),
+      makeStripePromo({ id: 'promo_2', code: 'CODE2' }),
+      makeStripePromo({ id: 'promo_3', code: 'CODE3' }),
+    ];
+
+    // Stripe listPromotionCodes
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ data: promos, has_more: false }), { status: 200 }),
     );
 
-    const db = ctx.env.DB as unknown as MockD1Database;
-    // first() for admin session (already mocked), then first() for COUNT
-    db._statement.first
-      .mockResolvedValueOnce({ id: 1, session_token: 'tok', email: 'admin@example.com', expires_at: '2099-01-01' })
-      .mockResolvedValueOnce({ total: 42 });
-    db._statement.all.mockResolvedValueOnce({
-      results: [{ id: 1, code: 'TESTCODE', discount_type: 'percent', discount_value: 50, active: 1 }],
-      success: true,
-    });
+    const ctx = createAdminContext(
+      adminRequest('https://darklysuite.com/api/admin/discount-codes?page=1&limit=2'),
+    );
 
     const response = await onRequestGet(ctx);
     expect(response.status).toBe(200);
+
     const body = await response.json() as { codes: unknown[]; total: number; page: number; limit: number };
-    expect(body.total).toBe(42);
+    expect(body.total).toBe(3);
     expect(body.page).toBe(1);
-    expect(body.limit).toBe(25);
-    expect(body.codes).toHaveLength(1);
+    expect(body.limit).toBe(2);
+    expect(body.codes).toHaveLength(2);
   });
 
-  it('applies search filter', async () => {
+  it('filters by search term', async () => {
+    const promos = [
+      makeStripePromo({ id: 'promo_1', code: 'LAUNCH50' }),
+      makeStripePromo({ id: 'promo_2', code: 'WELCOME10' }),
+    ];
+
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ data: promos, has_more: false }), { status: 200 }),
+    );
+
     const ctx = createAdminContext(
       adminRequest('https://darklysuite.com/api/admin/discount-codes?search=LAUNCH'),
     );
 
-    const db = ctx.env.DB as unknown as MockD1Database;
-    db._statement.first
-      .mockResolvedValueOnce({ id: 1, session_token: 'tok', email: 'admin@example.com', expires_at: '2099-01-01' })
-      .mockResolvedValueOnce({ total: 1 });
-    db._statement.all.mockResolvedValueOnce({ results: [], success: true });
-
-    await onRequestGet(ctx);
-
-    // Check that the COUNT query includes the search condition
-    const countSql = db.prepare.mock.calls[1][0] as string;
-    expect(countSql).toContain('LIKE');
+    const response = await onRequestGet(ctx);
+    const body = await response.json() as { codes: Array<{ code: string }>; total: number };
+    expect(body.total).toBe(1);
+    expect(body.codes[0].code).toBe('LAUNCH50');
   });
 
-  it('applies status filter for inactive codes', async () => {
+  it('filters by status', async () => {
+    const promos = [
+      makeStripePromo({ id: 'promo_active', code: 'ACTIVE', active: true, times_redeemed: 0 }),
+      makeStripePromo({ id: 'promo_inactive', code: 'INACTIVE', active: false }),
+    ];
+
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ data: promos, has_more: false }), { status: 200 }),
+    );
+
     const ctx = createAdminContext(
       adminRequest('https://darklysuite.com/api/admin/discount-codes?status=inactive'),
     );
 
-    const db = ctx.env.DB as unknown as MockD1Database;
-    db._statement.first
-      .mockResolvedValueOnce({ id: 1, session_token: 'tok', email: 'admin@example.com', expires_at: '2099-01-01' })
-      .mockResolvedValueOnce({ total: 0 });
-    db._statement.all.mockResolvedValueOnce({ results: [], success: true });
+    const response = await onRequestGet(ctx);
+    const body = await response.json() as { codes: Array<{ code: string }>; total: number };
+    expect(body.total).toBe(1);
+    expect(body.codes[0].code).toBe('INACTIVE');
+  });
 
-    await onRequestGet(ctx);
+  it('filters by product', async () => {
+    const promos = [
+      makeStripePromo({ id: 'promo_gmail', code: 'GMAIL', metadata: { product: 'gmail' } }),
+      makeStripePromo({ id: 'promo_all', code: 'ALLAPPS', metadata: {} }),
+      makeStripePromo({ id: 'promo_sheets', code: 'SHEETS', metadata: { product: 'sheets' } }),
+    ];
 
-    const countSql = db.prepare.mock.calls[1][0] as string;
-    expect(countSql).toContain('active = 0');
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ data: promos, has_more: false }), { status: 200 }),
+    );
+
+    const ctx = createAdminContext(
+      adminRequest('https://darklysuite.com/api/admin/discount-codes?product=gmail'),
+    );
+
+    const response = await onRequestGet(ctx);
+    const body = await response.json() as { codes: Array<{ code: string }>; total: number };
+    // Should match gmail-specific + codes with no product (applicable to all)
+    expect(body.total).toBe(2);
+    const codes = body.codes.map((c) => c.code);
+    expect(codes).toContain('GMAIL');
+    expect(codes).toContain('ALLAPPS');
   });
 });
 
@@ -149,20 +202,22 @@ describe('POST /api/admin/discount-codes', () => {
           code: 'TESTCODE',
           discount_type: 'percent',
           discount_value: 50,
-          product: ['gmail', 'sheets'],
+          product: 'gmail',
         }),
       }),
     );
 
-    const db = ctx.env.DB as unknown as MockD1Database;
-    db._statement.run.mockResolvedValue({ success: true, meta: { last_row_id: 1 } });
-
     const response = await onRequestPost(ctx);
     expect(response.status).toBe(201);
 
-    const body = await response.json() as { code: string; stripe_coupon_id: string };
+    const body = await response.json() as { id: string; code: string };
+    expect(body.id).toBe('promo_123');
     expect(body.code).toBe('TESTCODE');
-    expect(body.stripe_coupon_id).toBe('coupon_123');
+
+    // Verify Stripe promo code was created with metadata
+    const promoCall = fetchMock.mock.calls[1];
+    const promoBody = promoCall[1]?.body as string;
+    expect(promoBody).toContain('metadata%5Bproduct%5D=gmail');
   });
 
   it('validates discount_type', async () => {
@@ -196,8 +251,7 @@ describe('POST /api/admin/discount-codes', () => {
   it('creates bulk codes', async () => {
     const count = 3;
 
-    // Each bulk code needs 2 Stripe calls (coupon shared, but promo is per-code)
-    // Actually: 1 coupon call + N promo calls
+    // 1 coupon call + 3 promo calls
     fetchMock.mockResolvedValueOnce(
       new Response(JSON.stringify({ id: 'coupon_bulk', object: 'coupon' }), { status: 200 }),
     );
@@ -214,9 +268,6 @@ describe('POST /api/admin/discount-codes', () => {
         body: JSON.stringify({ discount_type: 'percent', discount_value: 100, count }),
       }),
     );
-
-    const db = ctx.env.DB as unknown as MockD1Database;
-    db._statement.run.mockResolvedValue({ success: true, meta: { last_row_id: 1 } });
 
     const response = await onRequestPost(ctx);
     expect(response.status).toBe(201);
@@ -241,76 +292,59 @@ describe('PATCH /api/admin/discount-codes', () => {
     expect(response.status).toBe(400);
   });
 
-  it('returns 404 when code not found', async () => {
+  it('returns 400 when no fields to update', async () => {
     const ctx = createAdminContext(
-      adminRequest('https://darklysuite.com/api/admin/discount-codes?id=999', {
+      adminRequest('https://darklysuite.com/api/admin/discount-codes?id=promo_123', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ active: false }),
+        body: JSON.stringify({}),
       }),
     );
 
-    const db = ctx.env.DB as unknown as MockD1Database;
-    // Admin session check returns session, then code lookup returns null
-    db._statement.first
-      .mockResolvedValueOnce({ id: 1, session_token: 'tok', email: 'admin@example.com', expires_at: '2099-01-01' })
-      .mockResolvedValueOnce(null);
-
     const response = await onRequestPatch(ctx);
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(400);
   });
 
-  it('toggles active and syncs with Stripe', async () => {
-    // Stripe updatePromotionCode
+  it('toggles active state via Stripe', async () => {
     fetchMock.mockResolvedValueOnce(
       new Response(JSON.stringify({ id: 'promo_123', active: false }), { status: 200 }),
     );
 
     const ctx = createAdminContext(
-      adminRequest('https://darklysuite.com/api/admin/discount-codes?id=1', {
+      adminRequest('https://darklysuite.com/api/admin/discount-codes?id=promo_123', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ active: false }),
       }),
     );
 
-    const db = ctx.env.DB as unknown as MockD1Database;
-    db._statement.first
-      .mockResolvedValueOnce({ id: 1, session_token: 'tok', email: 'admin@example.com', expires_at: '2099-01-01' })
-      .mockResolvedValueOnce({ id: 1, stripe_promo_code_id: 'promo_123' });
-
     const response = await onRequestPatch(ctx);
     expect(response.status).toBe(200);
 
-    // Verify Stripe was called to deactivate
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining('/promotion_codes/promo_123'),
       expect.objectContaining({ method: 'POST' }),
     );
   });
 
-  it('updates expiration and max_uses', async () => {
-    const ctx = createAdminContext(
-      adminRequest('https://darklysuite.com/api/admin/discount-codes?id=1', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ expires_at: '2026-12-31T00:00:00Z', max_uses: 10 }),
-      }),
+  it('updates product scope via Stripe metadata', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ id: 'promo_123', active: true }), { status: 200 }),
     );
 
-    const db = ctx.env.DB as unknown as MockD1Database;
-    db._statement.first
-      .mockResolvedValueOnce({ id: 1, session_token: 'tok', email: 'admin@example.com', expires_at: '2099-01-01' })
-      .mockResolvedValueOnce({ id: 1, stripe_promo_code_id: null });
+    const ctx = createAdminContext(
+      adminRequest('https://darklysuite.com/api/admin/discount-codes?id=promo_123', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product: 'sheets' }),
+      }),
+    );
 
     const response = await onRequestPatch(ctx);
     expect(response.status).toBe(200);
 
-    // Verify UPDATE query includes both fields
-    const updateCalls = db.prepare.mock.calls.filter(([sql]: [string]) => (sql as string).includes('UPDATE discount_codes SET'));
-    expect(updateCalls.length).toBe(1);
-    expect(updateCalls[0][0]).toContain('expires_at');
-    expect(updateCalls[0][0]).toContain('max_uses');
+    const callBody = fetchMock.mock.calls[0][1]?.body as string;
+    expect(callBody).toContain('metadata%5Bproduct%5D=sheets');
   });
 });
 
@@ -326,54 +360,27 @@ describe('DELETE /api/admin/discount-codes', () => {
     expect(response.status).toBe(400);
   });
 
-  it('deactivates Stripe promo and deletes from D1', async () => {
-    // Stripe updatePromotionCode (deactivate)
+  it('deactivates promo code via Stripe', async () => {
     fetchMock.mockResolvedValueOnce(
       new Response(JSON.stringify({ id: 'promo_del', active: false }), { status: 200 }),
     );
 
     const ctx = createAdminContext(
-      adminRequest('https://darklysuite.com/api/admin/discount-codes?id=1', {
+      adminRequest('https://darklysuite.com/api/admin/discount-codes?id=promo_del', {
         method: 'DELETE',
       }),
     );
 
-    const db = ctx.env.DB as unknown as MockD1Database;
-    db._statement.first
-      .mockResolvedValueOnce({ id: 1, session_token: 'tok', email: 'admin@example.com', expires_at: '2099-01-01' })
-      .mockResolvedValueOnce({ id: 1, stripe_promo_code_id: 'promo_del' });
-
     const response = await onRequestDelete(ctx);
     expect(response.status).toBe(200);
 
-    // Verify Stripe deactivation was called
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining('/promotion_codes/promo_del'),
       expect.objectContaining({ method: 'POST' }),
     );
 
-    // Verify D1 deletes (usages + code)
-    const deleteSqls = db.prepare.mock.calls
-      .map(([sql]: [string]) => sql as string)
-      .filter((sql: string) => sql.includes('DELETE'));
-    expect(deleteSqls).toHaveLength(2);
-    expect(deleteSqls[0]).toContain('discount_code_usages');
-    expect(deleteSqls[1]).toContain('discount_codes');
-  });
-
-  it('returns 404 when code not found', async () => {
-    const ctx = createAdminContext(
-      adminRequest('https://darklysuite.com/api/admin/discount-codes?id=999', {
-        method: 'DELETE',
-      }),
-    );
-
-    const db = ctx.env.DB as unknown as MockD1Database;
-    db._statement.first
-      .mockResolvedValueOnce({ id: 1, session_token: 'tok', email: 'admin@example.com', expires_at: '2099-01-01' })
-      .mockResolvedValueOnce(null);
-
-    const response = await onRequestDelete(ctx);
-    expect(response.status).toBe(404);
+    // Verify it sets active=false
+    const callBody = fetchMock.mock.calls[0][1]?.body as string;
+    expect(callBody).toContain('active=false');
   });
 });

@@ -194,6 +194,63 @@ export async function createStripeCoupon(
   return res.json() as Promise<StripeCoupon>
 }
 
+// -- List Promotion Codes -------------------------------------------------
+
+export interface StripePromotionCodeFull {
+  id: string
+  code: string
+  object: 'promotion_code'
+  active: boolean
+  created: number
+  expires_at: number | null
+  max_redemptions: number | null
+  times_redeemed: number
+  metadata: Record<string, string>
+  coupon: {
+    id: string
+    percent_off: number | null
+    amount_off: number | null
+    currency: string | null
+    duration: string
+    name: string | null
+    valid: boolean
+  }
+}
+
+export async function listPromotionCodes(
+  secretKey: string,
+): Promise<StripePromotionCodeFull[]> {
+  const all: StripePromotionCodeFull[] = []
+  let startingAfter: string | undefined
+
+  // Paginate through all promotion codes (100 per page)
+  for (;;) {
+    const params: Record<string, string> = {
+      limit: '100',
+      'expand[]': 'data.coupon',
+    }
+    if (startingAfter) params['starting_after'] = startingAfter
+
+    const res = await fetch(`${STRIPE_API}/promotion_codes?${encodeParams(params)}`, {
+      method: 'GET',
+      headers: authHeaders(secretKey),
+    })
+
+    if (!res.ok) {
+      const err = await res.text()
+      throw new Error(`Stripe listPromotionCodes failed (${res.status}): ${err}`)
+    }
+
+    const data = await res.json() as { data: StripePromotionCodeFull[]; has_more: boolean }
+    all.push(...data.data)
+
+    if (!data.has_more || data.data.length === 0) break
+    startingAfter = data.data[data.data.length - 1].id
+  }
+
+  return all
+}
+
 interface StripePromotionCode {
   id: string
   code: string
@@ -202,11 +259,16 @@ interface StripePromotionCode {
 
 export async function createStripePromotionCode(
   secretKey: string,
-  params: { couponId: string; code: string; expiresAt?: string; maxRedemptions?: number },
+  params: {
+    couponId: string
+    code: string
+    expiresAt?: string
+    maxRedemptions?: number
+    metadata?: Record<string, string>
+  },
 ): Promise<StripePromotionCode> {
   const body: Record<string, string> = {
-    'promotion[type]': 'coupon',
-    'promotion[coupon]': params.couponId,
+    coupon: params.couponId,
     code: params.code,
   }
 
@@ -216,6 +278,12 @@ export async function createStripePromotionCode(
 
   if (params.maxRedemptions) {
     body['max_redemptions'] = params.maxRedemptions.toString()
+  }
+
+  if (params.metadata) {
+    for (const [key, value] of Object.entries(params.metadata)) {
+      body[`metadata[${key}]`] = value
+    }
   }
 
   const res = await fetch(`${STRIPE_API}/promotion_codes`, {
@@ -235,10 +303,18 @@ export async function createStripePromotionCode(
 export async function updateStripePromotionCode(
   secretKey: string,
   promoCodeId: string,
-  params: { active: boolean },
+  params: { active?: boolean; metadata?: Record<string, string> },
 ): Promise<{ id: string; active: boolean }> {
-  const body: Record<string, string> = {
-    active: params.active.toString(),
+  const body: Record<string, string> = {}
+
+  if (params.active !== undefined) {
+    body['active'] = params.active.toString()
+  }
+
+  if (params.metadata) {
+    for (const [key, value] of Object.entries(params.metadata)) {
+      body[`metadata[${key}]`] = value
+    }
   }
 
   const res = await fetch(`${STRIPE_API}/promotion_codes/${promoCodeId}`, {
