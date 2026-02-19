@@ -125,6 +125,8 @@ describe('checkout — successful session creation', () => {
     const body = (fetchMock.mock.calls[0] as [string, RequestInit])[1].body as string;
     expect(body).toContain('mode=subscription');
     expect(body).toContain(encodeURIComponent('line_items[0][price]') + '=price_gmail_monthly');
+    // customer_creation is only valid for payment mode — must not be sent for subscriptions
+    expect(body).not.toContain('customer_creation');
   });
 
   it('creates a payment checkout for lifetime plan with customer_creation=always', async () => {
