@@ -293,7 +293,7 @@ interface StepProps {
 
 function Step({ number, title, children }: StepProps) {
   return (
-    <div className="setup-step">
+    <div className="setup-step" id={`step-${number}`}>
       <div className="setup-step-number">{number}</div>
       <div className="setup-step-body">
         <h3 className="setup-step-title">{title}</h3>

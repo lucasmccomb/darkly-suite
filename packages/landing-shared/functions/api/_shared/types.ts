@@ -27,6 +27,11 @@ export interface Env {
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;
   ADMIN_EMAIL: string;
+  // Per-product site URLs (optional) — used for checkout success redirects.
+  // When set, Stripe checkout success_url uses this domain instead of SITE_URL.
+  SITE_URL_GMAIL?: string;
+  SITE_URL_SHEETS?: string;
+  SITE_URL_DOCS?: string;
   // CORS — comma-separated list of allowed Chrome extension IDs (stable CWS IDs)
   // When unset, all chrome-extension:// origins are allowed (for local development)
   ALLOWED_EXTENSION_IDS?: string;

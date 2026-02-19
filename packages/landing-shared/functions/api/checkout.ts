@@ -43,7 +43,15 @@ async function handleCheckout(context: CFContext): Promise<Response> {
 
   const priceId = getPriceId(context.env, product, plan);
   const mode = plan === 'lifetime' ? 'payment' : 'subscription';
-  const siteUrl = context.env.SITE_URL;
+
+  // Use product-specific site URL for success redirect if available.
+  // e.g. Gmail purchases redirect to gmaildarkly.com instead of darklysuite.com.
+  const productSiteUrls: Partial<Record<string, string>> = {
+    gmail: context.env.SITE_URL_GMAIL,
+    sheets: context.env.SITE_URL_SHEETS,
+    docs: context.env.SITE_URL_DOCS,
+  };
+  const siteUrl = productSiteUrls[product] ?? context.env.SITE_URL;
 
   try {
     const session = await createCheckoutSession(context.env.STRIPE_SECRET_KEY, {
