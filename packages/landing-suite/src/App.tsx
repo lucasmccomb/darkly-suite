@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { ScrollToHash, AdminLayout, AdminLoginPage } from '@darkly/landing-shared'
+import { ScrollToHash, AdminLayout, AdminLoginPage, LogoDesignPage } from '@darkly/landing-shared'
 import { AdminLicensesPage, AdminDiscountsPage, AdminStatsPage } from '@darkly/landing-shared'
 import { HomePage } from './pages/HomePage.tsx'
 import { GmailPage } from './pages/GmailPage.tsx'
@@ -9,6 +9,7 @@ import { SuitePage } from './pages/SuitePage.tsx'
 import { PrivacyPage } from './pages/PrivacyPage.tsx'
 import { SuccessPage } from './pages/SuccessPage.tsx'
 import { SetupPage } from './pages/SetupPage.tsx'
+import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME } from './config.ts'
 
 export function App() {
   return (
@@ -23,6 +24,14 @@ export function App() {
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/success" element={<SuccessPage />} />
         <Route path="/setup" element={<SetupPage />} />
+        <Route path="/logo-design" element={
+          <LogoDesignPage
+            navLinks={NAV_LINKS}
+            navCta={NAV_CTA}
+            footerLinks={FOOTER_LINKS}
+            copyrightName={SITE_NAME}
+          />
+        } />
         <Route path="/admin" element={<AdminLoginPage />} />
         <Route element={<AdminLayout />}>
           <Route path="/admin/licenses" element={<AdminLicensesPage />} />
