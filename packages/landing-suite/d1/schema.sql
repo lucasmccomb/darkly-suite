@@ -26,6 +26,9 @@ CREATE TABLE IF NOT EXISTS discount_codes (
   discount_type TEXT NOT NULL CHECK (discount_type IN ('percent', 'fixed')),
   discount_value INTEGER NOT NULL,
   product TEXT,
+  active INTEGER NOT NULL DEFAULT 1,
+  max_uses INTEGER,
+  use_count INTEGER NOT NULL DEFAULT 0,
   stripe_coupon_id TEXT,
   stripe_promo_code_id TEXT,
   used_by_email TEXT,
@@ -36,6 +39,16 @@ CREATE TABLE IF NOT EXISTS discount_codes (
 );
 
 CREATE INDEX IF NOT EXISTS idx_discount_codes_code ON discount_codes(code);
+
+CREATE TABLE IF NOT EXISTS discount_code_usages (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  discount_code_id INTEGER NOT NULL REFERENCES discount_codes(id),
+  email TEXT,
+  license_id INTEGER REFERENCES licenses(id),
+  used_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_dcu_code_id ON discount_code_usages(discount_code_id);
 
 CREATE TABLE IF NOT EXISTS admin_sessions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
