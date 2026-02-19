@@ -2,7 +2,7 @@
 // Matches the original gmail-darkly repo's SettingsPanel layout.
 
 import React, { useEffect, useState, useCallback } from 'react';
-import type { BaseUserPreferences, ThemeMode } from '@darkly/core';
+import type { BaseUserPreferences, ThemeMode, PriceInfo } from '@darkly/core';
 import {
   DEFAULT_PREFERENCES,
   createPreferencesManager,
@@ -19,11 +19,12 @@ import {
 
 interface GmailSettingsPanelProps {
   isPro?: boolean;
+  prices?: PriceInfo;
   onUpgrade?: () => void;
   onClose: () => void;
 }
 
-export function GmailSettingsPanel({ isPro = false, onUpgrade, onClose }: GmailSettingsPanelProps) {
+export function GmailSettingsPanel({ isPro = false, prices, onUpgrade, onClose }: GmailSettingsPanelProps) {
   const p = usePrefix();
   const config = useDarklyConfig();
   const [prefs, setPrefs] = useState<BaseUserPreferences>(DEFAULT_PREFERENCES);
@@ -62,7 +63,7 @@ export function GmailSettingsPanel({ isPro = false, onUpgrade, onClose }: GmailS
   }
 
   if (!isPro && onUpgrade) {
-    return <Paywall onSubscribe={onUpgrade} onClose={onClose} />;
+    return <Paywall onSubscribe={onUpgrade} onClose={onClose} prices={prices} />;
   }
 
   return (

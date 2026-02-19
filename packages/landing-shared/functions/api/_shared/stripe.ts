@@ -92,6 +92,32 @@ export async function retrieveCheckoutSession(
   return res.json() as Promise<CheckoutSession>;
 }
 
+// -- Price Retrieval ------------------------------------------------------
+
+export interface StripePrice {
+  id: string;
+  unit_amount: number;
+  currency: string;
+  recurring: { interval: string; interval_count: number } | null;
+}
+
+export async function retrievePrice(
+  secretKey: string,
+  priceId: string,
+): Promise<StripePrice> {
+  const res = await fetch(`${STRIPE_API}/prices/${priceId}`, {
+    method: 'GET',
+    headers: authHeaders(secretKey),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Stripe retrievePrice failed (${res.status}): ${err}`);
+  }
+
+  return res.json() as Promise<StripePrice>;
+}
+
 // -- Billing Portal ------------------------------------------------------
 
 export interface PortalSession {

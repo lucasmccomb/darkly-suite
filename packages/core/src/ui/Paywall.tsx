@@ -3,13 +3,15 @@ import { ActionButton } from './shared/ActionButton';
 import { Wordmark } from './shared/Wordmark';
 import { X } from 'lucide-react';
 import { usePrefix } from '../context';
+import type { PriceInfo } from '../payment/client';
 
 interface PaywallProps {
   onSubscribe: () => void;
   onClose?: () => void;
+  prices?: PriceInfo;
 }
 
-export function Paywall({ onSubscribe, onClose }: PaywallProps) {
+export function Paywall({ onSubscribe, onClose, prices }: PaywallProps) {
   const p = usePrefix();
   const uid = useId();
 
@@ -61,9 +63,9 @@ export function Paywall({ onSubscribe, onClose }: PaywallProps) {
           Choose a plan to get started.
         </p>
         <div className={`${p}-paywall-plans`}>
-          <div className={`${p}-paywall-plan`}>$0.99/mo</div>
-          <div className={`${p}-paywall-plan ${p}-paywall-plan--highlight`}>$9.99/yr</div>
-          <div className={`${p}-paywall-plan`}>$29.99 lifetime</div>
+          <div className={`${p}-paywall-plan`}>{prices?.monthly ?? '$0.99'}/mo</div>
+          <div className={`${p}-paywall-plan ${p}-paywall-plan--highlight`}>{prices?.yearly ?? '$9.99'}/yr</div>
+          <div className={`${p}-paywall-plan`}>{prices?.lifetime ?? '$29.99'} lifetime</div>
         </div>
         <ActionButton fullWidth onClick={onSubscribe}>
           Subscribe Now

@@ -2,6 +2,8 @@ import type { Env, License } from '../_shared/types.ts';
 import { isValidToken, isValidProduct } from '../_shared/types.ts';
 import { corsHeaders, handleOptions, parseExtensionIds } from '../_shared/cors.ts';
 import { checkRateLimit, getClientIp } from '../_shared/rate-limit.ts';
+import { getProductPrices } from '../_shared/products.ts';
+import type { ProductId } from '../_shared/types.ts';
 
 type CFContext = EventContext<Env, string, unknown>;
 
@@ -57,9 +59,17 @@ export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
       .bind(token, product, product)
       .first<License>();
 
+    // Fetch live prices from Stripe (best-effort — omitted on failure)
+    let prices: { monthly: string; yearly: string; lifetime: string } | undefined;
+    try {
+      prices = await getProductPrices(context.env, product as ProductId);
+    } catch (err) {
+      console.warn('[status] Failed to fetch Stripe prices:', err);
+    }
+
     if (!result) {
       return new Response(
-        JSON.stringify({ paid: false, plan: null, product: null, expiresAt: null }),
+        JSON.stringify({ paid: false, plan: null, product: null, expiresAt: null, ...(prices && { prices }) }),
         { status: 200, headers },
       );
     }
@@ -70,6 +80,7 @@ export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
         plan: result.plan,
         product: result.product,
         expiresAt: result.expires_at,
+        ...(prices && { prices }),
       }),
       { status: 200, headers },
     );

@@ -9,16 +9,18 @@ import { Toggle } from './shared/Toggle';
 import { Wordmark } from './shared/Wordmark';
 import { usePrefix, useDarklyConfig } from '../context';
 import { X } from 'lucide-react';
+import type { PriceInfo } from '../payment/client';
 
 interface SettingsPanelProps {
   isPro?: boolean;
+  prices?: PriceInfo;
   onUpgrade?: () => void;
   onClose?: () => void;
   /** Render prop for product-specific settings sections */
   renderProductSection?: React.ReactNode;
 }
 
-export function SettingsPanel({ isPro = false, onUpgrade, onClose, renderProductSection }: SettingsPanelProps) {
+export function SettingsPanel({ isPro = false, prices, onUpgrade, onClose, renderProductSection }: SettingsPanelProps) {
   const p = usePrefix();
   const config = useDarklyConfig();
   const [prefs, setPrefs] = useState<BaseUserPreferences>(DEFAULT_PREFERENCES);
@@ -58,7 +60,7 @@ export function SettingsPanel({ isPro = false, onUpgrade, onClose, renderProduct
 
   // Show paywall if not paid
   if (!isPro && onUpgrade) {
-    return <Paywall onSubscribe={onUpgrade} onClose={onClose} />;
+    return <Paywall onSubscribe={onUpgrade} onClose={onClose} prices={prices} />;
   }
 
   return (

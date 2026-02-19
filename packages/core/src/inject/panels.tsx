@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import type { ProductConfig } from '../config';
+import type { PriceInfo } from '../payment/client';
 import { SettingsPanel } from '../ui/SettingsPanel';
 import { MiniControlPanel } from '../ui/MiniControlPanel';
 import { DarklyProvider } from '../context';
@@ -18,6 +19,7 @@ export function createSettingsModal(
   config: ProductConfig,
   options: {
     isPro: boolean;
+    prices?: PriceInfo;
     onUpgrade: () => void;
     renderProductSection?: React.ReactNode;
   },
@@ -52,6 +54,7 @@ export function createSettingsModal(
       <DarklyProvider config={config}>
         <SettingsPanel
           isPro={options.isPro}
+          prices={options.prices}
           onUpgrade={options.onUpgrade}
           onClose={() => handle.hide()}
           renderProductSection={options.renderProductSection}
@@ -107,6 +110,7 @@ export function createMiniPanel(
   config: ProductConfig,
   options: {
     isPro: boolean;
+    prices?: PriceInfo;
     onAllSettings: () => void;
     onUpgrade: () => void;
   },
@@ -133,6 +137,7 @@ export function createMiniPanel(
       <DarklyProvider config={config}>
         <MiniControlPanel
           isPro={options.isPro}
+          prices={options.prices}
           onAllSettings={options.onAllSettings}
           onUpgrade={options.onUpgrade}
           onClose={() => handle.hide()}

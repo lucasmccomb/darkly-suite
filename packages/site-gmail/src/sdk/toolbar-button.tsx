@@ -66,6 +66,7 @@ export function registerToolbarButton(
   config: ProductConfig,
   MiniControlPanel: React.FC<{
     isPro: boolean;
+    prices?: import('@darkly/core').PriceInfo;
     onAllSettings: () => void;
     onUpgrade: () => void;
     onClose: () => void;
@@ -109,6 +110,7 @@ export function registerToolbarButton(
         <DarklyProvider config={config}>
           <MiniControlPanel
             isPro={options.isPro}
+            prices={options.prices}
             onAllSettings={() => {
               dropdown.close();
               options.onAllSettings();

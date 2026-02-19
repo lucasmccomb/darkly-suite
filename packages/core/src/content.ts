@@ -99,6 +99,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
     }
 
     const proStatus = await payment.isPro();
+    const prices = await payment.getPrices();
 
     if (proStatus) {
       const currentPrefs = await prefs.load();
@@ -126,6 +127,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
     // Create the settings modal (centered overlay with backdrop)
     const settingsModal = createSettingsModal(config, {
       isPro: proStatus,
+      prices: prices ?? undefined,
       onUpgrade: () => payment.openPaymentPage(),
       renderProductSection: productSection,
     });
@@ -143,6 +145,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
     if (sitePlugin?.injectSidebarIcon) {
       miniPanel = createMiniPanel(config, {
         isPro: proStatus,
+        prices: prices ?? undefined,
         onAllSettings: () => {
           miniPanel!.hide();
           settingsModal.show();
@@ -155,6 +158,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
     if (sitePlugin) {
       const toolbarOpts = {
         isPro: proStatus,
+        prices: prices ?? undefined,
         onAllSettings: miniPanel
           ? () => {
               // Sheets/Docs: toggle mini panel anchored to toolbar button
