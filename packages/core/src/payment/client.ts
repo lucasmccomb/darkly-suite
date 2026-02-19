@@ -13,7 +13,8 @@ interface ProCache {
   checkedAt: number;
 }
 
-const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes
+const CACHE_TTL_PAID_MS = 30 * 60 * 1000; // 30 minutes
+const CACHE_TTL_UNPAID_MS = 2 * 60 * 1000; // 2 minutes
 
 function generateToken(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(16));
@@ -56,7 +57,8 @@ export function createPaymentClient(config: ProductConfig): PaymentClient {
     const result = await chrome.storage.local.get(proCacheKey);
     const cache = result[proCacheKey] as ProCache | undefined;
     if (!cache) return null;
-    if (Date.now() - cache.checkedAt > CACHE_TTL_MS) return null;
+    const ttl = cache.paid ? CACHE_TTL_PAID_MS : CACHE_TTL_UNPAID_MS;
+    if (Date.now() - cache.checkedAt > ttl) return null;
     return cache;
   }
 
