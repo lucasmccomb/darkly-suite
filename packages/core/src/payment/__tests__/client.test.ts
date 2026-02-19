@@ -136,11 +136,11 @@ describe('isPro', () => {
     expect(result).toBe(true);
   });
 
-  it('fetches from API when unpaid cache is expired (>2 min)', async () => {
-    // Seed the cache with an expired unpaid entry (3 minutes ago)
+  it('always re-checks API when cached status is unpaid', async () => {
+    // Seed the cache with a very recent unpaid entry
     localStorage[mockConfig.proCacheKey] = {
       paid: false,
-      checkedAt: Date.now() - 3 * 60 * 1000,
+      checkedAt: Date.now(),
     };
 
     fetchMock.mockResolvedValueOnce(new Response(
@@ -150,21 +150,9 @@ describe('isPro', () => {
 
     const result = await client.isPro();
 
+    // Should bypass cache and hit API — unpaid is never cached
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(result).toBe(true);
-  });
-
-  it('uses cached unpaid value within 2-minute TTL', async () => {
-    // Seed the cache with a recent unpaid entry (1 minute ago)
-    localStorage[mockConfig.proCacheKey] = {
-      paid: false,
-      checkedAt: Date.now() - 1 * 60 * 1000,
-    };
-
-    const result = await client.isPro();
-
-    expect(result).toBe(false);
-    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('fetches from API when no cache exists', async () => {

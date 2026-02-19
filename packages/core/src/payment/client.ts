@@ -14,7 +14,6 @@ interface ProCache {
 }
 
 const CACHE_TTL_PAID_MS = 30 * 60 * 1000; // 30 minutes
-const CACHE_TTL_UNPAID_MS = 2 * 60 * 1000; // 2 minutes
 
 function generateToken(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(16));
@@ -57,8 +56,10 @@ export function createPaymentClient(config: ProductConfig): PaymentClient {
     const result = await chrome.storage.local.get(proCacheKey);
     const cache = result[proCacheKey] as ProCache | undefined;
     if (!cache) return null;
-    const ttl = cache.paid ? CACHE_TTL_PAID_MS : CACHE_TTL_UNPAID_MS;
-    if (Date.now() - cache.checkedAt > ttl) return null;
+    // Only cache paid status — unpaid always re-checks the API so payment
+    // is recognized immediately on the next page load or refresh.
+    if (!cache.paid) return null;
+    if (Date.now() - cache.checkedAt > CACHE_TTL_PAID_MS) return null;
     return cache;
   }
 
@@ -91,8 +92,10 @@ export function createPaymentClient(config: ProductConfig): PaymentClient {
   }
 
   async function getPrices(): Promise<PriceInfo | null> {
-    const cached = await getCachedProStatus();
-    return cached?.prices ?? null;
+    // Read prices directly from storage — they're valid regardless of paid status
+    const result = await chrome.storage.local.get(proCacheKey);
+    const cache = result[proCacheKey] as ProCache | undefined;
+    return cache?.prices ?? null;
   }
 
   function onPaymentStatusChange(callback: (paid: boolean) => void): void {
