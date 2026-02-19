@@ -1,4 +1,4 @@
-import type { ProductConfig, SitePlugin } from './config';
+import type { ProductConfig, SitePlugin, Plan } from './config';
 import type React from 'react';
 import { ThemeEngine } from './theme/engine';
 import { SystemThemeDetector } from './theme/detector';
@@ -169,7 +169,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
               }
             }
           : () => settingsModal.show(), // Gmail: "All Settings" opens modal directly
-        onUpgrade: () => payment.openPaymentPage(),
+        onUpgrade: (plan?: Plan) => payment.openPaymentPage(plan),
       };
 
       toolbarButton = await sitePlugin.injectToolbarButton(toolbarOpts);
