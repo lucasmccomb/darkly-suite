@@ -128,7 +128,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
     const settingsModal = createSettingsModal(config, {
       isPro: proStatus,
       prices: prices ?? undefined,
-      onUpgrade: () => payment.openPaymentPage(),
+      onUpgrade: (plan) => payment.openPaymentPage(plan),
       renderProductSection: productSection,
     });
 

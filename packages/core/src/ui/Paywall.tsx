@@ -1,12 +1,20 @@
-import React, { useId } from 'react';
+import { useState, useId } from 'react';
 import { ActionButton } from './shared/ActionButton';
 import { Wordmark } from './shared/Wordmark';
 import { X } from 'lucide-react';
 import { usePrefix } from '../context';
 import type { PriceInfo } from '../payment/client';
 
+type Plan = 'monthly' | 'yearly' | 'lifetime';
+
+const PLANS: { id: Plan; name: string; price: string; period: string; subtitle: string }[] = [
+  { id: 'monthly', name: 'Monthly', price: '$0.99', period: '/mo', subtitle: 'Cancel anytime' },
+  { id: 'yearly', name: 'Yearly', price: '$9.99', period: '/yr', subtitle: 'Save 16%' },
+  { id: 'lifetime', name: 'Lifetime', price: '$29.99', period: '', subtitle: 'One-time payment' },
+];
+
 interface PaywallProps {
-  onSubscribe: () => void;
+  onSubscribe: (plan: Plan) => void;
   onClose?: () => void;
   prices?: PriceInfo;
 }
@@ -14,6 +22,7 @@ interface PaywallProps {
 export function Paywall({ onSubscribe, onClose, prices }: PaywallProps) {
   const p = usePrefix();
   const uid = useId();
+  const [selectedPlan, setSelectedPlan] = useState<Plan>('yearly');
 
   return (
     <div className={`${p}-settings-panel`}>
@@ -60,14 +69,25 @@ export function Paywall({ onSubscribe, onClose, prices }: PaywallProps) {
         <h3 className={`${p}-paywall-title`}>Subscribe to use <Wordmark /></h3>
         <p className={`${p}-paywall-description`}>
           Dark mode with theme presets, sunrise/sunset scheduling, and night vision.
-          Choose a plan to get started.
+          <br />Choose a plan to get started.
         </p>
         <div className={`${p}-paywall-plans`}>
-          <div className={`${p}-paywall-plan`}>{prices?.monthly ?? '$0.99'}/mo</div>
-          <div className={`${p}-paywall-plan ${p}-paywall-plan--highlight`}>{prices?.yearly ?? '$9.99'}/yr</div>
-          <div className={`${p}-paywall-plan`}>{prices?.lifetime ?? '$29.99'} lifetime</div>
+          {PLANS.map((plan) => (
+            <button
+              key={plan.id}
+              type="button"
+              className={`${p}-paywall-plan ${selectedPlan === plan.id ? `${p}-paywall-plan--selected` : ''}`}
+              onClick={() => setSelectedPlan(plan.id)}
+            >
+              <span className={`${p}-paywall-plan-name`}>{plan.name}</span>
+              <span className={`${p}-paywall-plan-price`}>
+                {plan.price}<span className={`${p}-paywall-plan-period`}>{plan.period}</span>
+              </span>
+              <span className={`${p}-paywall-plan-subtitle`}>{plan.subtitle}</span>
+            </button>
+          ))}
         </div>
-        <ActionButton fullWidth onClick={onSubscribe}>
+        <ActionButton fullWidth onClick={() => onSubscribe(selectedPlan)}>
           Subscribe Now
         </ActionButton>
       </div>

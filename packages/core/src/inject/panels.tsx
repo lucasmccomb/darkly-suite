@@ -20,7 +20,7 @@ export function createSettingsModal(
   options: {
     isPro: boolean;
     prices?: PriceInfo;
-    onUpgrade: () => void;
+    onUpgrade: (plan?: 'monthly' | 'yearly' | 'lifetime') => void;
     renderProductSection?: React.ReactNode;
   },
 ): PanelHandle {

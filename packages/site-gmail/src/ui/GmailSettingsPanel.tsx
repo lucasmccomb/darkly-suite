@@ -20,7 +20,7 @@ import {
 interface GmailSettingsPanelProps {
   isPro?: boolean;
   prices?: PriceInfo;
-  onUpgrade?: () => void;
+  onUpgrade?: (plan?: 'monthly' | 'yearly' | 'lifetime') => void;
   onClose: () => void;
 }
 
