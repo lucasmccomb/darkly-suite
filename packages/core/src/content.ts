@@ -209,6 +209,22 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
       }
     });
 
+    // When unpaid, refresh pro status when user returns to tab (e.g. after Stripe checkout)
+    if (!proStatus) {
+      let lastCheck = 0;
+      const handleVisibility = () => {
+        if (document.visibilityState !== 'visible') return;
+        const now = Date.now();
+        if (now - lastCheck < 5_000) return;
+        lastCheck = now;
+        payment.refreshProStatus();
+      };
+      document.addEventListener('visibilitychange', handleVisibility);
+      payment.onPaymentStatusChange((paid) => {
+        if (paid) document.removeEventListener('visibilitychange', handleVisibility);
+      });
+    }
+
     console.log(`[${config.productName}] Extension loaded`);
   }
 
