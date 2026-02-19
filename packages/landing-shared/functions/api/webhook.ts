@@ -115,10 +115,12 @@ async function handleCheckoutCompleted(env: Env, event: StripeEvent): Promise<vo
 async function trackDiscountUsage(
   env: Env,
   sessionId: string,
-  email: string | null,
-  token: string,
-  product: string,
+  _email: string | null,
+  _token: string,
+  _product: string,
 ): Promise<void> {
+  // Stripe tracks promotion code usage natively (times_redeemed).
+  // We just log when a discount was used for observability.
   try {
     const res = await fetch(
       `https://api.stripe.com/v1/checkout/sessions/${sessionId}?expand[]=total_details.breakdown`,
@@ -142,47 +144,8 @@ async function trackDiscountUsage(
         ? (discount.discount as Record<string, unknown>).promotion_code
         : null;
 
-    if (!promoCodeId || typeof promoCodeId !== 'string') return;
-
-    const license = await env.DB.prepare(
-      `SELECT id FROM licenses WHERE token = ? AND product = ? LIMIT 1`,
-    )
-      .bind(token, product)
-      .first<{ id: number }>();
-
-    if (!license) return;
-
-    // Increment use_count and set first-use fields if not already set
-    await env.DB.prepare(
-      `UPDATE discount_codes
-       SET use_count = use_count + 1,
-           used_by_email = COALESCE(used_by_email, ?),
-           used_by_license_id = COALESCE(used_by_license_id, ?),
-           used_at = COALESCE(used_at, datetime('now'))
-       WHERE stripe_promo_code_id = ?`,
-    )
-      .bind(email, license.id, promoCodeId)
-      .run();
-
-    // Insert audit row for multi-use tracking
-    const discountCode = await env.DB.prepare(
-      `SELECT id FROM discount_codes WHERE stripe_promo_code_id = ? LIMIT 1`,
-    )
-      .bind(promoCodeId)
-      .first<{ id: number }>();
-
-    if (discountCode) {
-      await env.DB.prepare(
-        `INSERT INTO discount_code_usages (discount_code_id, email, license_id) VALUES (?, ?, ?)`,
-      )
-        .bind(discountCode.id, email, license.id)
-        .run();
-
-      await env.DB.prepare(
-        `UPDATE licenses SET discount_code_id = ? WHERE id = ?`,
-      )
-        .bind(discountCode.id, license.id)
-        .run();
+    if (promoCodeId) {
+      console.log(`Checkout ${sessionId} used promotion code ${promoCodeId}`);
     }
   } catch {
     console.error('Failed to track discount code usage');

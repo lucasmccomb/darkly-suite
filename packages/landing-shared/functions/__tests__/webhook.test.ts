@@ -215,7 +215,7 @@ describe('webhook — checkout.session.completed', () => {
 });
 
 describe('webhook — discount usage tracking', () => {
-  it('increments use_count and inserts usage row on checkout with discount', async () => {
+  it('logs promotion code usage on checkout with discount', async () => {
     // retrieveCheckoutSession
     fetchMock.mockResolvedValueOnce(
       new Response(
@@ -247,27 +247,20 @@ describe('webhook — discount usage tracking', () => {
       ),
     );
 
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
     const env = createMockEnv();
-    const db = env.DB as unknown as MockD1Database;
-
-    // Mock: license lookup returns id=5
-    db._statement.first.mockResolvedValueOnce({ id: 5 });
-    // Mock: discount_code lookup returns id=10
-    db._statement.first.mockResolvedValueOnce({ id: 10 });
-
     const eventBody = makeWebhookEvent('checkout.session.completed', { id: 'cs_disc' });
     const response = await callWebhook(eventBody, env);
 
     expect(response.status).toBe(200);
 
-    // Verify use_count increment SQL
-    const allSql = db.prepare.mock.calls.map(([sql]: [string]) => sql as string);
-    const incrementSql = allSql.find((s: string) => s.includes('use_count = use_count + 1'));
-    expect(incrementSql).toBeDefined();
+    // Stripe tracks times_redeemed natively — we just log for observability
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('promo_abc123'),
+    );
 
-    // Verify discount_code_usages INSERT
-    const usageInsert = allSql.find((s: string) => s.includes('INSERT INTO discount_code_usages'));
-    expect(usageInsert).toBeDefined();
+    consoleSpy.mockRestore();
   });
 });
 
