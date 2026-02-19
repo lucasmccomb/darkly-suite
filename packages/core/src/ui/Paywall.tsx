@@ -30,7 +30,7 @@ export function Paywall({ onSubscribe, onClose, prices }: PaywallProps) {
   return (
     <div className={`${p}-settings-panel`}>
       <div className={`${p}-settings-header`}>
-        <h2 className={`${p}-settings-title`}><Wordmark /></h2>
+        <h2 className={`${p}-settings-title`}><Wordmark /> <span className={`${p}-settings-title-suffix`}>for Gmail</span></h2>
         {onClose && (
           <div className={`${p}-settings-header-actions`}>
             <button
@@ -45,9 +45,7 @@ export function Paywall({ onSubscribe, onClose, prices }: PaywallProps) {
         )}
       </div>
       <div className={`${p}-paywall`}>
-        <h3 className={`${p}-paywall-title`}>Subscribe to use <Wordmark /></h3>
-        <p className={`${p}-paywall-description`}>Intelligent dark mode for Gmail.</p>
-        <p className={`${p}-paywall-description`}>Choose a plan to get started.</p>
+        <h3 className={`${p}-paywall-title`}>Choose your <Wordmark /> plan:</h3>
         <div className={`${p}-paywall-plans`}>
           {PLANS.map((plan) => (
             <button
