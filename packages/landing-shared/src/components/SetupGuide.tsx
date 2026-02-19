@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Mail, Table2, FileText, AlertTriangle, ExternalLink } from 'lucide-react'
+import { Mail, Table2, FileText, Lightbulb, ExternalLink } from 'lucide-react'
 
 type TabId = 'gmail' | 'sheets' | 'docs'
 
@@ -88,44 +88,57 @@ function GmailGuide({ storeUrls }: { storeUrls: Record<string, string> }) {
         </p>
       </Step>
 
-      <Step number={4} title="Set Gmail's theme to Default">
-        <div className="setup-callout">
-          <div className="setup-callout-icon">
-            <AlertTriangle size={20} />
-          </div>
-          <div className="setup-callout-body">
-            <strong>Important for best results</strong>
-            <p>
-              Darkly applies dark mode by inverting Gmail&apos;s colors using a CSS filter. This
-              works best when Gmail is using its default (light) theme. If you have a custom or dark
-              Gmail theme, the inversion can produce incorrect colors or visual artifacts.
-            </p>
-            <div className="setup-callout-steps">
-              <span>To set the default theme:</span>
-              <ol>
-                <li>Click the <strong>Settings gear</strong> icon in Gmail (top-right)</li>
-                <li>Under &quot;Theme,&quot; click <strong>View all</strong></li>
-                <li>Select the <strong>Default</strong> theme (first option, plain white)</li>
-                <li>Click <strong>Save</strong></li>
-              </ol>
-            </div>
-            <p className="setup-callout-note">
-              Once set, Darkly handles all the dark mode styling — you won&apos;t see the plain
-              white theme because Darkly inverts it into a comfortable dark palette.
-            </p>
-          </div>
-        </div>
-      </Step>
-
-      <Step number={5} title="Toggle dark mode">
+      <Step number={4} title="Toggle dark mode">
         <p>
           Click the <strong>Darkly icon</strong> in Gmail&apos;s toolbar. The mini control panel
           lets you toggle dark mode on or off instantly. You can also use the keyboard shortcut
           to toggle.
         </p>
+        <div className="setup-callout setup-callout--tip">
+          <div className="setup-callout-icon">
+            <Lightbulb size={20} />
+          </div>
+          <div className="setup-callout-body">
+            <strong>Tip for optimized viewing</strong>
+            <p>
+              Darkly&apos;s dark mode looks the best when Gmail&apos;s theme is set to the default
+              theme provided by Gmail. If you&apos;re going to use one of Darkly&apos;s features to
+              change between light and dark mode, using Gmail&apos;s default light theme is better
+              for your eyes.
+            </p>
+            <div className="setup-callout-steps">
+              <span>To set the theme to Gmail&apos;s default:</span>
+              <ol>
+                <li>
+                  Click the <strong>Settings gear</strong> icon in Gmail (top-right) to open the
+                  Quick settings panel
+                  <img
+                    src="/images/setup/gear-icon-guide.png"
+                    alt="Gmail settings gear icon location"
+                    className="setup-callout-img"
+                  />
+                </li>
+                <li>
+                  In the <strong>Theme</strong> section of the Quick settings panel (halfway down
+                  panel) select the first, plain white theme in the grid of theme thumbnails
+                  (top-left thumbnail)
+                  <img
+                    src="/images/setup/quick-settings-guide.jpg"
+                    alt="Gmail Quick settings panel showing Theme section"
+                    className="setup-callout-img"
+                  />
+                </li>
+                <li>
+                  You should now have Gmail&apos;s default theme selected. Close the Quick settings
+                  panel. Darkly will handle all theme changes once configured.
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
       </Step>
 
-      <Step number={6} title="Choose your preferred mode">
+      <Step number={5} title="Choose your preferred mode">
         <p>
           Open the full settings panel by clicking the Darkly icon in the Gmail sidebar (right side).
           Choose from:
@@ -138,7 +151,7 @@ function GmailGuide({ storeUrls }: { storeUrls: Record<string, string> }) {
         </ul>
       </Step>
 
-      <Step number={7} title="You're all set">
+      <Step number={6} title="You're all set">
         <p>
           Darkly remembers your settings across sessions. Head to{' '}
           <a href="https://mail.google.com" target="_blank" rel="noopener noreferrer">
