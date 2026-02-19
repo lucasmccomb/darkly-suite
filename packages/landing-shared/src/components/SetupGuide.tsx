@@ -6,6 +6,7 @@ type TabId = 'gmail' | 'sheets' | 'docs'
 interface SetupGuideProps {
   activeTab?: string | null
   storeUrls: Record<string, string>
+  products?: TabId[]
 }
 
 const TABS: { id: TabId; label: string; icon: typeof Mail; color: string }[] = [
@@ -18,28 +19,31 @@ function isTabId(value: string | null | undefined): value is TabId {
   return value === 'gmail' || value === 'sheets' || value === 'docs'
 }
 
-export function SetupGuide({ activeTab, storeUrls }: SetupGuideProps) {
-  const initialTab: TabId = isTabId(activeTab) ? activeTab : 'gmail'
+export function SetupGuide({ activeTab, storeUrls, products }: SetupGuideProps) {
+  const visibleTabs = products ? TABS.filter((t) => products.includes(t.id)) : TABS
+  const initialTab: TabId = isTabId(activeTab) ? activeTab : visibleTabs[0]?.id ?? 'gmail'
   const [tab, setTab] = useState<TabId>(initialTab)
 
   return (
     <div className="setup-guide">
-      <div className="setup-tabs">
-        {TABS.map((t) => {
-          const Icon = t.icon
-          return (
-            <button
-              key={t.id}
-              className={`setup-tab ${tab === t.id ? 'setup-tab--active' : ''}`}
-              onClick={() => setTab(t.id)}
-              type="button"
-            >
-              <Icon size={18} color={tab === t.id ? t.color : undefined} strokeWidth={1.8} />
-              <span>{t.label}</span>
-            </button>
-          )
-        })}
-      </div>
+      {visibleTabs.length > 1 && (
+        <div className="setup-tabs">
+          {visibleTabs.map((t) => {
+            const Icon = t.icon
+            return (
+              <button
+                key={t.id}
+                className={`setup-tab ${tab === t.id ? 'setup-tab--active' : ''}`}
+                onClick={() => setTab(t.id)}
+                type="button"
+              >
+                <Icon size={18} color={tab === t.id ? t.color : undefined} strokeWidth={1.8} />
+                <span>{t.label}</span>
+              </button>
+            )
+          })}
+        </div>
+      )}
 
       <div className="setup-content">
         {tab === 'gmail' && <GmailGuide storeUrls={storeUrls} />}
