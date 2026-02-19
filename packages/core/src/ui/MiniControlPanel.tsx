@@ -145,7 +145,7 @@ export function MiniControlPanel({ isPro, onAllSettings, onUpgrade, onClose }: M
         <div className={`${p}-dropdown-paywall`}>
           <p className={`${p}-dropdown-paywall-title`}>Subscribe to use <Wordmark /></p>
           <p className={`${p}-dropdown-paywall-description`}>
-            Dark mode with plans from $2.99/mo.
+            Dark mode with plans from $0.99/mo.
           </p>
           <ActionButton size="compact" fullWidth onClick={onUpgrade}>
             Subscribe Now
