@@ -67,17 +67,7 @@ function GmailGuide({ storeUrls }: { storeUrls: Record<string, string> }) {
         </p>
       </Step>
 
-      <Step number={2} title="Choose a plan">
-        <p>
-          Darkly for Gmail requires a subscription to activate. Open the extension in Gmail
-          and choose from Monthly, Yearly, or Lifetime plans. You can also subscribe from
-          the{' '}
-          <a href="/#pricing">pricing section</a>
-          {' '}on this site.
-        </p>
-      </Step>
-
-      <Step number={3} title="Open Gmail">
+      <Step number={2} title="Open Gmail">
         <p>
           Navigate to{' '}
           <a href="https://mail.google.com" target="_blank" rel="noopener noreferrer">
@@ -85,6 +75,16 @@ function GmailGuide({ storeUrls }: { storeUrls: Record<string, string> }) {
             <ExternalLink size={14} style={{ marginLeft: 4, verticalAlign: 'middle' }} />
           </a>
           {' '}in Chrome. You should see the Darkly icon appear in Gmail&apos;s toolbar.
+        </p>
+      </Step>
+
+      <Step number={3} title="Choose a plan">
+        <p>
+          Darkly for Gmail requires a subscription to activate. Open the extension in Gmail
+          and choose from Monthly, Yearly, or Lifetime plans. You can also subscribe from
+          the{' '}
+          <a href="/#pricing">pricing section</a>
+          {' '}on this site.
         </p>
       </Step>
 
