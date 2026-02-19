@@ -61,9 +61,9 @@ export function Paywall({ onSubscribe, onClose }: PaywallProps) {
           Choose a plan to get started.
         </p>
         <div className={`${p}-paywall-plans`}>
-          <div className={`${p}-paywall-plan`}>$2.99/mo</div>
-          <div className={`${p}-paywall-plan ${p}-paywall-plan--highlight`}>$19.99/yr</div>
-          <div className={`${p}-paywall-plan`}>$49.99 lifetime</div>
+          <div className={`${p}-paywall-plan`}>$0.99/mo</div>
+          <div className={`${p}-paywall-plan ${p}-paywall-plan--highlight`}>$9.99/yr</div>
+          <div className={`${p}-paywall-plan`}>$29.99 lifetime</div>
         </div>
         <ActionButton fullWidth onClick={onSubscribe}>
           Subscribe Now

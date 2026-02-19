@@ -80,6 +80,14 @@ export function registerToolbarButton(
       if (!event.dropdown) return;
       const { dropdown } = event;
 
+      // Non-Pro users: skip the mini dropdown, open the full sidebar panel
+      // so they see complete pricing options instead of a cramped paywall.
+      if (!options.isPro) {
+        dropdown.close();
+        options.onAllSettings();
+        return;
+      }
+
       // Center the tooltip under the Darkly button.
       const tooltip = dropdown.el.closest('.inboxsdk__tooltip') as HTMLElement | null;
       const btn = document.querySelector('.inboxsdk__appButton') as HTMLElement | null;
