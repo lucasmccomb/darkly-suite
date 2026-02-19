@@ -49,11 +49,14 @@ export async function createCheckoutSession(
     success_url: params.successUrl,
     cancel_url: params.cancelUrl,
     allow_promotion_codes: 'true',
-    // Always create a Stripe Customer so stripe_customer_id is saved.
-    // In subscription mode Stripe creates one automatically; in payment
-    // mode (lifetime) the default is 'if_required' which skips it.
-    customer_creation: 'always',
   };
+
+  // Force Customer creation for one-time payments (lifetime plans).
+  // Subscription mode creates a Customer automatically; passing
+  // customer_creation there causes Stripe to reject the request.
+  if (params.mode === 'payment') {
+    body['customer_creation'] = 'always';
+  }
 
   for (const [key, value] of Object.entries(params.metadata)) {
     body[`metadata[${key}]`] = value;
