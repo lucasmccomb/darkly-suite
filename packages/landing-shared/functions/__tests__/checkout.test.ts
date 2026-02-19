@@ -127,7 +127,7 @@ describe('checkout — successful session creation', () => {
     expect(body).toContain(encodeURIComponent('line_items[0][price]') + '=price_gmail_monthly');
   });
 
-  it('creates a payment checkout for lifetime plan', async () => {
+  it('creates a payment checkout for lifetime plan with customer_creation=always', async () => {
     fetchMock.mockResolvedValueOnce(
       new Response(
         JSON.stringify({ id: 'cs_lt', url: 'https://checkout.stripe.com/cs_lt' }),
@@ -147,6 +147,7 @@ describe('checkout — successful session creation', () => {
     const body = (fetchMock.mock.calls[0] as [string, RequestInit])[1].body as string;
     expect(body).toContain('mode=payment');
     expect(body).toContain(encodeURIComponent('line_items[0][price]') + '=price_suite_lifetime');
+    expect(body).toContain('customer_creation=always');
   });
 
   it('creates a subscription checkout for yearly plan', async () => {
