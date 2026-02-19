@@ -107,6 +107,7 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy dist --project-name=gmail-darkly
           workingDirectory: packages/landing-gmail
+          packageManager: pnpm
 
   deploy-suite:
     name: Deploy darklysuite.com
@@ -140,3 +141,4 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy dist --project-name=darkly-suite
           workingDirectory: packages/landing-suite
+          packageManager: pnpm
