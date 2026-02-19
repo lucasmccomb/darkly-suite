@@ -1,5 +1,7 @@
 import { Monitor, Sunset, Clock, Settings } from 'lucide-react'
 import type { ReactNode } from 'react'
+import { FeatureScreenshots } from './ScreenshotShowcase.tsx'
+import type { ScreenshotImage } from './ScreenshotShowcase.tsx'
 
 interface FeatureItem {
   icon: ReactNode
@@ -12,6 +14,7 @@ interface FeaturesProps {
   items?: FeatureItem[]
   sectionTitle?: string
   sectionSubtitle?: string
+  screenshots?: ScreenshotImage[]
 }
 
 const defaultFeatures: FeatureItem[] = [
@@ -45,6 +48,7 @@ export function Features({
   items = defaultFeatures,
   sectionTitle = 'Everything you need for comfortable reading',
   sectionSubtitle = 'Darkly adapts Google apps to your environment so you never have to think about it.',
+  screenshots,
 }: FeaturesProps) {
   return (
     <section id="features" className="features section">
@@ -54,6 +58,9 @@ export function Features({
           <h2 className="section-title">{sectionTitle}</h2>
           <p className="section-subtitle">{sectionSubtitle}</p>
         </div>
+        {screenshots && screenshots.length > 0 && (
+          <FeatureScreenshots images={screenshots} />
+        )}
         <div className="features-grid">
           {items.map((feature) => (
             <div key={feature.title} className="feature-card">

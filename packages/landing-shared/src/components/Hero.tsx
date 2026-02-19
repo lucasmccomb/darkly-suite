@@ -2,6 +2,8 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { BrandLogo } from './BrandLogo.tsx'
 import { ShieldCheck } from 'lucide-react'
+import { HeroScreenshots } from './ScreenshotShowcase.tsx'
+import type { ScreenshotImage } from './ScreenshotShowcase.tsx'
 
 interface HeroProps {
   title: string
@@ -10,9 +12,10 @@ interface HeroProps {
   ctaLink: string
   badge?: string
   icon?: ReactNode
+  screenshots?: ScreenshotImage[]
 }
 
-export function Hero({ title, subtitle, ctaText, ctaLink, badge, icon }: HeroProps) {
+export function Hero({ title, subtitle, ctaText, ctaLink, badge, icon, screenshots }: HeroProps) {
   return (
     <section className="hero">
       <div className="hero-content">
@@ -38,6 +41,9 @@ export function Hero({ title, subtitle, ctaText, ctaLink, badge, icon }: HeroPro
           <span>{badge ?? 'No data collected. No tracking. 100% private.'}</span>
         </div>
       </div>
+      {screenshots && screenshots.length > 0 && (
+        <HeroScreenshots images={screenshots} />
+      )}
     </section>
   )
 }

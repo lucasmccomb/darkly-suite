@@ -1,9 +1,21 @@
 import { useState, useCallback } from 'react'
 import { Nav, Hero, Features, Pricing, ProductCard, FAQ, Footer, SuiteIcon } from '@darkly/landing-shared'
+import type { ScreenshotImage } from '@darkly/landing-shared'
 import { Mail, Table2, FileText } from 'lucide-react'
 import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URLS, individualTiers, bundleTiers, COMPARISON_FEATURES } from '../config.ts'
 
 type AppId = 'gmail' | 'sheets' | 'docs'
+
+const heroScreenshots: ScreenshotImage[] = [
+  { src: '/images/screenshots/split-view.jpg', alt: 'Gmail with Darkly dark mode — split view showing light and dark halves' },
+  { src: '/images/screenshots/panel-open-dark.jpg', alt: 'Gmail in dark mode with Darkly settings panel open' },
+]
+
+const featureScreenshots: ScreenshotImage[] = [
+  { src: '/images/screenshots/panel-views.jpg', alt: 'All Darkly theme modes — Schedule, Default, Sunrise/Sunset, and System' },
+  { src: '/images/screenshots/inbox-dark-mini-panel.jpg', alt: 'Gmail dark mode with Darkly mini panel showing quick theme controls' },
+  { src: '/images/screenshots/marketing-tile.jpg', alt: 'Darkly for Gmail — save your eyes with intelligent dark mode' },
+]
 
 export function HomePage() {
   const [selectedApp, setSelectedApp] = useState<AppId | null>(null)
@@ -21,6 +33,7 @@ export function HomePage() {
         subtitle="Automatic dark mode scheduling, OS theme sync, and intelligent styling for Gmail, Sheets, and Docs."
         ctaText="Get the Suite"
         ctaLink="/suite"
+        screenshots={heroScreenshots}
       />
       <section className="products section">
         <div className="container">
@@ -66,7 +79,7 @@ export function HomePage() {
           </div>
         </div>
       </section>
-      <Features />
+      <Features screenshots={featureScreenshots} />
       <Pricing
         product="suite"
         selectedApp={selectedApp}

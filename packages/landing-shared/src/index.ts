@@ -11,6 +11,8 @@ export { Footer } from './components/Footer.tsx'
 export { Pricing } from './components/Pricing.tsx'
 export { SetupGuide } from './components/SetupGuide.tsx'
 export { PromoTile } from './components/PromoTile.tsx'
+export { HeroScreenshots, FeatureScreenshots } from './components/ScreenshotShowcase.tsx'
+export type { ScreenshotImage } from './components/ScreenshotShowcase.tsx'
 
 // Pages
 export { LogoDesignPage } from './pages/LogoDesignPage.tsx'

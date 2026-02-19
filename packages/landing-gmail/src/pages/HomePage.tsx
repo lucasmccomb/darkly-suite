@@ -1,9 +1,21 @@
 import { Mail } from 'lucide-react'
 import { Nav, Hero, Features, Pricing, FAQ, Footer } from '@darkly/landing-shared'
+import type { ScreenshotImage } from '@darkly/landing-shared'
 import {
   NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URL,
   GMAIL_FEATURES, GMAIL_FAQ, individualTiers,
 } from '../config.ts'
+
+const heroScreenshots: ScreenshotImage[] = [
+  { src: '/images/screenshots/split-view.jpg', alt: 'Gmail with Darkly dark mode — split view showing light and dark halves' },
+  { src: '/images/screenshots/panel-open-dark.jpg', alt: 'Gmail in dark mode with Darkly settings panel open' },
+]
+
+const featureScreenshots: ScreenshotImage[] = [
+  { src: '/images/screenshots/panel-views.jpg', alt: 'All Darkly theme modes — Schedule, Default, Sunrise/Sunset, and System' },
+  { src: '/images/screenshots/inbox-dark-mini-panel.jpg', alt: 'Gmail dark mode with Darkly mini panel showing quick theme controls' },
+  { src: '/images/screenshots/marketing-tile.jpg', alt: 'Darkly for Gmail — save your eyes with intelligent dark mode' },
+]
 
 export function HomePage() {
   return (
@@ -15,10 +27,12 @@ export function HomePage() {
         ctaText="Get Darkly for Gmail"
         ctaLink="#pricing"
         icon={<Mail size={48} color="#ea4335" strokeWidth={1.5} />}
+        screenshots={heroScreenshots}
       />
       <Features
         sectionTitle="Built for Gmail, designed for comfort"
         sectionSubtitle="Darkly transforms every part of Gmail with carefully crafted dark styling."
+        screenshots={featureScreenshots}
       />
       <Pricing
         product="gmail"
