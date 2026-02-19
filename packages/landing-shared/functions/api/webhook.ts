@@ -152,21 +152,38 @@ async function trackDiscountUsage(
 
     if (!license) return;
 
+    // Increment use_count and set first-use fields if not already set
     await env.DB.prepare(
       `UPDATE discount_codes
-       SET used_by_email = ?, used_by_license_id = ?, used_at = datetime('now')
-       WHERE stripe_promo_code_id = ? AND used_at IS NULL`,
+       SET use_count = use_count + 1,
+           used_by_email = COALESCE(used_by_email, ?),
+           used_by_license_id = COALESCE(used_by_license_id, ?),
+           used_at = COALESCE(used_at, datetime('now'))
+       WHERE stripe_promo_code_id = ?`,
     )
       .bind(email, license.id, promoCodeId)
       .run();
 
-    await env.DB.prepare(
-      `UPDATE licenses SET discount_code_id = (
-         SELECT id FROM discount_codes WHERE stripe_promo_code_id = ? LIMIT 1
-       ) WHERE id = ?`,
+    // Insert audit row for multi-use tracking
+    const discountCode = await env.DB.prepare(
+      `SELECT id FROM discount_codes WHERE stripe_promo_code_id = ? LIMIT 1`,
     )
-      .bind(promoCodeId, license.id)
-      .run();
+      .bind(promoCodeId)
+      .first<{ id: number }>();
+
+    if (discountCode) {
+      await env.DB.prepare(
+        `INSERT INTO discount_code_usages (discount_code_id, email, license_id) VALUES (?, ?, ?)`,
+      )
+        .bind(discountCode.id, email, license.id)
+        .run();
+
+      await env.DB.prepare(
+        `UPDATE licenses SET discount_code_id = ? WHERE id = ?`,
+      )
+        .bind(discountCode.id, license.id)
+        .run();
+    }
   } catch {
     console.error('Failed to track discount code usage');
   }

@@ -296,6 +296,8 @@
 .badge--expired,
 .badge--past_due { background: rgba(242, 139, 130, 0.15); color: #f28b82; }
 .badge--used { background: rgba(154, 160, 166, 0.15); color: #9aa0a6; }
+.badge--inactive { background: rgba(154, 160, 166, 0.15); color: #9aa0a6; }
+.badge--exhausted { background: rgba(251, 188, 4, 0.15); color: #fbc004; }
 .badge--monthly { background: rgba(138, 180, 248, 0.15); color: #8ab4f8; }
 .badge--yearly { background: rgba(108, 92, 231, 0.15); color: #a29bfe; }
 .badge--lifetime { background: rgba(129, 201, 149, 0.15); color: #81c995; }
@@ -369,6 +371,40 @@
   flex: 1;
 }
 
+/* Checkbox Group */
+.admin-checkbox-group {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0.4rem 0;
+}
+
+.admin-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #e8eaed;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-transform: capitalize;
+}
+
+.admin-checkbox-label input[type="checkbox"] {
+  accent-color: #8ab4f8;
+}
+
+.admin-checkbox-hint {
+  color: #9aa0a6;
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+/* Inactive Row */
+.admin-row-inactive {
+  opacity: 0.5;
+}
+
 .admin-form-error {
   background: rgba(242, 139, 130, 0.1);
   border: 1px solid rgba(242, 139, 130, 0.3);
@@ -419,6 +455,20 @@
   color: #8ab4f8;
   background: rgba(138, 180, 248, 0.08);
   border-color: rgba(138, 180, 248, 0.15);
+}
+
+.admin-icon-btn--active {
+  color: #81c995;
+}
+
+.admin-icon-btn--active:hover {
+  color: #81c995;
+}
+
+.admin-icon-btn--danger:hover {
+  color: #f28b82;
+  background: rgba(242, 139, 130, 0.08);
+  border-color: rgba(242, 139, 130, 0.15);
 }
 
 .admin-actions-cell {

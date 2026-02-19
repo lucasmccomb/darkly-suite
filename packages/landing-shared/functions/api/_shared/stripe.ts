@@ -195,7 +195,7 @@ interface StripePromotionCode {
 
 export async function createStripePromotionCode(
   secretKey: string,
-  params: { couponId: string; code: string; expiresAt?: string },
+  params: { couponId: string; code: string; expiresAt?: string; maxRedemptions?: number },
 ): Promise<StripePromotionCode> {
   const body: Record<string, string> = {
     'promotion[type]': 'coupon',
@@ -205,6 +205,10 @@ export async function createStripePromotionCode(
 
   if (params.expiresAt) {
     body['expires_at'] = Math.floor(new Date(params.expiresAt).getTime() / 1000).toString()
+  }
+
+  if (params.maxRedemptions) {
+    body['max_redemptions'] = params.maxRedemptions.toString()
   }
 
   const res = await fetch(`${STRIPE_API}/promotion_codes`, {
@@ -219,6 +223,29 @@ export async function createStripePromotionCode(
   }
 
   return res.json() as Promise<StripePromotionCode>
+}
+
+export async function updateStripePromotionCode(
+  secretKey: string,
+  promoCodeId: string,
+  params: { active: boolean },
+): Promise<{ id: string; active: boolean }> {
+  const body: Record<string, string> = {
+    active: params.active.toString(),
+  }
+
+  const res = await fetch(`${STRIPE_API}/promotion_codes/${promoCodeId}`, {
+    method: 'POST',
+    headers: authHeaders(secretKey),
+    body: encodeParams(body),
+  })
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(`Stripe updatePromotionCode failed (${res.status}): ${err}`)
+  }
+
+  return res.json() as Promise<{ id: string; active: boolean }>
 }
 
 // -- Webhook Signature Verification --------------------------------------

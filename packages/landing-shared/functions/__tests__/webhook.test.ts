@@ -214,6 +214,63 @@ describe('webhook — checkout.session.completed', () => {
   });
 });
 
+describe('webhook — discount usage tracking', () => {
+  it('increments use_count and inserts usage row on checkout with discount', async () => {
+    // retrieveCheckoutSession
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          id: 'cs_disc',
+          url: '',
+          metadata: { token: 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee', plan: 'yearly', product: 'gmail' },
+          customer: 'cus_disc',
+          subscription: 'sub_disc',
+          customer_details: { email: 'discount@example.com' },
+        }),
+        { status: 200 },
+      ),
+    );
+
+    // trackDiscountUsage — expanded session with a discount
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          total_details: {
+            breakdown: {
+              discounts: [
+                { discount: { promotion_code: 'promo_abc123' } },
+              ],
+            },
+          },
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const env = createMockEnv();
+    const db = env.DB as unknown as MockD1Database;
+
+    // Mock: license lookup returns id=5
+    db._statement.first.mockResolvedValueOnce({ id: 5 });
+    // Mock: discount_code lookup returns id=10
+    db._statement.first.mockResolvedValueOnce({ id: 10 });
+
+    const eventBody = makeWebhookEvent('checkout.session.completed', { id: 'cs_disc' });
+    const response = await callWebhook(eventBody, env);
+
+    expect(response.status).toBe(200);
+
+    // Verify use_count increment SQL
+    const allSql = db.prepare.mock.calls.map(([sql]: [string]) => sql as string);
+    const incrementSql = allSql.find((s: string) => s.includes('use_count = use_count + 1'));
+    expect(incrementSql).toBeDefined();
+
+    // Verify discount_code_usages INSERT
+    const usageInsert = allSql.find((s: string) => s.includes('INSERT INTO discount_code_usages'));
+    expect(usageInsert).toBeDefined();
+  });
+});
+
 describe('webhook — customer.subscription.updated', () => {
   it('maps "active" Stripe status to "active" license status', async () => {
     const env = createMockEnv();
