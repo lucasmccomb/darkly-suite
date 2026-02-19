@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { Mail, Table2, FileText, AlertTriangle, ExternalLink } from 'lucide-react'
+import { Mail, Table2, FileText, Lightbulb, ExternalLink } from 'lucide-react'
 
 type TabId = 'gmail' | 'sheets' | 'docs'
 
 interface SetupGuideProps {
   activeTab?: string | null
   storeUrls: Record<string, string>
+  products?: TabId[]
 }
 
 const TABS: { id: TabId; label: string; icon: typeof Mail; color: string }[] = [
@@ -18,28 +19,31 @@ function isTabId(value: string | null | undefined): value is TabId {
   return value === 'gmail' || value === 'sheets' || value === 'docs'
 }
 
-export function SetupGuide({ activeTab, storeUrls }: SetupGuideProps) {
-  const initialTab: TabId = isTabId(activeTab) ? activeTab : 'gmail'
+export function SetupGuide({ activeTab, storeUrls, products }: SetupGuideProps) {
+  const visibleTabs = products ? TABS.filter((t) => products.includes(t.id)) : TABS
+  const initialTab: TabId = isTabId(activeTab) ? activeTab : visibleTabs[0]?.id ?? 'gmail'
   const [tab, setTab] = useState<TabId>(initialTab)
 
   return (
     <div className="setup-guide">
-      <div className="setup-tabs">
-        {TABS.map((t) => {
-          const Icon = t.icon
-          return (
-            <button
-              key={t.id}
-              className={`setup-tab ${tab === t.id ? 'setup-tab--active' : ''}`}
-              onClick={() => setTab(t.id)}
-              type="button"
-            >
-              <Icon size={18} color={tab === t.id ? t.color : undefined} strokeWidth={1.8} />
-              <span>{t.label}</span>
-            </button>
-          )
-        })}
-      </div>
+      {visibleTabs.length > 1 && (
+        <div className="setup-tabs">
+          {visibleTabs.map((t) => {
+            const Icon = t.icon
+            return (
+              <button
+                key={t.id}
+                className={`setup-tab ${tab === t.id ? 'setup-tab--active' : ''}`}
+                onClick={() => setTab(t.id)}
+                type="button"
+              >
+                <Icon size={18} color={tab === t.id ? t.color : undefined} strokeWidth={1.8} />
+                <span>{t.label}</span>
+              </button>
+            )
+          })}
+        </div>
+      )}
 
       <div className="setup-content">
         {tab === 'gmail' && <GmailGuide storeUrls={storeUrls} />}
@@ -74,33 +78,14 @@ function GmailGuide({ storeUrls }: { storeUrls: Record<string, string> }) {
         </p>
       </Step>
 
-      <Step number={3} title="Set Gmail's theme to Default">
-        <div className="setup-callout">
-          <div className="setup-callout-icon">
-            <AlertTriangle size={20} />
-          </div>
-          <div className="setup-callout-body">
-            <strong>Important for best results</strong>
-            <p>
-              Darkly applies dark mode by inverting Gmail&apos;s colors using a CSS filter. This
-              works best when Gmail is using its default (light) theme. If you have a custom or dark
-              Gmail theme, the inversion can produce incorrect colors or visual artifacts.
-            </p>
-            <div className="setup-callout-steps">
-              <span>To set the default theme:</span>
-              <ol>
-                <li>Click the <strong>Settings gear</strong> icon in Gmail (top-right)</li>
-                <li>Under &quot;Theme,&quot; click <strong>View all</strong></li>
-                <li>Select the <strong>Default</strong> theme (first option, plain white)</li>
-                <li>Click <strong>Save</strong></li>
-              </ol>
-            </div>
-            <p className="setup-callout-note">
-              Once set, Darkly handles all the dark mode styling — you won&apos;t see the plain
-              white theme because Darkly inverts it into a comfortable dark palette.
-            </p>
-          </div>
-        </div>
+      <Step number={3} title="Choose a plan">
+        <p>
+          Darkly for Gmail requires a subscription to activate. Open the extension in Gmail
+          and choose from Monthly, Yearly, or Lifetime plans. You can also subscribe from
+          the{' '}
+          <a href="/#pricing">pricing section</a>
+          {' '}on this site.
+        </p>
       </Step>
 
       <Step number={4} title="Toggle dark mode">
@@ -109,6 +94,48 @@ function GmailGuide({ storeUrls }: { storeUrls: Record<string, string> }) {
           lets you toggle dark mode on or off instantly. You can also use the keyboard shortcut
           to toggle.
         </p>
+        <div className="setup-callout setup-callout--tip">
+          <div className="setup-callout-icon">
+            <Lightbulb size={20} />
+          </div>
+          <div className="setup-callout-body">
+            <strong>Tip for optimized viewing</strong>
+            <p>
+              Darkly&apos;s dark mode looks the best when Gmail&apos;s theme is set to the default
+              theme provided by Gmail. If you&apos;re going to use one of Darkly&apos;s features to
+              change between light and dark mode, using Gmail&apos;s default light theme is better
+              for your eyes.
+            </p>
+            <div className="setup-callout-steps">
+              <span>To set the theme to Gmail&apos;s default:</span>
+              <ol>
+                <li>
+                  Click the <strong>Settings gear</strong> icon in Gmail (top-right) to open the
+                  Quick settings panel
+                  <img
+                    src="/images/setup/gear-icon-guide.png"
+                    alt="Gmail settings gear icon location"
+                    className="setup-callout-img"
+                  />
+                </li>
+                <li>
+                  In the <strong>Theme</strong> section of the Quick settings panel (halfway down
+                  panel) select the first, plain white theme in the grid of theme thumbnails
+                  (top-left thumbnail)
+                  <img
+                    src="/images/setup/quick-settings-guide.jpg"
+                    alt="Gmail Quick settings panel showing Theme section"
+                    className="setup-callout-img"
+                  />
+                </li>
+                <li>
+                  You should now have Gmail&apos;s default theme selected. Close the Quick settings
+                  panel. Darkly will handle all theme changes once configured.
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
       </Step>
 
       <Step number={5} title="Choose your preferred mode">
