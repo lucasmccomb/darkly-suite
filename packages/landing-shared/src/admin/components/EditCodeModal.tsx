@@ -3,6 +3,13 @@ import { AdminModal } from './AdminModal.tsx'
 
 const PRODUCTS = ['gmail', 'sheets', 'docs', 'suite'] as const
 
+const PRODUCT_LABELS: Record<string, string> = {
+  gmail: 'Darkly for Gmail',
+  sheets: 'Darkly for Sheets',
+  docs: 'Darkly for Docs',
+  suite: 'Darkly Suite',
+}
+
 interface EditCodeModalProps {
   open: boolean
   onClose: () => void
@@ -53,7 +60,7 @@ export function EditCodeModal({ open, onClose, onSave, code }: EditCodeModalProp
           >
             <option value="">All products</option>
             {PRODUCTS.map((p) => (
-              <option key={p} value={p}>{p}</option>
+              <option key={p} value={p}>{PRODUCT_LABELS[p]}</option>
             ))}
           </select>
         </div>
