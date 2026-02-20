@@ -5,6 +5,13 @@ import { EditCodeModal } from '../components/EditCodeModal.tsx'
 
 const PRODUCTS = ['gmail', 'sheets', 'docs', 'suite'] as const
 
+const PRODUCT_LABELS: Record<string, string> = {
+  gmail: 'Darkly for Gmail',
+  sheets: 'Darkly for Sheets',
+  docs: 'Darkly for Docs',
+  suite: 'Darkly Suite',
+}
+
 interface DiscountCode {
   id: string
   code: string
@@ -47,8 +54,7 @@ export function AdminDiscountsPage() {
   const [discountValue, setDiscountValue] = useState('')
   const [productScope, setProductScope] = useState('')
   const [expiresAt, setExpiresAt] = useState('')
-  const [maxUses, setMaxUses] = useState('')
-  const [bulkCount, setBulkCount] = useState('')
+  const [maxUses, setMaxUses] = useState('1')
 
   const fetchCodes = useCallback(async () => {
     setLoading(true)
@@ -85,7 +91,6 @@ export function AdminDiscountsPage() {
     if (productScope) body.product = productScope
     if (expiresAt) body.expires_at = new Date(expiresAt).toISOString()
     if (maxUses) body.max_uses = parseInt(maxUses, 10)
-    if (bulkCount && parseInt(bulkCount, 10) > 1) body.count = parseInt(bulkCount, 10)
 
     const res = await fetch('/api/admin/discount-codes', {
       method: 'POST',
@@ -99,8 +104,7 @@ export function AdminDiscountsPage() {
       setDiscountValue('')
       setProductScope('')
       setExpiresAt('')
-      setMaxUses('')
-      setBulkCount('')
+      setMaxUses('1')
       setShowForm(false)
       fetchCodes()
     } else {
@@ -149,8 +153,6 @@ export function AdminDiscountsPage() {
     setTimeout(() => setCopiedId(null), 2000)
   }
 
-  const bulkActive = parseInt(bulkCount, 10) > 1
-
   return (
     <div className="admin-page">
       <div className="admin-page-header">
@@ -163,27 +165,14 @@ export function AdminDiscountsPage() {
       {showForm && (
         <form className="admin-create-form" onSubmit={handleCreate}>
           {error && <div className="admin-form-error">{error}</div>}
-          <div className="admin-form-row admin-form-row--inline">
+          <div className="admin-form-row">
             <label>
-              Code {bulkActive ? '(auto-generated)' : '(optional)'}
+              Code (optional — random code will be generated if left empty)
               <input
                 type="text"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="e.g. LAUNCH50"
-                className="admin-input"
-                disabled={bulkActive}
-              />
-            </label>
-            <label>
-              Quantity
-              <input
-                type="number"
-                min="1"
-                max="100"
-                value={bulkCount}
-                onChange={(e) => { setBulkCount(e.target.value); if (parseInt(e.target.value, 10) > 1) setCode('') }}
-                placeholder="1"
                 className="admin-input"
               />
             </label>
@@ -222,7 +211,7 @@ export function AdminDiscountsPage() {
               >
                 <option value="">All products</option>
                 {PRODUCTS.map((p) => (
-                  <option key={p} value={p}>{p}</option>
+                  <option key={p} value={p}>{PRODUCT_LABELS[p]}</option>
                 ))}
               </select>
             </label>
@@ -250,7 +239,7 @@ export function AdminDiscountsPage() {
             </label>
           </div>
           <button type="submit" className="admin-btn-primary" disabled={creating}>
-            {creating ? 'Creating...' : bulkActive ? `Create ${bulkCount} Codes` : 'Create Discount Code'}
+            {creating ? 'Creating...' : 'Create Discount Code'}
           </button>
         </form>
       )}
@@ -265,10 +254,9 @@ export function AdminDiscountsPage() {
         />
         <select value={productFilter} onChange={(e) => { setProductFilter(e.target.value); setPage(1) }} className="admin-select">
           <option value="">All products</option>
-          <option value="gmail">Gmail</option>
-          <option value="sheets">Sheets</option>
-          <option value="docs">Docs</option>
-          <option value="suite">Suite</option>
+          {PRODUCTS.map((p) => (
+            <option key={p} value={p}>{PRODUCT_LABELS[p]}</option>
+          ))}
         </select>
         <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1) }} className="admin-select">
           <option value="">All statuses</option>
@@ -306,7 +294,7 @@ export function AdminDiscountsPage() {
                   <tr key={dc.id} className={dc.active ? '' : 'admin-row-inactive'}>
                     <td className="admin-code-cell">{dc.code}</td>
                     <td>{formatDiscount(dc)}</td>
-                    <td>{dc.product ?? 'All'}</td>
+                    <td>{dc.product ? PRODUCT_LABELS[dc.product] ?? dc.product : 'All'}</td>
                     <td>
                       <span className={`badge badge--${getCodeStatus(dc)}`}>
                         {getCodeStatus(dc)}
