@@ -42,12 +42,11 @@ export function SettingsPanel({ isPro = false, prices, onUpgrade, onClose, rende
 
   const updatePrefs = useCallback(
     (patch: Partial<BaseUserPreferences>) => {
-      const updated = { ...prefs, ...patch };
-      setPrefs(updated);
+      setPrefs((prev) => ({ ...prev, ...patch }));
       const prefsManager = createPreferencesManager(config);
       prefsManager.save(patch);
     },
-    [prefs, config],
+    [config],
   );
 
   if (loading) {

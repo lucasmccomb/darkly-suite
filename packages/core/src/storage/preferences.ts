@@ -10,6 +10,7 @@ export interface PreferencesManager {
 
 export function createPreferencesManager(config: ProductConfig): PreferencesManager {
   const key = config.storageKey;
+  let saveQueue: Promise<void> = Promise.resolve();
 
   async function load(): Promise<BaseUserPreferences> {
     const result = await chrome.storage.sync.get(key);
@@ -19,9 +20,15 @@ export function createPreferencesManager(config: ProductConfig): PreferencesMana
   }
 
   async function save(prefs: Partial<BaseUserPreferences>): Promise<void> {
-    const current = await load();
-    const merged = { ...current, ...prefs };
-    await chrome.storage.sync.set({ [key]: merged });
+    // Serialize saves to prevent read-modify-write races when
+    // the toggle is clicked rapidly — each save reads the result
+    // of the previous one.
+    saveQueue = saveQueue.then(async () => {
+      const current = await load();
+      const merged = { ...current, ...prefs };
+      await chrome.storage.sync.set({ [key]: merged });
+    });
+    return saveQueue;
   }
 
   function onChange(
