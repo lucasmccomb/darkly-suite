@@ -370,6 +370,7 @@ export function AdminDiscountsPage() {
         onClose={() => setShareCode(null)}
         code={shareCode?.code ?? ''}
         discount={shareCode ? formatDiscount(shareCode) : ''}
+        product={shareCode?.product ?? null}
         expiresAt={shareCode?.expires_at ?? null}
       />
 
