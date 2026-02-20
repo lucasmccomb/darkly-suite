@@ -25,12 +25,12 @@ export function Paywall({ onSubscribe, onClose, prices }: PaywallProps) {
   const config = useDarklyConfig();
   const [selectedPlan, setSelectedPlan] = useState<Plan>('yearly');
 
-  const siteBase = config.siteBase || 'https://gmaildarkly.com';
+  const siteBase = config.siteBase || 'https://darklysuite.com';
 
   return (
     <div className={`${p}-settings-panel`}>
       <div className={`${p}-settings-header`}>
-        <h2 className={`${p}-settings-title`}><Wordmark /> <span className={`${p}-settings-title-suffix`}>for Gmail</span></h2>
+        <h2 className={`${p}-settings-title`}><Wordmark /> <span className={`${p}-settings-title-suffix`}>{config.productName.replace('Darkly ', '')}</span></h2>
         {onClose && (
           <div className={`${p}-settings-header-actions`}>
             <button
@@ -99,10 +99,10 @@ export function Paywall({ onSubscribe, onClose, prices }: PaywallProps) {
             </svg>
           </div>
           <a
-            href="mailto:support@gmaildarkly.com"
+            href="mailto:admin@darklysuite.com"
             className={`${p}-paywall-support`}
           >
-            support@gmaildarkly.com
+            admin@darklysuite.com
           </a>
         </div>
       </div>
