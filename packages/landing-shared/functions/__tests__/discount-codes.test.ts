@@ -63,14 +63,17 @@ function makeStripePromo(overrides: Record<string, unknown> = {}) {
     max_redemptions: null,
     times_redeemed: 0,
     metadata: {},
-    coupon: {
-      id: 'coupon_test1',
-      percent_off: 50,
-      amount_off: null,
-      currency: null,
-      duration: 'once',
-      name: 'Darkly 50% off',
-      valid: true,
+    promotion: {
+      coupon: {
+        id: 'coupon_test1',
+        percent_off: 50,
+        amount_off: null,
+        currency: null,
+        duration: 'once',
+        name: 'Darkly 50% off',
+        valid: true,
+      },
+      type: 'coupon',
     },
     ...overrides,
   };

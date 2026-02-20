@@ -13,13 +13,13 @@ type CFContext = EventContext<Env, string, unknown>
 // -- Helpers ----------------------------------------------------------------
 
 function promoToCode(p: StripePromotionCodeFull) {
-  const coupon = p.coupon
+  const coupon = typeof p.promotion.coupon === 'object' ? p.promotion.coupon : null
   return {
     id: p.id,
     code: p.code,
     active: p.active,
-    discount_type: coupon.percent_off != null ? 'percent' : 'fixed',
-    discount_value: coupon.percent_off ?? (coupon.amount_off != null ? coupon.amount_off / 100 : 0),
+    discount_type: coupon?.percent_off != null ? 'percent' : 'fixed',
+    discount_value: coupon?.percent_off ?? (coupon?.amount_off != null ? coupon.amount_off / 100 : 0),
     product: p.metadata.product ?? null,
     max_redemptions: p.max_redemptions,
     times_redeemed: p.times_redeemed,
