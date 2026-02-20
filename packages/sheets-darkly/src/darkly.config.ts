@@ -8,7 +8,7 @@ export const config: ProductConfig = {
   tokenKey: 'sd_token',
   proCacheKey: 'sd_pro_cache',
   apiBase: 'https://darklysuite.com/api',
-  siteBase: 'https://darklysuite.com',
+  siteBase: 'https://sheetsdarkly.com',
   alarmName: 'sd-schedule-check',
   tabUrlPattern: 'https://docs.google.com/spreadsheets/*',
 };

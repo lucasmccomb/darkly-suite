@@ -23,7 +23,7 @@ Before starting, verify these are live:
 **Setup**: Use a Chrome profile signed into the fresh Google account. No previous Darkly extension installed.
 
 1. [ ] Load the extension as unpacked from the production `dist/` directory
-2. [ ] **Verify**: Browser opens `darklysuite.com/setup?product=sheets` in a new tab
+2. [ ] **Verify**: Browser opens `sheetsdarkly.com/setup` in a new tab
 3. [ ] **Verify**: The setup page loads correctly (not a DNS error)
 4. [ ] Navigate to `docs.google.com/spreadsheets` and open any spreadsheet
 5. [ ] **Verify**: Google Sheets loads normally (no crashes, no console errors)
