@@ -260,9 +260,7 @@ export function createBackgroundWorker(config: ProductConfig): void {
     console.log(`[${config.productName}] Extension installed:`, details.reason);
     if (details.reason === 'install') {
       if (typeof __DEV_MODE__ === 'undefined' || !__DEV_MODE__) {
-        const setupUrl = config.productId === 'suite'
-          ? `${config.siteBase}/setup?product=${config.productId}`
-          : `${config.siteBase}/setup`;
+        const setupUrl = `${config.siteBase}/setup?product=${config.productId}`;
         chrome.tabs.create({ url: setupUrl });
       }
       await worker.setupAlarm();
