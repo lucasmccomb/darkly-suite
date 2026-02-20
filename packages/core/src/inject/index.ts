@@ -34,3 +34,6 @@ export type { KeyboardShortcutOptions } from './keyboard-shortcuts';
 
 export { showNotification } from './notifications';
 export type { NotificationType, NotificationOptions } from './notifications';
+
+export { injectFab, removeFab } from './fab';
+export type { FabOptions } from './fab';

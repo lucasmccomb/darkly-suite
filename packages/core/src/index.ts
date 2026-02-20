@@ -5,6 +5,7 @@ export type {
   SiteId,
   ProductId,
   Plan,
+  PageContext,
   ProductConfig,
   ToolbarButtonOpts,
   SidebarIconOpts,
@@ -71,6 +72,8 @@ export {
   createMiniPanel,
   registerKeyboardShortcut,
   showNotification,
+  injectFab,
+  removeFab,
 } from './inject';
 export type {
   ToolbarButtonContext,
@@ -81,6 +84,7 @@ export type {
   KeyboardShortcutOptions,
   NotificationType,
   NotificationOptions,
+  FabOptions,
 } from './inject';
 
 // UI components

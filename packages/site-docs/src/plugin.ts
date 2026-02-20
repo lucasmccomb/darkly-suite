@@ -8,6 +8,7 @@ import type {
   KeyboardShortcutHandlers,
   ThemeEngine,
   ProductConfig,
+  PageContext,
 } from '@darkly/core';
 import { injectToolbarButton } from './inject/toolbar';
 import { injectSidebarIcon } from './inject/sidebar-icon';
@@ -35,6 +36,12 @@ export const docsPlugin: SitePlugin = {
   siteId: 'docs',
   tabUrlPattern: 'https://docs.google.com/document/*',
   contentScriptMatches: ['https://docs.google.com/document/*'],
+
+  getPageContext(): PageContext {
+    // Editor pages have a doc ID: /document/d/{id}/...
+    if (/\/document\/d\/[^/]+/.test(window.location.pathname)) return 'editor';
+    return 'dashboard';
+  },
 
   // Docs override CSS is loaded via the manifest css array.
   overrideStyles: 'docs-overrides.css',

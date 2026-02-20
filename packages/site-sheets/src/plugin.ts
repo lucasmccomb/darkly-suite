@@ -9,6 +9,7 @@ import type {
   KeyboardShortcutHandlers,
   ThemeEngine,
   ProductConfig,
+  PageContext,
 } from '@darkly/core';
 import { injectToolbarButton } from './inject/toolbar';
 import { injectSidebarIcon } from './inject/sidebar-icon';
@@ -22,6 +23,12 @@ export const sheetsPlugin: SitePlugin = {
   siteId: 'sheets',
   tabUrlPattern: 'https://docs.google.com/spreadsheets/*',
   contentScriptMatches: ['https://docs.google.com/spreadsheets/*'],
+
+  getPageContext(): PageContext {
+    // Editor pages have a doc ID: /spreadsheets/d/{id}/...
+    if (/\/spreadsheets\/d\/[^/]+/.test(window.location.pathname)) return 'editor';
+    return 'dashboard';
+  },
 
   // Sheets override CSS is loaded via the manifest css array.
   overrideStyles: 'sheets-overrides.css',
