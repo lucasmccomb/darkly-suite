@@ -7,6 +7,12 @@
 
 import { createMockContext, createMockEnv } from './test-helpers';
 import type { MockD1Database } from './test-helpers';
+import {
+  makeStripePromotionCode,
+  makeStripeListResponse,
+  CREATE_PROMO_PARAMS,
+  LIST_PROMO_PARAMS,
+} from './fixtures/stripe-promotion-code';
 
 // ---------------------------------------------------------------------------
 // Mock fetch for Stripe API calls
@@ -52,32 +58,8 @@ function adminRequest(url: string, init?: RequestInit): Request {
   });
 }
 
-function makeStripePromo(overrides: Record<string, unknown> = {}) {
-  return {
-    id: 'promo_test1',
-    code: 'TESTCODE',
-    object: 'promotion_code',
-    active: true,
-    created: Math.floor(Date.now() / 1000),
-    expires_at: null,
-    max_redemptions: null,
-    times_redeemed: 0,
-    metadata: {},
-    promotion: {
-      coupon: {
-        id: 'coupon_test1',
-        percent_off: 50,
-        amount_off: null,
-        currency: null,
-        duration: 'once',
-        name: 'Darkly 50% off',
-        valid: true,
-      },
-      type: 'coupon',
-    },
-    ...overrides,
-  };
-}
+// Fixture: makeStripePromotionCode from ./fixtures/stripe-promotion-code.ts
+// Sourced from Stripe API docs, NOT from our code. See fixture file for doc links.
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -95,16 +77,20 @@ describe('GET /api/admin/discount-codes', () => {
     expect(response.status).toBe(401);
   });
 
+  // Contract: GET /v1/promotion_codes
+  // https://docs.stripe.com/api/promotion_codes/list
+  // Must expand data.promotion.coupon to get coupon details.
+
   it('returns paginated codes from Stripe', async () => {
     const promos = [
-      makeStripePromo({ id: 'promo_1', code: 'CODE1' }),
-      makeStripePromo({ id: 'promo_2', code: 'CODE2' }),
-      makeStripePromo({ id: 'promo_3', code: 'CODE3' }),
+      makeStripePromotionCode({ id: 'promo_1', code: 'CODE1' }),
+      makeStripePromotionCode({ id: 'promo_2', code: 'CODE2' }),
+      makeStripePromotionCode({ id: 'promo_3', code: 'CODE3' }),
     ];
 
     // Stripe listPromotionCodes
     fetchMock.mockResolvedValueOnce(
-      new Response(JSON.stringify({ data: promos, has_more: false }), { status: 200 }),
+      new Response(JSON.stringify(makeStripeListResponse(promos)), { status: 200 }),
     );
 
     const ctx = createAdminContext(
@@ -113,6 +99,10 @@ describe('GET /api/admin/discount-codes', () => {
 
     const response = await onRequestGet(ctx);
     expect(response.status).toBe(200);
+
+    // Verify we request the correct expand path (promotion.coupon, NOT coupon)
+    const listUrl = (fetchMock.mock.calls[0] as [string, RequestInit])[0];
+    expect(listUrl).toContain(LIST_PROMO_PARAMS.expandCoupon);
 
     const body = await response.json() as { codes: unknown[]; total: number; page: number; limit: number };
     expect(body.total).toBe(3);
@@ -123,12 +113,12 @@ describe('GET /api/admin/discount-codes', () => {
 
   it('filters by search term', async () => {
     const promos = [
-      makeStripePromo({ id: 'promo_1', code: 'LAUNCH50' }),
-      makeStripePromo({ id: 'promo_2', code: 'WELCOME10' }),
+      makeStripePromotionCode({ id: 'promo_1', code: 'LAUNCH50' }),
+      makeStripePromotionCode({ id: 'promo_2', code: 'WELCOME10' }),
     ];
 
     fetchMock.mockResolvedValueOnce(
-      new Response(JSON.stringify({ data: promos, has_more: false }), { status: 200 }),
+      new Response(JSON.stringify(makeStripeListResponse(promos)), { status: 200 }),
     );
 
     const ctx = createAdminContext(
@@ -143,12 +133,12 @@ describe('GET /api/admin/discount-codes', () => {
 
   it('filters by status', async () => {
     const promos = [
-      makeStripePromo({ id: 'promo_active', code: 'ACTIVE', active: true, times_redeemed: 0 }),
-      makeStripePromo({ id: 'promo_inactive', code: 'INACTIVE', active: false }),
+      makeStripePromotionCode({ id: 'promo_active', code: 'ACTIVE', active: true, times_redeemed: 0 }),
+      makeStripePromotionCode({ id: 'promo_inactive', code: 'INACTIVE', active: false }),
     ];
 
     fetchMock.mockResolvedValueOnce(
-      new Response(JSON.stringify({ data: promos, has_more: false }), { status: 200 }),
+      new Response(JSON.stringify(makeStripeListResponse(promos)), { status: 200 }),
     );
 
     const ctx = createAdminContext(
@@ -163,13 +153,13 @@ describe('GET /api/admin/discount-codes', () => {
 
   it('filters by product', async () => {
     const promos = [
-      makeStripePromo({ id: 'promo_gmail', code: 'GMAIL', metadata: { product: 'gmail' } }),
-      makeStripePromo({ id: 'promo_all', code: 'ALLAPPS', metadata: {} }),
-      makeStripePromo({ id: 'promo_sheets', code: 'SHEETS', metadata: { product: 'sheets' } }),
+      makeStripePromotionCode({ id: 'promo_gmail', code: 'GMAIL', metadata: { product: 'gmail' } }),
+      makeStripePromotionCode({ id: 'promo_all', code: 'ALLAPPS', metadata: {} }),
+      makeStripePromotionCode({ id: 'promo_sheets', code: 'SHEETS', metadata: { product: 'sheets' } }),
     ];
 
     fetchMock.mockResolvedValueOnce(
-      new Response(JSON.stringify({ data: promos, has_more: false }), { status: 200 }),
+      new Response(JSON.stringify(makeStripeListResponse(promos)), { status: 200 }),
     );
 
     const ctx = createAdminContext(
@@ -187,6 +177,10 @@ describe('GET /api/admin/discount-codes', () => {
 });
 
 describe('POST /api/admin/discount-codes', () => {
+  // Contract: POST /v1/promotion_codes
+  // https://docs.stripe.com/api/promotion_codes/create
+  // Coupon MUST be nested: promotion[type]=coupon & promotion[coupon]=<id>
+
   it('creates a single code with Stripe coupon and promo code', async () => {
     // Stripe createCoupon
     fetchMock.mockResolvedValueOnce(
@@ -217,9 +211,11 @@ describe('POST /api/admin/discount-codes', () => {
     expect(body.id).toBe('promo_123');
     expect(body.code).toBe('TESTCODE');
 
-    // Verify Stripe promo code was created with metadata
+    // Verify promo creation uses correct nested Stripe params (not bare `coupon`)
     const promoCall = fetchMock.mock.calls[1];
     const promoBody = promoCall[1]?.body as string;
+    expect(promoBody).toContain(CREATE_PROMO_PARAMS.promotionType);
+    expect(promoBody).toContain(CREATE_PROMO_PARAMS.promotionCouponPrefix + 'coupon_123');
     expect(promoBody).toContain('metadata%5Bproduct%5D=gmail');
   });
 

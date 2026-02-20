@@ -15,6 +15,7 @@ import {
   createStripeCoupon,
   createStripePromotionCode,
 } from '../api/_shared/stripe';
+import { CREATE_PROMO_PARAMS } from './fixtures/stripe-promotion-code';
 
 // ---------------------------------------------------------------------------
 // Mock fetch globally for Stripe API calls
@@ -302,7 +303,12 @@ describe('createStripeCoupon', () => {
 describe('createStripePromotionCode', () => {
   const secretKey = 'sk_test_123';
 
-  it('creates a promotion code', async () => {
+  // Contract: POST /v1/promotion_codes
+  // https://docs.stripe.com/api/promotion_codes/create
+  // Coupon MUST be sent as promotion[type]=coupon & promotion[coupon]=<id>
+  // A bare `coupon=<id>` parameter is rejected as "unknown parameter".
+
+  it('creates a promotion code with correct nested promotion params', async () => {
     fetchMock.mockResolvedValueOnce(
       new Response(JSON.stringify({ id: 'promo_1', code: 'SAVE20', object: 'promotion_code' }), { status: 200 }),
     );
@@ -311,8 +317,10 @@ describe('createStripePromotionCode', () => {
 
     const body = (fetchMock.mock.calls[0] as [string, RequestInit])[1].body as string;
     expect(body).toContain('code=SAVE20');
-    expect(body).toContain('promotion%5Btype%5D=coupon');
-    expect(body).toContain('promotion%5Bcoupon%5D=coup_1');
+    expect(body).toContain(CREATE_PROMO_PARAMS.promotionType);
+    expect(body).toContain(CREATE_PROMO_PARAMS.promotionCouponPrefix + 'coup_1');
+    // Must NOT send bare `coupon` — Stripe rejects it as unknown parameter
+    expect(body).not.toMatch(/(?<![a-z%5D])coupon=coup_1/);
     expect(body).not.toContain('expires_at');
   });
 
