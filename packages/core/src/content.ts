@@ -8,6 +8,7 @@ import { createPaymentClient } from './payment/client';
 import { createSettingsModal, createMiniPanel } from './inject/panels';
 import type { PanelHandle } from './inject/panels';
 import type { BaseUserPreferences } from './storage/types';
+import { injectFab } from './inject/fab';
 
 /**
  * Creates and starts a content script for the given product configuration.
@@ -156,38 +157,46 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
 
     // Site plugin handles its own UI injection (toolbar, sidebar, etc.)
     if (sitePlugin) {
-      const toolbarOpts = {
-        isPro: proStatus,
-        prices: prices ?? undefined,
-        onAllSettings: miniPanel
-          ? () => {
-              // Sheets/Docs: toggle mini panel anchored to toolbar button
-              if (miniPanel!.isVisible()) {
-                miniPanel!.hide();
-              } else if (toolbarButton) {
-                miniPanel!.show(toolbarButton);
-              }
-            }
-          : () => settingsModal.show(), // Gmail: "All Settings" opens modal directly
-        onUpgrade: (plan?: Plan) => payment.openPaymentPage(plan),
-      };
+      const pageContext = sitePlugin.getPageContext?.() ?? 'editor';
 
-      toolbarButton = await sitePlugin.injectToolbarButton(toolbarOpts);
-
-      // Start DOM observer to re-inject toolbar when the host app rebuilds it
-      sitePlugin.startDomObserver(async () => {
-        toolbarButton = await sitePlugin.injectToolbarButton(toolbarOpts);
-      });
-
-      // Inject sidebar icon in companion app-switcher strip (Sheets/Docs)
-      if (sitePlugin.injectSidebarIcon) {
-        sitePlugin.injectSidebarIcon({
+      if (pageContext === 'editor') {
+        // Editor path: toolbar button, DOM observer, sidebar icon
+        const toolbarOpts = {
           isPro: proStatus,
-          onClick: showSettings,
+          prices: prices ?? undefined,
+          onAllSettings: miniPanel
+            ? () => {
+                // Sheets/Docs: toggle mini panel anchored to toolbar button
+                if (miniPanel!.isVisible()) {
+                  miniPanel!.hide();
+                } else if (toolbarButton) {
+                  miniPanel!.show(toolbarButton);
+                }
+              }
+            : () => settingsModal.show(), // Gmail: "All Settings" opens modal directly
+          onUpgrade: (plan?: Plan) => payment.openPaymentPage(plan),
+        };
+
+        toolbarButton = await sitePlugin.injectToolbarButton(toolbarOpts);
+
+        // Start DOM observer to re-inject toolbar when the host app rebuilds it
+        sitePlugin.startDomObserver(async () => {
+          toolbarButton = await sitePlugin.injectToolbarButton(toolbarOpts);
         });
+
+        // Inject sidebar icon in companion app-switcher strip (Sheets/Docs)
+        if (sitePlugin.injectSidebarIcon) {
+          sitePlugin.injectSidebarIcon({
+            isPro: proStatus,
+            onClick: showSettings,
+          });
+        }
+      } else {
+        // Dashboard path: inject icon into Google's header toolbar
+        await injectFab(config, { onClick: showSettings });
       }
 
-      // Register keyboard shortcuts (Alt+Shift+D toggle, Alt+Shift+S settings)
+      // Register keyboard shortcuts on both editor and dashboard pages
       if (sitePlugin.registerKeyboardShortcuts) {
         sitePlugin.registerKeyboardShortcuts({
           toggleDarkMode: () => engine.toggle(),

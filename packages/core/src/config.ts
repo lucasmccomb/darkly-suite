@@ -6,6 +6,7 @@ import type React from 'react';
 export type SiteId = 'gmail' | 'sheets' | 'docs';
 export type ProductId = 'gmail' | 'sheets' | 'docs' | 'suite';
 export type Plan = 'monthly' | 'yearly' | 'lifetime';
+export type PageContext = 'editor' | 'dashboard';
 
 export interface ProductConfig {
   productId: ProductId;
@@ -56,6 +57,7 @@ export interface SitePlugin {
   getDefaultPreferences?(): Record<string, unknown>;
   overrideStyles: string;
   init?(engine: ThemeEngine, config: ProductConfig): Promise<void>;
+  getPageContext?(): PageContext;
 }
 
 // Forward reference for ThemeEngine (avoids circular import)
