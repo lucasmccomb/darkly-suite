@@ -1,14 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { AdminModal } from './AdminModal.tsx'
-
-const PRODUCTS = ['gmail', 'sheets', 'docs', 'suite'] as const
-
-const PRODUCT_LABELS: Record<string, string> = {
-  gmail: 'Darkly for Gmail',
-  sheets: 'Darkly for Sheets',
-  docs: 'Darkly for Docs',
-  suite: 'Darkly Suite',
-}
+import { PRODUCTS, PRODUCT_LABELS } from '../constants.ts'
 
 interface EditCodeModalProps {
   open: boolean

@@ -1,19 +1,7 @@
 import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
 import { AdminModal } from './AdminModal.tsx'
-
-const PRODUCT_NAMES: Record<string, string> = {
-  gmail: 'Darkly for Gmail',
-  sheets: 'Darkly for Sheets',
-  docs: 'Darkly for Docs',
-  suite: 'Darkly Suite',
-}
-
-const PRODUCT_URLS: Record<string, string> = {
-  gmail: 'gmaildarkly.com',
-  sheets: 'sheetsdarkly.com',
-  docs: 'docsdarkly.com',
-}
+import { PRODUCT_LABELS, PRODUCT_URLS } from '../constants.ts'
 
 interface ShareCodeModalProps {
   open: boolean
@@ -57,7 +45,7 @@ export function ShareCodeModal({ open, onClose, code, discount, product, expires
 }
 
 function buildShareText(code: string, discount: string, product: string | null, expiresAt: string | null): string {
-  const productName = product ? (PRODUCT_NAMES[product] ?? 'Darkly Suite') : 'Darkly Suite'
+  const productName = product ? (PRODUCT_LABELS[product] ?? 'Darkly Suite') : 'Darkly Suite'
   const url = product ? (PRODUCT_URLS[product] ?? 'darklysuite.com') : 'darklysuite.com'
   const discountPhrase = discount === 'Free' ? 'a free membership' : discount.toLowerCase()
   const timeFrame = expiresAt ? `, valid until ${formatDate(expiresAt)}` : ''
