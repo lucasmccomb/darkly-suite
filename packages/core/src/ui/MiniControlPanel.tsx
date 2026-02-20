@@ -125,12 +125,11 @@ export function MiniControlPanel({ isPro, prices, onAllSettings, onUpgrade, onCl
 
   const updatePrefs = useCallback(
     (patch: Partial<BaseUserPreferences>) => {
-      const updated = { ...prefs, ...patch };
-      setPrefs(updated);
+      setPrefs((prev) => ({ ...prev, ...patch }));
       const prefsManager = createPreferencesManager(config);
       prefsManager.save(patch);
     },
-    [prefs, config],
+    [config],
   );
 
   if (loading) {
