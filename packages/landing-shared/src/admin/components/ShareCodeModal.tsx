@@ -11,6 +11,8 @@ const PRODUCT_NAMES: Record<string, string> = {
 
 const PRODUCT_URLS: Record<string, string> = {
   gmail: 'gmaildarkly.com',
+  sheets: 'sheetsdarkly.com',
+  docs: 'docsdarkly.com',
 }
 
 interface ShareCodeModalProps {
