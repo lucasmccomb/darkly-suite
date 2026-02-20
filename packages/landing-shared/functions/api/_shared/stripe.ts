@@ -206,14 +206,17 @@ export interface StripePromotionCodeFull {
   max_redemptions: number | null
   times_redeemed: number
   metadata: Record<string, string>
-  coupon: {
-    id: string
-    percent_off: number | null
-    amount_off: number | null
-    currency: string | null
-    duration: string
-    name: string | null
-    valid: boolean
+  promotion: {
+    coupon: string | {
+      id: string
+      percent_off: number | null
+      amount_off: number | null
+      currency: string | null
+      duration: string
+      name: string | null
+      valid: boolean
+    }
+    type: string
   }
 }
 
@@ -227,7 +230,7 @@ export async function listPromotionCodes(
   for (;;) {
     const params: Record<string, string> = {
       limit: '100',
-      'expand[]': 'data.coupon',
+      'expand[]': 'data.promotion.coupon',
     }
     if (startingAfter) params['starting_after'] = startingAfter
 
