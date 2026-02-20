@@ -271,7 +271,8 @@ export async function createStripePromotionCode(
   },
 ): Promise<StripePromotionCode> {
   const body: Record<string, string> = {
-    coupon: params.couponId,
+    'promotion[type]': 'coupon',
+    'promotion[coupon]': params.couponId,
     code: params.code,
   }
 

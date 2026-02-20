@@ -311,7 +311,8 @@ describe('createStripePromotionCode', () => {
 
     const body = (fetchMock.mock.calls[0] as [string, RequestInit])[1].body as string;
     expect(body).toContain('code=SAVE20');
-    expect(body).toContain('coupon=coup_1');
+    expect(body).toContain('promotion%5Btype%5D=coupon');
+    expect(body).toContain('promotion%5Bcoupon%5D=coup_1');
     expect(body).not.toContain('expires_at');
   });
 
