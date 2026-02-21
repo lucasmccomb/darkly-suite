@@ -1,4 +1,5 @@
-import type { Env } from '../_shared/types.ts'
+import { type Env, isValidProduct, type ProductId } from '../_shared/types.ts'
+import { getProductStripeId } from '../_shared/products.ts'
 import { requireAdmin } from './_shared/auth.ts'
 import {
   listPromotionCodes,
@@ -147,12 +148,22 @@ export const onRequestPost: PagesFunction<Env> = async (context: CFContext) => {
     return errorResponse(400, 'Cannot specify a custom code when creating in bulk')
   }
 
+  if (body.product && !isValidProduct(body.product)) {
+    return errorResponse(400, 'Invalid product scope')
+  }
+
   try {
+    let appliesTo: string[] | undefined
+    if (body.product) {
+      appliesTo = [getProductStripeId(context.env, body.product as ProductId)]
+    }
+
     const productLabel = body.product ? ` (${body.product})` : ''
     const coupon = await createStripeCoupon(context.env.STRIPE_SECRET_KEY, {
       discountType: body.discount_type,
       discountValue: body.discount_value,
       name: `Darkly${productLabel} ${body.discount_value}${body.discount_type === 'percent' ? '%' : '$'} off`,
+      appliesTo,
     })
 
     const created: Array<{ id: string; code: string }> = []
@@ -186,7 +197,9 @@ export const onRequestPost: PagesFunction<Env> = async (context: CFContext) => {
 
 /**
  * PATCH /api/admin/discount-codes?id=promo_xxx
- * Updates a promotion code in Stripe. Supports: active, product (metadata).
+ * Updates a promotion code in Stripe. Supports: active toggle only.
+ * Product scope cannot be changed — it's enforced by the coupon's applies_to,
+ * which is immutable after creation.
  */
 export const onRequestPatch: PagesFunction<Env> = async (context: CFContext) => {
   const unauthorized = await requireAdmin(context.request, context.env.DB)
@@ -196,19 +209,16 @@ export const onRequestPatch: PagesFunction<Env> = async (context: CFContext) => 
   const promoId = url.searchParams.get('id')
   if (!promoId) return errorResponse(400, 'Missing ?id= parameter')
 
-  const body = (await context.request.json()) as { active?: boolean; product?: string }
+  const body = (await context.request.json()) as { active?: boolean }
 
-  if (body.active === undefined && body.product === undefined) {
+  if (body.active === undefined) {
     return errorResponse(400, 'No fields to update')
   }
 
   try {
-    const updateParams: { active?: boolean; metadata?: Record<string, string> } = {}
-
-    if (body.active !== undefined) updateParams.active = body.active
-    if (body.product !== undefined) updateParams.metadata = { product: body.product }
-
-    await updateStripePromotionCode(context.env.STRIPE_SECRET_KEY, promoId, updateParams)
+    await updateStripePromotionCode(context.env.STRIPE_SECRET_KEY, promoId, {
+      active: body.active,
+    })
 
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,

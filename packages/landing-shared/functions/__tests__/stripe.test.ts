@@ -287,6 +287,44 @@ describe('createStripeCoupon', () => {
     expect(body).not.toContain('percent_off');
   });
 
+  it('includes applies_to when product IDs are provided', async () => {
+    fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ id: 'coup_4', object: 'coupon' }), { status: 200 }));
+
+    await createStripeCoupon(secretKey, {
+      discountType: 'percent',
+      discountValue: 50,
+      name: '50% Off Gmail',
+      appliesTo: ['prod_gmail_123'],
+    });
+
+    const body = (fetchMock.mock.calls[0] as [string, RequestInit])[1].body as string;
+    expect(body).toContain('applies_to%5Bproducts%5D%5B0%5D=prod_gmail_123');
+  });
+
+  it('includes multiple products in applies_to', async () => {
+    fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ id: 'coup_5', object: 'coupon' }), { status: 200 }));
+
+    await createStripeCoupon(secretKey, {
+      discountType: 'percent',
+      discountValue: 100,
+      name: 'Free Multi',
+      appliesTo: ['prod_gmail_123', 'prod_sheets_456'],
+    });
+
+    const body = (fetchMock.mock.calls[0] as [string, RequestInit])[1].body as string;
+    expect(body).toContain('applies_to%5Bproducts%5D%5B0%5D=prod_gmail_123');
+    expect(body).toContain('applies_to%5Bproducts%5D%5B1%5D=prod_sheets_456');
+  });
+
+  it('omits applies_to when not provided', async () => {
+    fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ id: 'coup_6', object: 'coupon' }), { status: 200 }));
+
+    await createStripeCoupon(secretKey, { discountType: 'percent', discountValue: 50, name: '50% All' });
+
+    const body = (fetchMock.mock.calls[0] as [string, RequestInit])[1].body as string;
+    expect(body).not.toContain('applies_to');
+  });
+
   it('throws on non-OK response', async () => {
     fetchMock.mockResolvedValueOnce(new Response('error', { status: 400 }));
 

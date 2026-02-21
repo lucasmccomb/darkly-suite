@@ -116,20 +116,6 @@ export function AdminDiscountsPage() {
     if (res.ok) fetchCodes()
   }
 
-  async function handleEditSave(id: string, patch: { product?: string }) {
-    const res = await fetch(`/api/admin/discount-codes?id=${id}`, {
-      method: 'PATCH',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(patch),
-    })
-    if (!res.ok) {
-      const d = await res.json()
-      throw new Error(d.error || 'Failed to update')
-    }
-    fetchCodes()
-  }
-
   async function handleDelete(dc: DiscountCode) {
     if (!confirm(`Deactivate code ${dc.code}? (Stripe promo codes cannot be deleted)`)) return
     const res = await fetch(`/api/admin/discount-codes?id=${dc.id}`, {
@@ -326,8 +312,8 @@ export function AdminDiscountsPage() {
                         <button
                           className="admin-icon-btn"
                           onClick={() => setEditCode(dc)}
-                          title="Edit product scope"
-                          aria-label="Edit product scope"
+                          title="View details"
+                          aria-label="View details"
                         >
                           <Pencil size={16} />
                         </button>
@@ -369,7 +355,6 @@ export function AdminDiscountsPage() {
       <EditCodeModal
         open={editCode !== null}
         onClose={() => setEditCode(null)}
-        onSave={handleEditSave}
         code={editCode}
       />
     </div>

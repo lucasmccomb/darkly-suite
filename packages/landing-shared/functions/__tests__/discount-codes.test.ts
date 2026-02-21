@@ -211,12 +211,64 @@ describe('POST /api/admin/discount-codes', () => {
     expect(body.id).toBe('promo_123');
     expect(body.code).toBe('TESTCODE');
 
+    // Verify coupon creation includes applies_to with the product's Stripe ID
+    const couponCall = fetchMock.mock.calls[0];
+    const couponBody = couponCall[1]?.body as string;
+    expect(couponBody).toContain('applies_to%5Bproducts%5D%5B0%5D=prod_test_gmail');
+
     // Verify promo creation uses correct nested Stripe params (not bare `coupon`)
     const promoCall = fetchMock.mock.calls[1];
     const promoBody = promoCall[1]?.body as string;
     expect(promoBody).toContain(CREATE_PROMO_PARAMS.promotionType);
     expect(promoBody).toContain(CREATE_PROMO_PARAMS.promotionCouponPrefix + 'coupon_123');
     expect(promoBody).toContain('metadata%5Bproduct%5D=gmail');
+  });
+
+  it('creates a code without applies_to when no product specified', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ id: 'coupon_all', object: 'coupon' }), { status: 200 }),
+    );
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ id: 'promo_all', code: 'ALLPRODUCTS', object: 'promotion_code' }), { status: 200 }),
+    );
+
+    const ctx = createAdminContext(
+      adminRequest('https://darklysuite.com/api/admin/discount-codes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: 'ALLPRODUCTS',
+          discount_type: 'percent',
+          discount_value: 100,
+        }),
+      }),
+    );
+
+    const response = await onRequestPost(ctx);
+    expect(response.status).toBe(201);
+
+    // Verify coupon creation does NOT include applies_to
+    const couponBody = fetchMock.mock.calls[0][1]?.body as string;
+    expect(couponBody).not.toContain('applies_to');
+  });
+
+  it('rejects invalid product scope', async () => {
+    const ctx = createAdminContext(
+      adminRequest('https://darklysuite.com/api/admin/discount-codes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          discount_type: 'percent',
+          discount_value: 50,
+          product: 'invalid_product',
+        }),
+      }),
+    );
+
+    const response = await onRequestPost(ctx);
+    expect(response.status).toBe(400);
+    const body = await response.json() as { error: string };
+    expect(body.error).toContain('Invalid product scope');
   });
 
   it('validates discount_type', async () => {
@@ -326,11 +378,7 @@ describe('PATCH /api/admin/discount-codes', () => {
     );
   });
 
-  it('updates product scope via Stripe metadata', async () => {
-    fetchMock.mockResolvedValueOnce(
-      new Response(JSON.stringify({ id: 'promo_123', active: true }), { status: 200 }),
-    );
-
+  it('rejects product scope updates (immutable — tied to coupon applies_to)', async () => {
     const ctx = createAdminContext(
       adminRequest('https://darklysuite.com/api/admin/discount-codes?id=promo_123', {
         method: 'PATCH',
@@ -340,10 +388,8 @@ describe('PATCH /api/admin/discount-codes', () => {
     );
 
     const response = await onRequestPatch(ctx);
-    expect(response.status).toBe(200);
-
-    const callBody = fetchMock.mock.calls[0][1]?.body as string;
-    expect(callBody).toContain('metadata%5Bproduct%5D=sheets');
+    expect(response.status).toBe(400);
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });
 

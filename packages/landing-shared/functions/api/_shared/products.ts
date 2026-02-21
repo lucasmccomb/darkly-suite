@@ -2,6 +2,26 @@ import type { Env, ProductId, Plan } from './types.ts';
 import { retrievePrice } from './stripe.ts';
 
 /**
+ * Product ID registry.
+ * Maps a product to its Stripe product ID (used for coupon applies_to).
+ */
+export function getProductStripeId(env: Env, product: ProductId): string {
+  const productMap: Record<ProductId, string> = {
+    gmail: env.STRIPE_PRODUCT_GMAIL,
+    sheets: env.STRIPE_PRODUCT_SHEETS,
+    docs: env.STRIPE_PRODUCT_DOCS,
+    suite: env.STRIPE_PRODUCT_SUITE,
+  };
+
+  const id = productMap[product];
+  if (!id) {
+    throw new Error(`No Stripe product configured for ${product}`);
+  }
+
+  return id;
+}
+
+/**
  * Product price registry.
  * Maps (product, plan) to the correct Stripe price env var.
  */

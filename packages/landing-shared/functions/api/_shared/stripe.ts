@@ -165,7 +165,12 @@ interface StripeCoupon {
 
 export async function createStripeCoupon(
   secretKey: string,
-  params: { discountType: 'percent' | 'fixed'; discountValue: number; name: string },
+  params: {
+    discountType: 'percent' | 'fixed';
+    discountValue: number;
+    name: string;
+    appliesTo?: string[];
+  },
 ): Promise<StripeCoupon> {
   const isFree = params.discountType === 'percent' && params.discountValue === 100
   const body: Record<string, string> = {
@@ -178,6 +183,12 @@ export async function createStripeCoupon(
   } else {
     body['amount_off'] = (params.discountValue * 100).toString()
     body['currency'] = 'usd'
+  }
+
+  if (params.appliesTo && params.appliesTo.length > 0) {
+    for (let i = 0; i < params.appliesTo.length; i++) {
+      body[`applies_to[products][${i}]`] = params.appliesTo[i]
+    }
   }
 
   const res = await fetch(`${STRIPE_API}/coupons`, {

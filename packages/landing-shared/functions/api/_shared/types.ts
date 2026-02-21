@@ -23,6 +23,11 @@ export interface Env {
   STRIPE_PRICE_SUITE_MONTHLY: string;
   STRIPE_PRICE_SUITE_YEARLY: string;
   STRIPE_PRICE_SUITE_LIFETIME: string;
+  // Stripe product IDs (for coupon applies_to restriction)
+  STRIPE_PRODUCT_GMAIL: string;
+  STRIPE_PRODUCT_SHEETS: string;
+  STRIPE_PRODUCT_DOCS: string;
+  STRIPE_PRODUCT_SUITE: string;
   // OAuth
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;

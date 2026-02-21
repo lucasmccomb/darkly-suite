@@ -1,71 +1,33 @@
-import { useState, type FormEvent } from 'react'
 import { AdminModal } from './AdminModal.tsx'
-import { PRODUCTS, PRODUCT_LABELS } from '../constants.ts'
+import { PRODUCT_LABELS } from '../constants.ts'
 
 interface EditCodeModalProps {
   open: boolean
   onClose: () => void
-  onSave: (id: string, patch: { product?: string }) => Promise<void>
   code: { id: string; code: string; product: string | null } | null
 }
 
-export function EditCodeModal({ open, onClose, onSave, code }: EditCodeModalProps) {
-  const [product, setProduct] = useState('')
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
-
-  // Reset form when code changes
-  const [prevId, setPrevId] = useState<string | null>(null)
-  if (code && code.id !== prevId) {
-    setPrevId(code.id)
-    setProduct(code.product ?? '')
-    setError('')
-  }
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault()
-    if (!code) return
-    setSaving(true)
-    setError('')
-
-    try {
-      await onSave(code.id, { product: product || undefined })
-      onClose()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save')
-    } finally {
-      setSaving(false)
-    }
-  }
+export function EditCodeModal({ open, onClose, code }: EditCodeModalProps) {
+  const productLabel = code?.product
+    ? PRODUCT_LABELS[code.product] ?? code.product
+    : 'All products'
 
   return (
-    <AdminModal open={open} onClose={onClose} title={`Edit ${code?.code ?? 'Code'}`}>
-      <form onSubmit={handleSubmit}>
-        {error && <div className="admin-form-error">{error}</div>}
+    <AdminModal open={open} onClose={onClose} title={`Details: ${code?.code ?? 'Code'}`}>
+      <div className="admin-form-row">
+        <label>Product Scope</label>
+        <div className="admin-readonly-value">{productLabel}</div>
+        <p className="admin-help-text">
+          Product scope is set at creation and enforced by Stripe.
+          To change it, deactivate this code and create a new one.
+        </p>
+      </div>
 
-        <div className="admin-form-row">
-          <label>Product Scope</label>
-          <select
-            value={product}
-            onChange={(e) => setProduct(e.target.value)}
-            className="admin-select"
-          >
-            <option value="">All products</option>
-            {PRODUCTS.map((p) => (
-              <option key={p} value={p}>{PRODUCT_LABELS[p]}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="admin-share-actions">
-          <button type="button" className="admin-btn-secondary" onClick={onClose}>
-            Cancel
-          </button>
-          <button type="submit" className="admin-btn-primary" disabled={saving}>
-            {saving ? 'Saving...' : 'Save'}
-          </button>
-        </div>
-      </form>
+      <div className="admin-share-actions">
+        <button type="button" className="admin-btn-secondary" onClick={onClose}>
+          Close
+        </button>
+      </div>
     </AdminModal>
   )
 }
