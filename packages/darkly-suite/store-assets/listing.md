@@ -6,11 +6,11 @@ Darkly Suite — Dark Mode for Google Workspace
 
 ## Short Description (132 chars max)
 
-All-in-one dark mode for Gmail, Sheets, Docs, and Drive. One extension, one subscription — theme presets, scheduling, and OS sync included.
+All-in-one dark mode for Gmail, Sheets, Docs, and Drive. One extension, one subscription — scheduling and OS sync included.
 
 ## Detailed Description
 
-Darkly Suite brings a carefully engineered dark mode to Gmail, Google Sheets, Google Docs, and Google Drive — all from a single extension with a single subscription. Stop juggling separate dark mode extensions. Darkly Suite gives you unified dark mode across Google Workspace with per-app settings, shared theme presets, and one license that covers everything.
+Darkly Suite brings a carefully engineered dark mode to Gmail, Google Sheets, Google Docs, and Google Drive — all from a single extension with a single subscription. Stop juggling separate dark mode extensions. Darkly Suite gives you unified dark mode across Google Workspace with per-app settings and one license that covers everything.
 
 WHY DARKLY SUITE?
 
@@ -19,7 +19,7 @@ Most dark mode extensions only work on one Google app. If you use Gmail, Sheets,
 - One extension, four apps — Gmail, Sheets, Docs, and Drive dark mode in a single install
 - One subscription — covers all four apps at a lower price than buying individually
 - Per-app settings — configure dark mode independently for each app
-- Shared preferences — theme presets and scheduling sync across all apps
+- Shared preferences — scheduling syncs across all apps
 - Conflict detection — works gracefully alongside standalone Darkly extensions if you have them installed
 
 GMAIL FEATURES
@@ -53,7 +53,6 @@ GOOGLE DRIVE FEATURES
 
 SHARED FEATURES ACROSS ALL APPS
 
-- 5 theme presets — Choose from Nord, Solarized Dark, Monokai, Catppuccin Mocha, and Rose Pine to match your preferred aesthetic
 - Automatic scheduling — Set dark mode to activate and deactivate at specific times each day
 - Sunrise/sunset sync — Automatically follow your local daylight hours so dark mode turns on at dusk and off at dawn
 - OS theme sync — Match your system's light/dark preference so Google Workspace follows your desktop setting
@@ -74,7 +73,7 @@ HOW IT WORKS
 
 Install Darkly Suite and dark mode is ready across Gmail, Google Sheets, Google Docs, and Google Drive. Each app gets its own toggle button in the toolbar for instant on/off control.
 
-Open the settings panel in any app to configure that app's dark mode independently. Set scheduling, choose a theme preset, enable Preserve Grid Colors in Sheets or Preserve Page Colors in Docs — each app remembers its own preferences.
+Open the settings panel in any app to configure that app's dark mode independently. Set scheduling, enable Preserve Grid Colors in Sheets or Preserve Page Colors in Docs — each app remembers its own preferences.
 
 Your preferences sync across devices using Chrome's built-in sync. No account required for preference syncing.
 

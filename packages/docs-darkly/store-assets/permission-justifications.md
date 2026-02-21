@@ -7,7 +7,7 @@ Privacy Practices tab. These are copy-paste ready for the submission form.
 
 ### storage
 
-Stores user preferences (dark mode on/off, schedule times, theme preset) using
+Stores user preferences (dark mode on/off, schedule times) using
 chrome.storage.sync so settings persist across sessions and sync across the user's
 Chrome browsers. Also uses chrome.storage.local for pro status cache and
 sunrise/sunset times cache. No personal data is stored.

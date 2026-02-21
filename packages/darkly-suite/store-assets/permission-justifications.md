@@ -11,7 +11,7 @@ Google apps, plus the scripting permission for Gmail's InboxSDK integration.
 
 ### storage
 
-Stores user preferences (dark mode on/off, schedule times, theme preset) for each
+Stores user preferences (dark mode on/off, schedule times) for each
 supported Google app using chrome.storage.sync so settings persist across sessions and
 sync across the user's Chrome browsers. Each app has its own preferences key
 (ds_gmail_preferences, ds_sheets_preferences, ds_docs_preferences, ds_drive_preferences). Also uses
