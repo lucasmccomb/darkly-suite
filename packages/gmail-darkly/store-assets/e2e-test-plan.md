@@ -10,7 +10,7 @@ Use a **fresh Google account** and a **production build** (`pnpm --filter gmail-
 Before starting, verify these are live:
 
 - [ ] **darklysuite.com** — Payment API deployed on Cloudflare Pages with D1 + Stripe bindings
-- [ ] **darklysuite.com/api/status/{any-token}?product=gmail** — Returns `{"paid":false}` (not a 500 or DNS error)
+- [ ] **darklysuite.com/api/status/00000000-0000-4000-8000-000000000000?product=gmail** — Returns `{"paid":false}` (not a 500 or DNS error). Token must be a valid UUID v4.
 - [ ] **gmaildarkly.com** — Landing page live with working `/privacy` page
 - [ ] **Stripe test mode** — Products and prices configured for gmail (monthly/yearly/lifetime)
 - [ ] **Production zip** — Built from latest main: `pnpm --filter gmail-darkly build`, then zip `dist/`
