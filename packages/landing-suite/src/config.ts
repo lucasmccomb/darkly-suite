@@ -21,6 +21,7 @@ export const NAV_LINKS = [
   { to: '/setup', label: 'Setup' },
   { to: '/#pricing', label: 'Pricing' },
   { to: '/privacy', label: 'Privacy' },
+  { to: '/account', label: 'Account' },
 ]
 
 export const NAV_CTA = { to: '/suite', label: 'Get the Suite' }
