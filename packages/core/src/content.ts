@@ -99,7 +99,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
       await sitePlugin.init(engine, config);
     }
 
-    const proStatus = await payment.isPro();
+    const proStatus = await payment.refreshProStatus();
     const prices = await payment.getPrices();
 
     if (proStatus) {
