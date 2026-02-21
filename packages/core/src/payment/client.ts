@@ -125,6 +125,7 @@ export function createPaymentClient(config: ProductConfig): PaymentClient {
     const token = await getToken();
     const url = `${apiBase}/checkout?token=${token}&plan=${plan}&product=${config.productId}`;
     chrome.runtime.sendMessage({ type: 'openTab', url });
+    chrome.runtime.sendMessage({ type: 'checkoutStarted' });
   }
 
   async function openManageSubscription(): Promise<void> {

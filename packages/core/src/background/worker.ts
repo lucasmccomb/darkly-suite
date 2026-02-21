@@ -1,5 +1,6 @@
 import type { ProductConfig } from '../config';
 import { createPaymentClient } from '../payment/client';
+import { createCheckoutPoller } from '../payment/checkout-poller';
 import { createPreferencesManager } from '../storage/preferences';
 import { getSunTimes } from '../geo/sun-times';
 import { shouldBeDark as isInScheduleRange } from '../theme/scheduler';
@@ -205,10 +206,14 @@ export function createSiteWorker(config: ProductConfig): SiteWorkerHandlers {
  */
 export function createBackgroundWorker(config: ProductConfig): void {
   const worker = createSiteWorker(config);
+  const checkoutPoller = createCheckoutPoller(config);
 
   chrome.alarms.onAlarm.addListener(async (alarm) => {
     if (alarm.name === config.alarmName) {
       await worker.handleAlarm();
+    }
+    if (alarm.name === checkoutPoller.alarmName) {
+      await checkoutPoller.handleAlarm();
     }
   });
 
@@ -250,6 +255,11 @@ export function createBackgroundWorker(config: ProductConfig): void {
 
     if (message.type === 'openTab') {
       chrome.tabs.create({ url: message.url });
+      return false;
+    }
+
+    if (message.type === 'checkoutStarted') {
+      checkoutPoller.start();
       return false;
     }
 
