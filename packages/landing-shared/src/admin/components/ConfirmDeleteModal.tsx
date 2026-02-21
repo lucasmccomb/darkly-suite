@@ -45,8 +45,8 @@ export function ConfirmDeleteModal({ open, license, loading, onClose, onConfirm 
 
       <p className="admin-confirm-warning">
         {license.plan === 'lifetime'
-          ? 'This will permanently delete this license. This action cannot be undone.'
-          : 'This will permanently delete this license and cancel any active subscription. This action cannot be undone.'}
+          ? 'This will permanently delete this license. Lifetime plans do not have a Stripe subscription, so there is nothing to cancel. This action cannot be undone.'
+          : 'This will permanently delete this license and cancel any active Stripe subscription. This action cannot be undone.'}
       </p>
 
       <div className="admin-share-actions">
