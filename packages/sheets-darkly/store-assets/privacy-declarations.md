@@ -10,7 +10,7 @@ scheduling based on time of day, sunrise/sunset, or OS theme preference.
 
 ## Privacy Policy URL
 
-https://darklysuite.com/privacy
+https://sheetsdarkly.com/privacy
 
 ## Data Use Declarations
 

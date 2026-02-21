@@ -36,11 +36,11 @@ Your preferences sync across devices using Chrome's built-in sync. No account re
 
 PRIVACY
 
-Darkly for Google Sheets does not read your spreadsheet data, collect personal information, or send analytics. Your preferences are stored locally using Chrome's storage API. See our full privacy policy at https://darklysuite.com/privacy.
+Darkly for Google Sheets does not read your spreadsheet data, collect personal information, or send analytics. Your preferences are stored locally using Chrome's storage API. See our full privacy policy at https://sheetsdarkly.com/privacy.
 
 SUPPORT
 
-Visit https://darklysuite.com/sheets for documentation and support, or email admin@darklysuite.com.
+Visit https://sheetsdarkly.com for documentation and support, or email admin@darklysuite.com.
 
 ## Category
 
@@ -52,7 +52,7 @@ English
 
 ## Website
 
-https://darklysuite.com/sheets
+https://sheetsdarkly.com
 
 ## Pricing
 
