@@ -20,7 +20,7 @@ export function Footer() {
         </div>
         <div className="footer-bottom">
           <span className="footer-copyright">&copy; {new Date().getFullYear()} Darkly Suite. All rights reserved.</span>
-          <span className="footer-trademark">Gmail, Google Sheets, and Google Docs are trademarks of Google LLC. Darkly is not affiliated with or endorsed by Google.</span>
+          <span className="footer-trademark">Gmail, Google Sheets, Google Docs, and Google Drive are trademarks of Google LLC. Darkly is not affiliated with or endorsed by Google.</span>
         </div>
       </div>
     </footer>

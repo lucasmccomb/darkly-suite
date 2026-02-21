@@ -5,9 +5,9 @@ These map to the Privacy Practices tab in the developer dashboard.
 
 ## Single Purpose Description
 
-Darkly Suite applies dark mode themes to Gmail, Google Sheets, and Google Docs with
+Darkly Suite applies dark mode themes to Gmail, Google Sheets, Google Docs, and Google Drive with
 automatic scheduling based on time of day, sunrise/sunset, or OS theme preference.
-One extension provides unified dark mode across three Google Workspace apps.
+One extension provides unified dark mode across four Google Workspace apps.
 
 ## Privacy Policy URL
 
@@ -43,7 +43,7 @@ it is collected, the purpose, whether it is sold, and whether it is transmitted.
 
 - Collected: NO
 - Note: The extension does not read, access, or store any email content, document
-  content, or spreadsheet data.
+  content, spreadsheet data, or Drive files.
 
 ### Location
 
@@ -67,7 +67,7 @@ it is collected, the purpose, whether it is sold, and whether it is transmitted.
 
 - Collected: NO
 - Note: The extension injects CSS for dark mode theming but does not read or extract
-  any page content from Gmail, Google Sheets, or Google Docs.
+  any page content from Gmail, Google Sheets, Google Docs, or Google Drive.
 
 ## Remote Code
 

@@ -1,4 +1,4 @@
-import { Check, Mail, Table2, FileText } from 'lucide-react'
+import { Check, Mail, Table2, FileText, HardDrive } from 'lucide-react'
 import { SuiteIcon } from './SuiteIcon.tsx'
 import { STORE_URLS } from '../constants.ts'
 
@@ -94,6 +94,7 @@ const COMPARISON_FEATURES = [
   { name: 'Gmail dark mode', gmail: true, sheets: false, docs: false, suite: true },
   { name: 'Sheets dark mode', gmail: false, sheets: true, docs: false, suite: true },
   { name: 'Docs dark mode', gmail: false, sheets: false, docs: true, suite: true },
+  { name: 'Drive dark mode', gmail: false, sheets: false, docs: false, suite: true },
   { name: 'OS theme sync', gmail: true, sheets: true, docs: true, suite: true },
   { name: 'Time-based scheduling', gmail: true, sheets: true, docs: true, suite: true },
   { name: 'Sunrise/sunset scheduling', gmail: true, sheets: true, docs: true, suite: true },
@@ -104,7 +105,7 @@ const COMPARISON_FEATURES = [
 ]
 
 const defaultFeatures = [
-  'Dark mode for Gmail, Sheets, and Docs',
+  'Dark mode for Gmail, Sheets, Docs, and Drive',
   'OS dark mode detection',
   'Manual toggle',
   'Time-based scheduling',
@@ -130,7 +131,7 @@ export function Pricing({ product, selectedApp, onAppChange, features = defaultF
             <h2 className="section-title">Simple, transparent pricing</h2>
             <p className="section-subtitle">
               {product === 'suite'
-                ? 'One subscription covers Gmail, Sheets, and Docs. Pick the billing cycle that works for you.'
+                ? 'One subscription covers Gmail, Sheets, Docs, and Drive. Pick the billing cycle that works for you.'
                 : 'One plan, every feature. Pick the billing cycle that works for you.'}
             </p>
           </div>
@@ -186,7 +187,7 @@ export function Pricing({ product, selectedApp, onAppChange, features = defaultF
         <div className="pricing-row">
           <div className="pricing-row-head">
             <h3 className="pricing-row-title">Full Suite</h3>
-            <p className="pricing-row-desc">All three apps, one price</p>
+            <p className="pricing-row-desc">All four apps, one price</p>
           </div>
           <div className="pricing-tiers">
             {bundleTiers.map((tier) => (
@@ -200,8 +201,9 @@ export function Pricing({ product, selectedApp, onAppChange, features = defaultF
                   <Mail size={22} color="#ea4335" strokeWidth={1.8} />
                   <Table2 size={22} color="#81c995" strokeWidth={1.8} />
                   <FileText size={22} color="#4285f4" strokeWidth={1.8} />
+                  <HardDrive size={22} color="#f9ab00" strokeWidth={1.8} />
                 </div>
-                <div className="pricing-suite-label">Gmail, Sheets & Docs</div>
+                <div className="pricing-suite-label">Gmail, Sheets, Docs & Drive</div>
                 <div className="pricing-price">
                   {tier.price}
                   {tier.period && <span>{tier.period}</span>}

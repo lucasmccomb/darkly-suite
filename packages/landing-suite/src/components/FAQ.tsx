@@ -17,7 +17,7 @@ const defaultFaqs: FAQItem[] = [
   },
   {
     question: 'Does Darkly Suite cover all Google apps?',
-    answer: 'The Darkly Suite bundle provides dark mode for Gmail, Google Sheets, and Google Docs. A single license covers all three apps. You can also purchase individual licenses for a single app at a lower price.',
+    answer: 'The Darkly Suite bundle provides dark mode for Gmail, Google Sheets, Google Docs, and Google Drive. A single license covers all four apps. You can also purchase individual licenses for Gmail, Sheets, or Docs at a lower price.',
   },
   {
     question: 'How does sunrise/sunset scheduling work?',
@@ -33,7 +33,7 @@ const defaultFaqs: FAQItem[] = [
   },
   {
     question: 'Does a Suite license include all future apps?',
-    answer: 'Yes. If we add dark mode support for additional Google apps (like Drive), Suite license holders will get access automatically at no additional cost.',
+    answer: 'Yes. As we add dark mode support for additional Google apps, Suite license holders get access automatically at no additional cost. Drive support was recently added this way.',
   },
 ]
 
