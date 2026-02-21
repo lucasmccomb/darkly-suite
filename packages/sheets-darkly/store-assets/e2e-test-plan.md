@@ -13,7 +13,7 @@ Before starting, verify these are live:
 - [ ] **darklysuite.com/api/status/00000000-0000-4000-8000-000000000000?product=sheets** — Returns `{"paid":false}` (not a 500 or DNS error). Token must be a valid UUID v4.
 - [ ] **sheetsdarkly.com/privacy** — Privacy policy page is accessible
 - [ ] **Stripe test mode** — Products and prices configured for sheets (monthly/yearly/lifetime)
-- [ ] **Promo code** — `CWSREVIEWSHEETS2026` (or equivalent test code) created in Stripe dashboard
+- [ ] **Promo code** — `CWSREVIEWSHEETS` (or equivalent test code) created in Stripe dashboard
 - [ ] **Production zip** — Built from latest main: `pnpm --filter sheets-darkly build`, then zip `dist/`
 
 ---
@@ -64,7 +64,7 @@ Before starting, verify these are live:
 1. [ ] Click "Subscribe Now" in the paywall
 2. [ ] **Verify**: New tab opens to Stripe Checkout
 3. [ ] At Stripe Checkout, locate the promo code field
-4. [ ] Enter `CWSREVIEWSHEETS2026` (or the configured test code)
+4. [ ] Enter `CWSREVIEWSHEETS` (or the configured test code)
 5. [ ] **Verify**: Discount is applied (100% off if configured as such)
 6. [ ] Complete checkout with test card `4242 4242 4242 4242` (still required for `duration:once` coupons)
 7. [ ] **Verify**: Redirected to success page
