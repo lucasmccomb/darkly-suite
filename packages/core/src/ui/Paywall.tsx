@@ -7,10 +7,16 @@ import type { PriceInfo } from '../payment/client';
 
 type Plan = 'monthly' | 'yearly' | 'lifetime';
 
-const PLANS: { id: Plan; name: string; price: string; period: string; subtitle: string }[] = [
+const INDIVIDUAL_PLANS: { id: Plan; name: string; price: string; period: string; subtitle: string }[] = [
   { id: 'monthly', name: 'Monthly', price: '$0.99', period: '/mo', subtitle: 'Cancel anytime' },
   { id: 'yearly', name: 'Yearly', price: '$9.99', period: '/yr', subtitle: 'Save 16%' },
   { id: 'lifetime', name: 'Lifetime', price: '$29.99', period: '', subtitle: 'One-time' },
+];
+
+const SUITE_PLANS: typeof INDIVIDUAL_PLANS = [
+  { id: 'monthly', name: 'Monthly', price: '$2.99', period: '/mo', subtitle: 'Cancel anytime' },
+  { id: 'yearly', name: 'Yearly', price: '$29.99', period: '/yr', subtitle: 'Save 16%' },
+  { id: 'lifetime', name: 'Lifetime', price: '$49.99', period: '', subtitle: 'One-time' },
 ];
 
 interface PaywallProps {
@@ -26,6 +32,7 @@ export function Paywall({ onSubscribe, onClose, prices }: PaywallProps) {
   const [selectedPlan, setSelectedPlan] = useState<Plan>('yearly');
 
   const siteBase = config.siteBase || 'https://darklysuite.com';
+  const plans = config.productId === 'suite' ? SUITE_PLANS : INDIVIDUAL_PLANS;
 
   return (
     <div className={`${p}-settings-panel`}>
@@ -47,7 +54,7 @@ export function Paywall({ onSubscribe, onClose, prices }: PaywallProps) {
       <div className={`${p}-paywall`}>
         <h3 className={`${p}-paywall-title`}>Choose your <Wordmark /> plan:</h3>
         <div className={`${p}-paywall-plans`}>
-          {PLANS.map((plan) => (
+          {plans.map((plan) => (
             <button
               key={plan.id}
               type="button"
