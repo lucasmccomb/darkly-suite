@@ -125,17 +125,6 @@ Before starting, verify these are live:
 22. [ ] Toggle ON: **Verify** spreadsheet grid/cells stay in original light colors while the rest of the UI remains dark
 23. [ ] Edit some cells — **Verify** the preserved colors look correct during editing
 
-### Theme Presets
-
-24. [ ] Test each theme preset and verify the UI updates accordingly:
-    - [ ] Nord
-    - [ ] Solarized Dark
-    - [ ] Monokai
-    - [ ] Catppuccin Mocha
-    - [ ] Rose Pine
-25. [ ] **Verify**: Each preset applies a distinct color palette to the dark theme
-26. [ ] **Verify**: Switching presets is smooth (no flash or broken intermediate state)
-
 ---
 
 ## Test 6: Pro User — Manage Subscription
