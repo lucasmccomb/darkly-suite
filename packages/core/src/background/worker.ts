@@ -253,6 +253,13 @@ export function createBackgroundWorker(config: ProductConfig): void {
       return true;
     }
 
+    if (message.type === 'getEmail') {
+      chrome.identity.getProfileUserInfo({ accountStatus: chrome.identity.AccountStatus.ANY })
+        .then(info => sendResponse(info.email || null))
+        .catch(() => sendResponse(null));
+      return true;
+    }
+
     if (message.type === 'openTab') {
       chrome.tabs.create({ url: message.url });
       return false;

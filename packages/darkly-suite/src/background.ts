@@ -102,6 +102,13 @@ chrome.runtime.onMessage.addListener(
       return true;
     }
 
+    if (message.type === 'getEmail') {
+      chrome.identity.getProfileUserInfo({ accountStatus: chrome.identity.AccountStatus.ANY })
+        .then(info => sendResponse(info.email || null))
+        .catch(() => sendResponse(null));
+      return true;
+    }
+
     if (message.type === 'openTab') {
       if (message.url) {
         chrome.tabs.create({ url: message.url as string });
