@@ -541,17 +541,12 @@ For each Google app:
 20. [ ] **Thumbnails** — Verify file thumbnails display in their original colors
 21. [ ] **Profile avatars** — Verify user profile photos and avatars are not inverted
 
-### Keyboard Shortcuts
-
-22. [ ] Press `Alt+Shift+D` — **Verify**: Dark mode toggles on/off
-23. [ ] Press `Alt+Shift+S` — **Verify**: Settings modal opens
-
 ### Console Check
 
-24. [ ] Open DevTools Console
-25. [ ] **Verify**: Console shows `[Darkly Suite] Drive content script loaded (prefix: ds, storage: ds_drive_preferences)`
-26. [ ] **Verify**: No JavaScript errors
-27. [ ] **Verify**: `data-darkly-active` attribute is set to `ds-drive` on `<html>`
+22. [ ] Open DevTools Console
+23. [ ] **Verify**: Console shows `[Darkly Suite] Drive content script loaded (prefix: ds, storage: ds_drive_preferences)`
+24. [ ] **Verify**: No JavaScript errors
+25. [ ] **Verify**: `data-darkly-active` attribute is set to `ds-drive` on `<html>`
 
 ### Cross-Navigation
 
@@ -622,16 +617,6 @@ For each Google app:
 - [ ] Switch to a different Google account within the same Chrome profile
 - [ ] **Verify**: Extension continues to work on all four apps
 - [ ] **Verify**: Payment status is tied to the extension token, not the Google account
-
-### Keyboard Shortcuts
-
-- [ ] On Gmail: **Verify** keyboard shortcut toggles dark mode (InboxSDK keyboard API)
-- [ ] On Sheets: **Verify** keyboard shortcut toggles dark mode
-- [ ] On Docs: **Verify** keyboard shortcut toggles dark mode
-- [ ] On Drive: **Verify** keyboard shortcut toggles dark mode (Alt+Shift+D)
-- [ ] On Sheets: **Verify** keyboard shortcut opens settings
-- [ ] On Docs: **Verify** keyboard shortcut opens settings
-- [ ] On Drive: **Verify** keyboard shortcut opens settings (Alt+Shift+S)
 
 ---
 

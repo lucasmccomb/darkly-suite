@@ -276,7 +276,7 @@ Test dark mode appearance across all Google Docs UI elements:
 - [ ] **Collaborative editing** — have another user edit the same document while dark mode is active; verify dark mode works while others edit, cursors visible
 - [ ] **Pageless mode transition** — start in paginated mode with dark mode on; switch to pageless (File > Page setup > Pageless); verify dark mode adjusts without errors (pageless detection in plugin.ts)
 - [ ] **color-scheme forced to light** — verify `document.documentElement.style.colorScheme` is `'light'` when dark mode is active (prevents Google's native dark mode from conflicting; `forceColorSchemeLight: true` in config)
-- [ ] **Keyboard shortcuts** — verify Ctrl/Cmd+Shift+D (or configured shortcut) toggles dark mode; verify shortcut for opening settings works
+
 
 ---
 
