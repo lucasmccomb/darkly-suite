@@ -13,6 +13,7 @@ export const NAV_LINKS = [
   { to: '/#pricing', label: 'Pricing' },
   { to: '/#faq', label: 'FAQ' },
   { to: '/privacy', label: 'Privacy' },
+  { to: 'https://darklysuite.com/account', label: 'Account', external: true },
 ]
 
 export const NAV_CTA = { to: '/#pricing', label: 'Get Darkly for Docs' }
