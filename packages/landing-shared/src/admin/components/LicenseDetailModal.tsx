@@ -43,7 +43,7 @@ interface LicenseDetailModalProps {
   open: boolean
   license: License | null
   onClose: () => void
-  onAction: () => void
+  onAction: (message?: string) => void
 }
 
 type ActionState = { loading: boolean; action: string | null }
@@ -63,7 +63,7 @@ export function LicenseDetailModal({ open, license, onClose, onAction }: License
       if (res.ok) {
         setDetail(await res.json())
       } else {
-        setError('Failed to load license details')
+        setError('Failed to load membership details')
       }
     } catch {
       setError('Network error')
@@ -79,20 +79,42 @@ export function LicenseDetailModal({ open, license, onClose, onAction }: License
     }
   }, [open, license, fetchDetail])
 
-  const handleAction = async (action: string, confirmMessage: string) => {
-    if (!license || !confirm(confirmMessage)) return
-    setActionState({ loading: true, action })
+  const handleCancelSubscription = async () => {
+    if (!license || !confirm('Cancel subscription immediately and revoke access? This cannot be undone.')) return
+    setActionState({ loading: true, action: 'cancel' })
     try {
-      const res = await fetch(`/api/admin/licenses?id=${license.id}&action=${action}`, {
+      const res = await fetch(`/api/admin/licenses?id=${license.id}&action=cancel_immediately`, {
         method: 'PATCH',
         credentials: 'same-origin',
       })
       if (res.ok) {
-        onAction()
+        onAction('Subscription cancelled successfully')
         fetchDetail()
       } else {
         const body = await res.json().catch(() => ({ error: 'Unknown error' })) as { error: string }
-        setError(body.error || `Failed to ${action.replace(/_/g, ' ')}`)
+        setError(body.error || 'Failed to cancel subscription')
+      }
+    } catch {
+      setError('Network error')
+    } finally {
+      setActionState({ loading: false, action: null })
+    }
+  }
+
+  const handleDeleteMembership = async () => {
+    if (!license || !confirm('Permanently delete this membership? This will remove the license and cancel any active Stripe subscription. This cannot be undone.')) return
+    setActionState({ loading: true, action: 'delete' })
+    try {
+      const res = await fetch(`/api/admin/licenses?id=${license.id}`, {
+        method: 'DELETE',
+        credentials: 'same-origin',
+      })
+      if (res.ok) {
+        onAction('Membership deleted successfully')
+        onClose()
+      } else {
+        const body = await res.json().catch(() => ({ error: 'Unknown error' })) as { error: string }
+        setError(body.error || 'Failed to delete membership')
       }
     } catch {
       setError('Network error')
@@ -109,7 +131,7 @@ export function LicenseDetailModal({ open, license, onClose, onAction }: License
   const subActive = sub && !['canceled', 'incomplete_expired'].includes(sub.status)
 
   return (
-    <AdminModal open={open} onClose={onClose} title="License Details">
+    <AdminModal open={open} onClose={onClose} title="Edit Membership">
       {loading ? (
         <div className="admin-table-loading">Loading...</div>
       ) : error && !detail ? (
@@ -185,48 +207,22 @@ export function LicenseDetailModal({ open, license, onClose, onAction }: License
 
           {/* Actions */}
           <div className="admin-detail-actions">
-            {hasSubscription && subActive && !sub?.cancel_at_period_end && (
-              <button
-                className="admin-btn-warning"
-                disabled={actionState.loading}
-                onClick={() => handleAction(
-                  'cancel_subscription',
-                  `Cancel subscription at period end (${sub ? formatTimestamp(sub.current_period_end) : 'end of period'})? User keeps access until then.`,
-                )}
-              >
-                {actionState.action === 'cancel_subscription' ? 'Canceling...' : 'Cancel at Period End'}
-              </button>
-            )}
             {hasSubscription && subActive && (
               <button
                 className="admin-btn-danger"
                 disabled={actionState.loading}
-                onClick={() => handleAction(
-                  'cancel_immediately',
-                  'Cancel subscription immediately and revoke access? This cannot be undone.',
-                )}
+                onClick={handleCancelSubscription}
               >
-                {actionState.action === 'cancel_immediately' ? 'Canceling...' : 'Cancel Immediately'}
+                {actionState.action === 'cancel' ? 'Canceling...' : 'Cancel Subscription'}
               </button>
             )}
-            {detail.license.status === 'active' && (
-              <button
-                className="admin-btn-danger"
-                disabled={actionState.loading}
-                onClick={() => handleAction('revoke_access', 'Revoke access? This only changes the D1 record, not the Stripe subscription.')}
-              >
-                {actionState.action === 'revoke_access' ? 'Revoking...' : 'Revoke Access'}
-              </button>
-            )}
-            {detail.license.status === 'inactive' && (
-              <button
-                className="admin-btn-primary"
-                disabled={actionState.loading}
-                onClick={() => handleAction('grant_access', 'Grant access? This only changes the D1 record, not the Stripe subscription.')}
-              >
-                {actionState.action === 'grant_access' ? 'Granting...' : 'Grant Access'}
-              </button>
-            )}
+            <button
+              className="admin-btn-danger"
+              disabled={actionState.loading}
+              onClick={handleDeleteMembership}
+            >
+              {actionState.action === 'delete' ? 'Deleting...' : 'Delete Membership'}
+            </button>
           </div>
         </div>
       ) : null}
@@ -244,11 +240,19 @@ function DetailRow({ label, value, children }: { label: string; value?: string; 
 }
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  const d = new Date(iso)
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  const yy = String(d.getFullYear()).slice(-2)
+  return `${mm}/${dd}/${yy}`
 }
 
 function formatTimestamp(ts: number): string {
-  return new Date(ts * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  const d = new Date(ts * 1000)
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  const yy = String(d.getFullYear()).slice(-2)
+  return `${mm}/${dd}/${yy}`
 }
 
 function formatCurrency(amount: number, currency: string): string {

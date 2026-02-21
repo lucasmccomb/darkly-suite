@@ -24,8 +24,8 @@ function AdminShell() {
           <Wordmark />{' '}Admin
         </div>
         <nav className="admin-sidebar-nav">
-          <NavLink to="/admin/licenses" className={({ isActive }) => isActive ? 'admin-nav-link active' : 'admin-nav-link'}>
-            Licenses
+          <NavLink to="/admin/memberships" className={({ isActive }) => isActive ? 'admin-nav-link active' : 'admin-nav-link'}>
+            Memberships
           </NavLink>
           <NavLink to="/admin/discounts" className={({ isActive }) => isActive ? 'admin-nav-link active' : 'admin-nav-link'}>
             Discount Codes

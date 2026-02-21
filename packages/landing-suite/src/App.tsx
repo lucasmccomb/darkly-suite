@@ -39,7 +39,7 @@ export function App() {
         } />
         <Route path="/admin" element={<AdminLoginPage />} />
         <Route element={<AdminLayout />}>
-          <Route path="/admin/licenses" element={<AdminLicensesPage />} />
+          <Route path="/admin/memberships" element={<AdminLicensesPage />} />
           <Route path="/admin/discounts" element={<AdminDiscountsPage />} />
           <Route path="/admin/stats" element={<AdminStatsPage />} />
         </Route>
