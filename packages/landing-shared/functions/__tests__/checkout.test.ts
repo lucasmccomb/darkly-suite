@@ -274,6 +274,50 @@ describe('checkout — POST handler', () => {
   });
 });
 
+describe('checkout — email prefill', () => {
+  it('passes customer_email to Stripe when email param is present', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ id: 'cs_email', url: 'https://checkout.stripe.com/cs_email' }),
+        { status: 200 },
+      ),
+    );
+
+    const context = createMockContext({
+      request: new Request(
+        `https://darklysuite.com/api/checkout?token=${validToken}&plan=yearly&product=gmail&email=user%40example.com`,
+      ),
+    });
+
+    const response = await onRequestGet(context);
+    expect(response.status).toBe(303);
+
+    const body = (fetchMock.mock.calls[0] as [string, RequestInit])[1].body as string;
+    expect(body).toContain('customer_email=user%40example.com');
+  });
+
+  it('does not include customer_email when email param is absent', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ id: 'cs_noemail', url: 'https://checkout.stripe.com/cs_noemail' }),
+        { status: 200 },
+      ),
+    );
+
+    const context = createMockContext({
+      request: new Request(
+        `https://darklysuite.com/api/checkout?token=${validToken}&plan=yearly&product=gmail`,
+      ),
+    });
+
+    const response = await onRequestGet(context);
+    expect(response.status).toBe(303);
+
+    const body = (fetchMock.mock.calls[0] as [string, RequestInit])[1].body as string;
+    expect(body).not.toContain('customer_email');
+  });
+});
+
 describe('checkout — Stripe error handling', () => {
   it('returns 500 when Stripe API fails', async () => {
     fetchMock.mockResolvedValueOnce(new Response('Internal server error', { status: 500 }));

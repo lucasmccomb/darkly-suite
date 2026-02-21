@@ -56,7 +56,7 @@ export function AccountSubscriptionsPage() {
       {loading ? (
         <div className="admin-table-loading">Loading...</div>
       ) : !data || data.subscriptions.length === 0 ? (
-        <div className="admin-empty">No subscriptions found. Purchase a Darkly plan to get started.</div>
+        <div className="admin-empty">No subscriptions found for this account.</div>
       ) : (
         <div className="admin-table-wrap">
           <table className="admin-table">

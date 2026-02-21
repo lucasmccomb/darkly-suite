@@ -101,6 +101,20 @@ async function handleUserFlow(
   // Clean up expired user sessions
   await db.prepare(`DELETE FROM user_sessions WHERE expires_at <= datetime('now')`).run()
 
+  // Only allow login if this email has at least one license (any status)
+  const license = await db
+    .prepare('SELECT id FROM licenses WHERE email = ? LIMIT 1')
+    .bind(email)
+    .first()
+
+  if (!license) {
+    return redirectWithError(
+      origin,
+      'No subscriptions found for this email. Please sign in with the email you used to purchase your subscription.',
+      '/account',
+    )
+  }
+
   const sessionToken = generateSessionToken()
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days
 

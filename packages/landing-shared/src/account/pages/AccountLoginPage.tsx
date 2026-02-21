@@ -27,7 +27,7 @@ function LoginContent() {
     <div className="admin-login">
       <div className="admin-login-card">
         <h1><Wordmark />{' '}Account</h1>
-        <p>Sign in with Google to manage your Darkly subscriptions.</p>
+        <p>Sign in with the Google account you used to purchase your subscription.</p>
         {error && <div className="admin-login-error">{error}</div>}
         <a href="/api/auth/start?type=user" className="admin-google-btn">
           <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
