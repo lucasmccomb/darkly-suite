@@ -11,6 +11,7 @@ import type { MockD1Database } from './test-helpers';
 
 // ---------------------------------------------------------------------------
 // Mock fetch for Stripe API calls (retrieveCheckoutSession, trackDiscountUsage)
+// and Resend API calls (sendAdminEmail)
 // ---------------------------------------------------------------------------
 
 const fetchMock = jest.fn() as jest.MockedFunction<typeof fetch>;
@@ -28,6 +29,11 @@ import { onRequestPost } from '../api/webhook';
 
 function makeWebhookEvent(type: string, data: Record<string, unknown>) {
   return JSON.stringify({ id: `evt_${Date.now()}`, type, data: { object: data } });
+}
+
+/** Respond with 200 to any remaining fetch calls (e.g. sendAdminEmail) */
+function mockResendSuccess() {
+  fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ id: 'email_ok' }), { status: 200 }));
 }
 
 async function callWebhook(
@@ -99,6 +105,7 @@ describe('webhook — checkout.session.completed', () => {
           customer: 'cus_123',
           subscription: 'sub_456',
           customer_details: { email: 'buyer@example.com' },
+          amount_total: 999,
         }),
         { status: 200 },
       ),
@@ -108,6 +115,9 @@ describe('webhook — checkout.session.completed', () => {
     fetchMock.mockResolvedValueOnce(
       new Response(JSON.stringify({ total_details: { breakdown: { discounts: [] } } }), { status: 200 }),
     );
+
+    // sendAdminEmail
+    mockResendSuccess();
 
     const env = createMockEnv();
     const eventBody = makeWebhookEvent('checkout.session.completed', { id: 'cs_test_123' });
@@ -125,6 +135,89 @@ describe('webhook — checkout.session.completed', () => {
     const sql = db.prepare.mock.calls[0][0] as string;
     expect(sql).toContain('INSERT INTO licenses');
     expect(sql).toContain('ON CONFLICT(token, product) DO UPDATE');
+  });
+
+  it('sends admin email notification on new purchase', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          id: 'cs_notify',
+          url: '',
+          metadata: { token: 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee', plan: 'yearly', product: 'sheets' },
+          customer: 'cus_n',
+          subscription: 'sub_n',
+          customer_details: { email: 'buyer@example.com' },
+          amount_total: 999,
+        }),
+        { status: 200 },
+      ),
+    );
+
+    // trackDiscountUsage
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ total_details: { breakdown: { discounts: [] } } }), { status: 200 }),
+    );
+
+    // sendAdminEmail
+    mockResendSuccess();
+
+    const env = createMockEnv();
+    const eventBody = makeWebhookEvent('checkout.session.completed', { id: 'cs_notify' });
+    await callWebhook(eventBody, env);
+
+    // The third fetch call should be the Resend email
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    const [emailUrl, emailOpts] = fetchMock.mock.calls[2];
+    expect(emailUrl).toBe('https://api.resend.com/emails');
+    const emailBody = JSON.parse(emailOpts?.body as string);
+    expect(emailBody.subject).toContain('New purchase');
+    expect(emailBody.subject).toContain('Sheets');
+    expect(emailBody.subject).toContain('buyer@example.com');
+    expect(emailBody.text).toContain('$9.99');
+  });
+
+  it('includes promo code info in purchase notification', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          id: 'cs_promo',
+          url: '',
+          metadata: { token: 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee', plan: 'yearly', product: 'gmail' },
+          customer: 'cus_p',
+          subscription: 'sub_p',
+          customer_details: { email: 'promo@example.com' },
+          amount_total: 0,
+        }),
+        { status: 200 },
+      ),
+    );
+
+    // trackDiscountUsage — with promo code
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          total_details: {
+            breakdown: {
+              discounts: [
+                { discount: { promotion_code: 'promo_abc123', coupon: { name: 'LAUNCH50' } } },
+              ],
+            },
+          },
+        }),
+        { status: 200 },
+      ),
+    );
+
+    // sendAdminEmail
+    mockResendSuccess();
+
+    const env = createMockEnv();
+    const eventBody = makeWebhookEvent('checkout.session.completed', { id: 'cs_promo' });
+    await callWebhook(eventBody, env);
+
+    const [, emailOpts] = fetchMock.mock.calls[2];
+    const emailBody = JSON.parse(emailOpts?.body as string);
+    expect(emailBody.text).toContain('LAUNCH50');
   });
 
   it('handles missing metadata gracefully (no crash)', async () => {
@@ -163,6 +256,7 @@ describe('webhook — checkout.session.completed', () => {
           customer: 'cus_lt',
           subscription: null,
           customer_details: { email: 'lt@example.com' },
+          amount_total: 4999,
         }),
         { status: 200 },
       ),
@@ -172,6 +266,9 @@ describe('webhook — checkout.session.completed', () => {
     fetchMock.mockResolvedValueOnce(
       new Response(JSON.stringify({ total_details: { breakdown: { discounts: [] } } }), { status: 200 }),
     );
+
+    // sendAdminEmail
+    mockResendSuccess();
 
     const env = createMockEnv();
     const eventBody = makeWebhookEvent('checkout.session.completed', { id: 'cs_lt' });
@@ -193,6 +290,7 @@ describe('webhook — checkout.session.completed', () => {
           customer: 'cus_def',
           subscription: 'sub_def',
           customer_details: { email: 'default@example.com' },
+          amount_total: 99,
         }),
         { status: 200 },
       ),
@@ -202,6 +300,9 @@ describe('webhook — checkout.session.completed', () => {
     fetchMock.mockResolvedValueOnce(
       new Response(JSON.stringify({ total_details: { breakdown: { discounts: [] } } }), { status: 200 }),
     );
+
+    // sendAdminEmail
+    mockResendSuccess();
 
     const env = createMockEnv();
     const eventBody = makeWebhookEvent('checkout.session.completed', { id: 'cs_default' });
@@ -226,6 +327,7 @@ describe('webhook — discount usage tracking', () => {
           customer: 'cus_disc',
           subscription: 'sub_disc',
           customer_details: { email: 'discount@example.com' },
+          amount_total: 0,
         }),
         { status: 200 },
       ),
@@ -246,6 +348,9 @@ describe('webhook — discount usage tracking', () => {
         { status: 200 },
       ),
     );
+
+    // sendAdminEmail
+    mockResendSuccess();
 
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
 
@@ -337,10 +442,68 @@ describe('webhook — customer.subscription.updated', () => {
     const db = env.DB as unknown as MockD1Database;
     expect(db._statement.bind).toHaveBeenCalledWith('active', 'sub_unknown');
   });
+
+  it('sends notification when status changes to a problematic state', async () => {
+    const env = createMockEnv();
+
+    // sendAdminEmail for the notification
+    mockResendSuccess();
+
+    const eventBody = JSON.stringify({
+      id: `evt_${Date.now()}`,
+      type: 'customer.subscription.updated',
+      data: {
+        object: { id: 'sub_pd_notify', status: 'past_due' },
+        previous_attributes: { status: 'active' },
+      },
+    });
+
+    const { header } = await generateWebhookSignature(eventBody, env.STRIPE_WEBHOOK_SECRET);
+    const request = new Request('https://darklysuite.com/api/webhook', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'stripe-signature': header },
+      body: eventBody,
+    });
+    const context = createMockContext({ request, env });
+    await onRequestPost(context);
+
+    // Verify email was sent (license lookup + email send)
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [emailUrl] = fetchMock.mock.calls[0];
+    expect(emailUrl).toBe('https://api.resend.com/emails');
+  });
+
+  it('does not send notification when status remains active', async () => {
+    const env = createMockEnv();
+
+    const eventBody = JSON.stringify({
+      id: `evt_${Date.now()}`,
+      type: 'customer.subscription.updated',
+      data: {
+        object: { id: 'sub_active', status: 'active' },
+        previous_attributes: { status: 'trialing' },
+      },
+    });
+
+    const { header } = await generateWebhookSignature(eventBody, env.STRIPE_WEBHOOK_SECRET);
+    const request = new Request('https://darklysuite.com/api/webhook', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'stripe-signature': header },
+      body: eventBody,
+    });
+    const context = createMockContext({ request, env });
+    await onRequestPost(context);
+
+    // No Resend fetch should have been made
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
 });
 
 describe('webhook — customer.subscription.deleted', () => {
-  it('sets license status to "cancelled"', async () => {
+  it('sets license status to "cancelled" and sends notification', async () => {
+    // sendAdminEmail
+    mockResendSuccess();
+
     const env = createMockEnv();
     const eventBody = makeWebhookEvent('customer.subscription.deleted', {
       id: 'sub_deleted',
@@ -349,14 +512,27 @@ describe('webhook — customer.subscription.deleted', () => {
 
     expect(response.status).toBe(200);
     const db = env.DB as unknown as MockD1Database;
-    const sql = db.prepare.mock.calls[0][0] as string;
-    expect(sql).toContain("status = 'cancelled'");
-    expect(db._statement.bind).toHaveBeenCalledWith('sub_deleted');
+
+    // First call: SELECT license for notification context
+    const selectSql = db.prepare.mock.calls[0][0] as string;
+    expect(selectSql).toContain('SELECT email, product, plan');
+
+    // Second call: UPDATE license status
+    const updateSql = db.prepare.mock.calls[1][0] as string;
+    expect(updateSql).toContain("status = 'cancelled'");
+
+    // Verify email was sent
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [emailUrl] = fetchMock.mock.calls[0];
+    expect(emailUrl).toBe('https://api.resend.com/emails');
   });
 });
 
 describe('webhook — invoice.payment_failed', () => {
-  it('sets license status to "past_due"', async () => {
+  it('sets license status to "past_due" and sends notification', async () => {
+    // sendAdminEmail
+    mockResendSuccess();
+
     const env = createMockEnv();
     const eventBody = makeWebhookEvent('invoice.payment_failed', {
       subscription: 'sub_pastdue',
@@ -365,9 +541,17 @@ describe('webhook — invoice.payment_failed', () => {
 
     expect(response.status).toBe(200);
     const db = env.DB as unknown as MockD1Database;
-    const sql = db.prepare.mock.calls[0][0] as string;
-    expect(sql).toContain("status = 'past_due'");
-    expect(db._statement.bind).toHaveBeenCalledWith('sub_pastdue');
+
+    // First call: UPDATE status
+    const updateSql = db.prepare.mock.calls[0][0] as string;
+    expect(updateSql).toContain("status = 'past_due'");
+
+    // Second call: SELECT license for notification
+    const selectSql = db.prepare.mock.calls[1][0] as string;
+    expect(selectSql).toContain('SELECT email, product, plan');
+
+    // Verify email was sent
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
   it('does nothing when subscription ID is null', async () => {
@@ -411,5 +595,74 @@ describe('webhook — handler errors', () => {
     expect(body.error).toContain('Webhook handler failed');
 
     consoleSpy.mockRestore();
+  });
+});
+
+describe('webhook — email notification resilience', () => {
+  it('does not break webhook processing when email sending fails', async () => {
+    // retrieveCheckoutSession
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          id: 'cs_email_fail',
+          url: '',
+          metadata: { token: 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee', plan: 'monthly', product: 'gmail' },
+          customer: 'cus_ef',
+          subscription: 'sub_ef',
+          customer_details: { email: 'test@example.com' },
+          amount_total: 99,
+        }),
+        { status: 200 },
+      ),
+    );
+
+    // trackDiscountUsage
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ total_details: { breakdown: { discounts: [] } } }), { status: 200 }),
+    );
+
+    // sendAdminEmail — fails
+    fetchMock.mockRejectedValueOnce(new Error('Resend down'));
+
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+    const env = createMockEnv();
+    const eventBody = makeWebhookEvent('checkout.session.completed', { id: 'cs_email_fail' });
+    const response = await callWebhook(eventBody, env);
+
+    // Webhook should still return 200 — email failure doesn't break it
+    expect(response.status).toBe(200);
+
+    consoleSpy.mockRestore();
+  });
+
+  it('skips email when RESEND_API_KEY is not configured', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          id: 'cs_no_key',
+          url: '',
+          metadata: { token: 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee', plan: 'monthly', product: 'gmail' },
+          customer: 'cus_nk',
+          subscription: 'sub_nk',
+          customer_details: { email: 'test@example.com' },
+          amount_total: 99,
+        }),
+        { status: 200 },
+      ),
+    );
+
+    // trackDiscountUsage
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ total_details: { breakdown: { discounts: [] } } }), { status: 200 }),
+    );
+
+    const env = createMockEnv({ RESEND_API_KEY: undefined });
+    const eventBody = makeWebhookEvent('checkout.session.completed', { id: 'cs_no_key' });
+    const response = await callWebhook(eventBody, env);
+
+    expect(response.status).toBe(200);
+    // Only 2 fetch calls (Stripe), no Resend call
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });

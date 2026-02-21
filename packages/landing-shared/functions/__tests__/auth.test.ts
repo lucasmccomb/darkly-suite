@@ -336,6 +336,7 @@ describe('auth/callback — OAuth callback flow', () => {
       iat: Math.floor(Date.now() / 1000),
     });
 
+    // Google token exchange
     fetchMock.mockResolvedValueOnce(
       new Response(
         JSON.stringify({
@@ -346,6 +347,11 @@ describe('auth/callback — OAuth callback flow', () => {
         }),
         { status: 200 },
       ),
+    );
+
+    // sendAdminEmail (admin login notification)
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ id: 'email_ok' }), { status: 200 }),
     );
 
     const context = createMockContext({
@@ -370,6 +376,11 @@ describe('auth/callback — OAuth callback flow', () => {
     expect(db.prepare).toHaveBeenCalledTimes(2);
     const insertSql = db.prepare.mock.calls[1][0] as string;
     expect(insertSql).toContain('INSERT INTO admin_sessions');
+
+    // Should have sent admin login notification
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const [emailUrl] = fetchMock.mock.calls[1];
+    expect(emailUrl).toBe('https://api.resend.com/emails');
   });
 
   it('creates user session when email has a license', async () => {
@@ -413,7 +424,7 @@ describe('auth/callback — OAuth callback flow', () => {
     expect(setCookie).toContain('darkly_user_session=');
   });
 
-  it('rejects user login when email has no licenses', async () => {
+  it('rejects user login when email has no licenses and sends notification', async () => {
     const idToken = createFakeJwt({
       iss: 'https://accounts.google.com',
       sub: '789',
@@ -424,6 +435,7 @@ describe('auth/callback — OAuth callback flow', () => {
       iat: Math.floor(Date.now() / 1000),
     });
 
+    // Google token exchange
     fetchMock.mockResolvedValueOnce(
       new Response(
         JSON.stringify({
@@ -434,6 +446,11 @@ describe('auth/callback — OAuth callback flow', () => {
         }),
         { status: 200 },
       ),
+    );
+
+    // sendAdminEmail (failed login notification)
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ id: 'email_ok' }), { status: 200 }),
     );
 
     const context = createMockContext({
@@ -453,6 +470,14 @@ describe('auth/callback — OAuth callback flow', () => {
     // Should NOT have set a user session cookie
     const setCookie = response.headers.get('Set-Cookie');
     expect(setCookie).toBeNull();
+
+    // Should have sent failed login notification
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const [emailUrl, emailOpts] = fetchMock.mock.calls[1];
+    expect(emailUrl).toBe('https://api.resend.com/emails');
+    const emailBody = JSON.parse(emailOpts?.body as string);
+    expect(emailBody.subject).toContain('Failed login attempt');
+    expect(emailBody.text).toContain('nosubscription@example.com');
   });
 
   it('redirects with error when Google token exchange fails', async () => {
