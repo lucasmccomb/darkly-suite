@@ -6,17 +6,22 @@ type CFContext = EventContext<Env, string, unknown>
 /**
  * GET /api/auth/start
  * Redirects to Google OAuth consent screen.
+ * Pass ?type=user for account portal login (default: admin).
  */
 export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
   const { GOOGLE_CLIENT_ID } = context.env
   const url = new URL(context.request.url)
   const redirectUri = `${url.origin}/api/auth/callback`
 
+  const flowType = url.searchParams.get('type') === 'user' ? 'user' : 'admin'
+
   const stateBytes = new Uint8Array(16)
   crypto.getRandomValues(stateBytes)
-  const state = Array.from(stateBytes)
+  const randomHex = Array.from(stateBytes)
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('')
+
+  const state = `${flowType}:${randomHex}`
 
   const authUrl = buildAuthorizationUrl(GOOGLE_CLIENT_ID, redirectUri, state)
 
