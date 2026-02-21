@@ -26,7 +26,7 @@ export const FOOTER_LINKS = [
 export const GMAIL_FEATURES = [
   'Dark mode for Gmail',
   'OS dark mode detection',
-  'Manual toggle & keyboard shortcut',
+  'Manual toggle',
   'Time-based scheduling',
   'Sunrise/sunset scheduling',
   'Cross-device sync',
@@ -50,10 +50,6 @@ export const GMAIL_FAQ = [
   {
     question: 'Does it work across multiple devices?',
     answer: "Yes. Darkly uses Chrome's built-in sync storage, so your settings automatically sync across every device where you're signed into Chrome.",
-  },
-  {
-    question: 'Is there a quick toggle?',
-    answer: 'You can toggle dark mode with the toolbar button in Gmail, or use the keyboard shortcut g then Shift+T.',
   },
   {
     question: 'Can I customize the colors?',

@@ -95,7 +95,6 @@ const COMPARISON_FEATURES = [
   { name: 'Sheets dark mode', gmail: false, sheets: true, docs: false, suite: true },
   { name: 'Docs dark mode', gmail: false, sheets: false, docs: true, suite: true },
   { name: 'OS theme sync', gmail: true, sheets: true, docs: true, suite: true },
-  { name: 'Keyboard shortcut', gmail: true, sheets: true, docs: true, suite: true },
   { name: 'Time-based scheduling', gmail: true, sheets: true, docs: true, suite: true },
   { name: 'Sunrise/sunset scheduling', gmail: true, sheets: true, docs: true, suite: true },
   { name: 'Cross-device sync', gmail: true, sheets: true, docs: true, suite: true },
@@ -107,7 +106,7 @@ const COMPARISON_FEATURES = [
 const defaultFeatures = [
   'Dark mode for Gmail, Sheets, and Docs',
   'OS dark mode detection',
-  'Manual toggle & keyboard shortcut',
+  'Manual toggle',
   'Time-based scheduling',
   'Sunrise/sunset scheduling',
   'Cross-device sync',
