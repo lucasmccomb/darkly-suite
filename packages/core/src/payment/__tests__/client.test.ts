@@ -233,11 +233,18 @@ describe('openPaymentPage', () => {
     await client.initPayment();
   });
 
+  it('requests email from background via getEmail message', async () => {
+    await client.openPaymentPage();
+
+    const emailMsg = chromeMock.runtime.sendMessage.mock.calls[0]![0] as { type: string };
+    expect(emailMsg.type).toBe('getEmail');
+  });
+
   it('sends openTab message with token, default plan (yearly), and productId', async () => {
     await client.openPaymentPage();
 
-    expect(chromeMock.runtime.sendMessage).toHaveBeenCalledTimes(2);
-    const msg = chromeMock.runtime.sendMessage.mock.calls[0]![0] as { type: string; url: string };
+    expect(chromeMock.runtime.sendMessage).toHaveBeenCalledTimes(3);
+    const msg = chromeMock.runtime.sendMessage.mock.calls[1]![0] as { type: string; url: string };
     const token = syncStorage[mockConfig.tokenKey] as string;
     expect(msg.type).toBe('openTab');
     expect(msg.url).toBe(`${mockConfig.apiBase}/checkout?token=${token}&plan=yearly&product=${mockConfig.productId}`);
@@ -246,14 +253,28 @@ describe('openPaymentPage', () => {
   it('sends checkoutStarted message after openTab', async () => {
     await client.openPaymentPage();
 
-    const msg = chromeMock.runtime.sendMessage.mock.calls[1]![0] as { type: string };
+    const msg = chromeMock.runtime.sendMessage.mock.calls[2]![0] as { type: string };
     expect(msg.type).toBe('checkoutStarted');
+  });
+
+  it('includes email in checkout URL when background returns one', async () => {
+    chromeMock.runtime.sendMessage.mockImplementationOnce(
+      (_message: unknown, callback?: (response: unknown) => void) => {
+        if (callback) callback('user@example.com');
+      },
+    );
+
+    await client.openPaymentPage();
+
+    const msg = chromeMock.runtime.sendMessage.mock.calls[1]![0] as { type: string; url: string };
+    const token = syncStorage[mockConfig.tokenKey] as string;
+    expect(msg.url).toBe(`${mockConfig.apiBase}/checkout?token=${token}&plan=yearly&product=${mockConfig.productId}&email=user%40example.com`);
   });
 
   it('sends openTab message with monthly plan', async () => {
     await client.openPaymentPage('monthly');
 
-    const msg = chromeMock.runtime.sendMessage.mock.calls[0]![0] as { type: string; url: string };
+    const msg = chromeMock.runtime.sendMessage.mock.calls[1]![0] as { type: string; url: string };
     const token = syncStorage[mockConfig.tokenKey] as string;
     expect(msg.url).toBe(`${mockConfig.apiBase}/checkout?token=${token}&plan=monthly&product=${mockConfig.productId}`);
   });
@@ -261,7 +282,7 @@ describe('openPaymentPage', () => {
   it('sends openTab message with lifetime plan', async () => {
     await client.openPaymentPage('lifetime');
 
-    const msg = chromeMock.runtime.sendMessage.mock.calls[0]![0] as { type: string; url: string };
+    const msg = chromeMock.runtime.sendMessage.mock.calls[1]![0] as { type: string; url: string };
     const token = syncStorage[mockConfig.tokenKey] as string;
     expect(msg.url).toBe(`${mockConfig.apiBase}/checkout?token=${token}&plan=lifetime&product=${mockConfig.productId}`);
   });

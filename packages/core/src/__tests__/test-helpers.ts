@@ -123,7 +123,9 @@ export function createMockChromeStorage() {
       clear: jest.fn(async () => true),
     },
     runtime: {
-      sendMessage: jest.fn(),
+      sendMessage: jest.fn((_message: unknown, callback?: (response: unknown) => void) => {
+        if (callback) callback(null);
+      }),
     },
   };
 

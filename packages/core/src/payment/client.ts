@@ -17,8 +17,15 @@ const CACHE_TTL_PAID_MS = 30 * 60 * 1000; // 30 minutes
 
 async function getEmail(): Promise<string | null> {
   try {
-    const info = await chrome.identity.getProfileUserInfo({ accountStatus: chrome.identity.AccountStatus.ANY });
-    return info.email || null;
+    return await new Promise((resolve) => {
+      chrome.runtime.sendMessage({ type: 'getEmail' }, (response) => {
+        if (chrome.runtime.lastError || !response) {
+          resolve(null);
+          return;
+        }
+        resolve(response);
+      });
+    });
   } catch {
     return null;
   }
