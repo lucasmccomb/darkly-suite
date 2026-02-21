@@ -8,6 +8,7 @@ on:
       - 'packages/landing-suite/**'
       - 'packages/landing-gmail/**'
       - 'packages/landing-sheets/**'
+      - 'packages/landing-docs/**'
   workflow_dispatch:
     inputs:
       deploy-all:
@@ -20,6 +21,10 @@ on:
         default: false
       deploy-sheets:
         description: 'Deploy landing-sheets → sheetsdarkly.com'
+        type: boolean
+        default: false
+      deploy-docs:
+        description: 'Deploy landing-docs → docsdarkly.com'
         type: boolean
         default: false
       deploy-suite:
@@ -38,6 +43,7 @@ jobs:
     outputs:
       landing-gmail: ${{ steps.changes.outputs.landing-gmail }}
       landing-sheets: ${{ steps.changes.outputs.landing-sheets }}
+      landing-docs: ${{ steps.changes.outputs.landing-docs }}
       landing-suite: ${{ steps.changes.outputs.landing-suite }}
     steps:
       - uses: actions/checkout@v4
@@ -51,11 +57,13 @@ jobs:
             if [[ "${{ inputs.deploy-all }}" == "true" ]]; then
               echo "landing-gmail=true" >> $GITHUB_OUTPUT
               echo "landing-sheets=true" >> $GITHUB_OUTPUT
+              echo "landing-docs=true" >> $GITHUB_OUTPUT
               echo "landing-suite=true" >> $GITHUB_OUTPUT
               exit 0
             fi
             echo "landing-gmail=${{ inputs.deploy-gmail }}" >> $GITHUB_OUTPUT
             echo "landing-sheets=${{ inputs.deploy-sheets }}" >> $GITHUB_OUTPUT
+            echo "landing-docs=${{ inputs.deploy-docs }}" >> $GITHUB_OUTPUT
             echo "landing-suite=${{ inputs.deploy-suite }}" >> $GITHUB_OUTPUT
             exit 0
           fi
@@ -78,6 +86,11 @@ jobs:
             SHEETS_CHANGED=true
           fi
 
+          DOCS_CHANGED=false
+          if echo "$CHANGED" | grep -q '^packages/landing-docs/' || [[ "$SHARED_CHANGED" == "true" ]]; then
+            DOCS_CHANGED=true
+          fi
+
           SUITE_CHANGED=false
           if echo "$CHANGED" | grep -q '^packages/landing-suite/' || [[ "$SHARED_CHANGED" == "true" ]]; then
             SUITE_CHANGED=true
@@ -85,9 +98,10 @@ jobs:
 
           echo "landing-gmail=$GMAIL_CHANGED" >> $GITHUB_OUTPUT
           echo "landing-sheets=$SHEETS_CHANGED" >> $GITHUB_OUTPUT
+          echo "landing-docs=$DOCS_CHANGED" >> $GITHUB_OUTPUT
           echo "landing-suite=$SUITE_CHANGED" >> $GITHUB_OUTPUT
 
-          echo "Deploy targets: gmail=$GMAIL_CHANGED sheets=$SHEETS_CHANGED suite=$SUITE_CHANGED (shared=$SHARED_CHANGED)"
+          echo "Deploy targets: gmail=$GMAIL_CHANGED sheets=$SHEETS_CHANGED docs=$DOCS_CHANGED suite=$SUITE_CHANGED (shared=$SHARED_CHANGED)"
 
   deploy-gmail:
     name: Deploy gmaildarkly.com
@@ -155,6 +169,40 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy dist --project-name=sheets-darkly
           workingDirectory: packages/landing-sheets
+          packageManager: pnpm
+
+  deploy-docs:
+    name: Deploy docsdarkly.com
+    needs: detect-changes
+    if: needs.detect-changes.outputs.landing-docs == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build landing-docs
+        run: pnpm --filter @darkly/landing-docs build
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=docs-darkly
+          workingDirectory: packages/landing-docs
           packageManager: pnpm
 
   deploy-suite:
