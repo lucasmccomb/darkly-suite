@@ -240,6 +240,43 @@ importers:
         specifier: ^6.0.1
         version: 6.0.1
 
+  packages/landing-docs:
+    dependencies:
+      '@darkly/landing-shared':
+        specifier: workspace:*
+        version: link:../landing-shared
+      lucide-react:
+        specifier: ^0.564.0
+        version: 0.564.0(react@19.2.4)
+      react:
+        specifier: ^19.2.0
+        version: 19.2.4
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.4(react@19.2.4)
+      react-router-dom:
+        specifier: ^7.13.0
+        version: 7.13.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+    devDependencies:
+      '@types/node':
+        specifier: ^24.10.1
+        version: 24.10.13
+      '@types/react':
+        specifier: ^19.2.7
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19.2.3
+        version: 19.2.3(@types/react@19.2.14)
+      '@vitejs/plugin-react':
+        specifier: ^5.1.1
+        version: 5.1.4(vite@7.3.1(@types/node@24.10.13)(terser@5.46.0))
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
+      vite:
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@24.10.13)(terser@5.46.0)
+
   packages/landing-gmail:
     dependencies:
       '@darkly/landing-shared':
