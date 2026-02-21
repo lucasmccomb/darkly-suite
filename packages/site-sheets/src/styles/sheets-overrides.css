@@ -43,6 +43,12 @@
   filter: invert(1) hue-rotate(180deg) !important;
 }
 
+/* Active cell editor -- HTML overlay that sits on top of the grid canvas.
+ * Without re-inversion, it turns dark while the preserved grid stays light. */
+[data-darkly-theme="dark"][data-darkly-grid="preserve"] .cell-input {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
 /* ============================================================
  * 4. Color picker swatch re-inversion -- show accurate colors
  * ============================================================ */
