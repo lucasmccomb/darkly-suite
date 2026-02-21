@@ -1,7 +1,7 @@
 {
   "name": "darkly-suite-ext",
   "version": "1.0.0",
-  "description": "Bundle Chrome extension providing dark mode for Gmail, Sheets, and Docs",
+  "description": "Bundle Chrome extension providing dark mode for Gmail, Sheets, Docs, and Drive",
   "private": true,
   "scripts": {
     "dev": "webpack --config webpack.dev.js --watch",
@@ -15,6 +15,7 @@
     "@darkly/site-gmail": "workspace:*",
     "@darkly/site-sheets": "workspace:*",
     "@darkly/site-docs": "workspace:*",
+    "@darkly/site-drive": "workspace:*",
     "@inboxsdk/core": "^2.2.11",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

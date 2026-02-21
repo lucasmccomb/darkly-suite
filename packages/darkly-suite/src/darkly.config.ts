@@ -12,7 +12,7 @@ export const config: ProductConfig = {
   siteBase: 'https://darklysuite.com',
   alarmName: 'ds-schedule-check',
   tabUrlPattern: 'https://mail.google.com/*',
-  sites: ['gmail', 'sheets', 'docs'],
+  sites: ['gmail', 'sheets', 'docs', 'drive'],
 };
 
 /**
@@ -46,6 +46,12 @@ export const siteConfigs: Record<SiteId, SiteConfigEntry> = {
     alarmName: 'ds-docs-schedule-check',
     tabUrlPattern: 'https://docs.google.com/document/*',
   },
+  drive: {
+    siteId: 'drive',
+    storageKey: 'ds_drive_preferences',
+    alarmName: 'ds-drive-schedule-check',
+    tabUrlPattern: 'https://drive.google.com/*',
+  },
 };
 
 /**
@@ -66,7 +72,7 @@ export function getSiteConfig(siteId: SiteId): ProductConfig {
     alarmName: site.alarmName,
     tabUrlPattern: site.tabUrlPattern,
     sites: config.sites,
-    // Docs requires forced light color-scheme to prevent Google's native dark mode
-    forceColorSchemeLight: siteId === 'docs',
+    // Docs and Drive require forced light color-scheme to prevent Google's native dark mode
+    forceColorSchemeLight: siteId === 'docs' || siteId === 'drive',
   };
 }
