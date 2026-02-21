@@ -125,17 +125,6 @@ Before starting, verify these are live:
 22. [ ] Toggle ON: **Verify** spreadsheet grid/cells stay in original light colors while the rest of the UI remains dark
 23. [ ] Edit some cells — **Verify** the preserved colors look correct during editing
 
-### Theme Presets
-
-24. [ ] Test each theme preset and verify the UI updates accordingly:
-    - [ ] Nord
-    - [ ] Solarized Dark
-    - [ ] Monokai
-    - [ ] Catppuccin Mocha
-    - [ ] Rose Pine
-25. [ ] **Verify**: Each preset applies a distinct color palette to the dark theme
-26. [ ] **Verify**: Switching presets is smooth (no flash or broken intermediate state)
-
 ---
 
 ## Test 6: Pro User — Manage Subscription
@@ -154,12 +143,12 @@ Before starting, verify these are live:
 
 **Setup**: Continue from Test 6.
 
-1. [ ] Set dark mode to ON with a specific theme preset (e.g., Nord)
+1. [ ] Set dark mode to ON
 2. [ ] Close the Sheets tab completely
 3. [ ] Open a new tab and navigate to any spreadsheet on `docs.google.com/spreadsheets`
-4. [ ] **Verify**: Dark mode is still active with the same preset (preferences persisted)
+4. [ ] **Verify**: Dark mode is still active (preferences persisted)
 5. [ ] Open a spreadsheet in a different Chrome window
-6. [ ] **Verify**: Dark mode is active with the same preset there too (chrome.storage.sync)
+6. [ ] **Verify**: Dark mode is active there too (chrome.storage.sync)
 
 ---
 

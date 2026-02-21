@@ -129,18 +129,6 @@ CSS support exists for this feature via `data-darkly-page="preserve"`. A UI togg
 22. [ ] **If toggle exists**: Toggle OFF — **Verify** everything inverts including the document canvas
 23. [ ] **If toggle does NOT exist**: Note this as a non-blocker observation. The CSS rules are ready but the UI toggle is not yet wired. Verify the CSS works by manually setting `data-darkly-page="preserve"` on `<html>` in DevTools and confirming the canvas re-inverts.
 
-### Theme Presets
-
-24. [ ] Test each theme preset and verify the UI updates accordingly:
-    - [ ] Default (no preset — standard dark inversion)
-    - [ ] Nord
-    - [ ] Solarized Dark
-    - [ ] Monokai
-    - [ ] Catppuccin Mocha
-    - [ ] Rose Pine
-25. [ ] **Verify**: Each preset applies a distinct color palette to the dark theme
-26. [ ] **Verify**: Switching presets is smooth (no flash or broken intermediate state)
-
 ---
 
 ## Test 6: Pro User — Manage Subscription
@@ -159,12 +147,12 @@ CSS support exists for this feature via `data-darkly-page="preserve"`. A UI togg
 
 **Setup**: Continue from Test 6.
 
-1. [ ] Set dark mode to ON with a specific theme preset (e.g., Nord)
+1. [ ] Set dark mode to ON
 2. [ ] Close the Docs tab completely
 3. [ ] Open a new tab and navigate to any document on `docs.google.com/document`
-4. [ ] **Verify**: Dark mode is still active with the same preset (preferences persisted)
+4. [ ] **Verify**: Dark mode is still active (preferences persisted)
 5. [ ] Open a document in a different Chrome window
-6. [ ] **Verify**: Dark mode is active with the same preset there too (chrome.storage.sync)
+6. [ ] **Verify**: Dark mode is active there too (chrome.storage.sync)
 
 ---
 
