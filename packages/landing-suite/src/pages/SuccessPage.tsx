@@ -38,7 +38,7 @@ export function SuccessPage() {
             color: 'var(--color-text)',
             marginBottom: 12,
           }}>
-            Welcome to <Wordmark /> Pro!
+            Welcome to <Wordmark /> Suite!
           </h1>
           <p style={{
             fontSize: '1.1rem',
