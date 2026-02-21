@@ -31,7 +31,7 @@ export const FOOTER_LINKS = [
   { to: '/docs', label: 'Docs' },
   { to: '/suite', label: 'Bundle' },
   { to: '/privacy', label: 'Privacy Policy' },
-  { to: 'mailto:support@darklysuite.com', label: 'Contact', external: true },
+  { to: '/support', label: 'Support' },
 ]
 
 export const individualTiers = (product: string): PricingTier[] => [

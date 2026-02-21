@@ -15,7 +15,7 @@ export function Footer() {
             <Link to="/docs">Docs</Link>
             <Link to="/suite">Bundle</Link>
             <Link to="/privacy">Privacy Policy</Link>
-            <a href="mailto:support@darklysuite.com">Contact</a>
+            <Link to="/support">Support</Link>
           </div>
         </div>
         <div className="footer-bottom">
