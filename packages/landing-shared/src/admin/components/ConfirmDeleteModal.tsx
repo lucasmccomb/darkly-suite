@@ -44,7 +44,9 @@ export function ConfirmDeleteModal({ open, license, loading, onClose, onConfirm 
       </div>
 
       <p className="admin-confirm-warning">
-        This will permanently delete this license and cancel any active subscription. This action cannot be undone.
+        {license.plan === 'lifetime'
+          ? 'This will permanently delete this license. This action cannot be undone.'
+          : 'This will permanently delete this license and cancel any active subscription. This action cannot be undone.'}
       </p>
 
       <div className="admin-share-actions">
