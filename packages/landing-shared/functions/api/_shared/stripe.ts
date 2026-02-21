@@ -346,6 +346,23 @@ export async function updateStripePromotionCode(
   return res.json() as Promise<{ id: string; active: boolean }>
 }
 
+// -- Subscription Cancellation -------------------------------------------
+
+export async function cancelSubscription(
+  secretKey: string,
+  subscriptionId: string,
+): Promise<void> {
+  const res = await fetch(`${STRIPE_API}/subscriptions/${subscriptionId}`, {
+    method: 'DELETE',
+    headers: authHeaders(secretKey),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Stripe cancelSubscription failed (${res.status}): ${err}`);
+  }
+}
+
 // -- Webhook Signature Verification --------------------------------------
 
 export async function verifyWebhookSignature(
