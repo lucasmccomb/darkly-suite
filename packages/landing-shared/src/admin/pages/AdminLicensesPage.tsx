@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Trash2, Eye } from 'lucide-react'
-import { ConfirmDeleteModal } from '../components/ConfirmDeleteModal'
+import { Pencil } from 'lucide-react'
 import { LicenseDetailModal } from '../components/LicenseDetailModal'
 import { AdminToast } from '../components/AdminToast'
 
@@ -36,8 +35,6 @@ export function AdminLicensesPage() {
   const [plan, setPlan] = useState('')
   const [product, setProduct] = useState('')
   const [page, setPage] = useState(1)
-  const [deletingLicense, setDeletingLicense] = useState<License | null>(null)
-  const [deleteLoading, setDeleteLoading] = useState(false)
   const [detailLicense, setDetailLicense] = useState<License | null>(null)
   const [toast, setToast] = useState<Toast | null>(null)
 
@@ -61,45 +58,20 @@ export function AdminLicensesPage() {
     fetchLicenses()
   }, [fetchLicenses])
 
-  const handleDeleteClick = (license: License) => {
-    setDeletingLicense(license)
-  }
-
-  const handleConfirmDelete = async () => {
-    if (!deletingLicense) return
-
-    setDeleteLoading(true)
-    try {
-      const res = await fetch(`/api/admin/licenses?id=${deletingLicense.id}`, {
-        method: 'DELETE',
-        credentials: 'same-origin',
-      })
-
-      if (res.ok) {
-        setToast({ message: 'License deleted successfully', type: 'success' })
-        setDeletingLicense(null)
-        fetchLicenses()
-      } else {
-        const body = await res.json().catch(() => ({ error: 'Unknown error' })) as { error: string }
-        setToast({ message: body.error || 'Failed to delete license', type: 'error' })
-      }
-    } catch {
-      setToast({ message: 'Network error — please try again', type: 'error' })
-    } finally {
-      setDeleteLoading(false)
-    }
-  }
-
-  const handleDetailAction = () => {
-    setToast({ message: 'Action completed successfully', type: 'success' })
+  const handleDetailAction = (message?: string) => {
+    setToast({ message: message ?? 'Action completed successfully', type: 'success' })
     fetchLicenses()
+  }
+
+  const handleDetailClose = () => {
+    setDetailLicense(null)
   }
 
   const totalPages = data ? Math.ceil(data.total / data.limit) : 0
 
   return (
     <div className="admin-page">
-      <h2>Licenses</h2>
+      <h2>Memberships</h2>
       <div className="admin-filters">
         <input
           type="text"
@@ -131,10 +103,10 @@ export function AdminLicensesPage() {
       {loading ? (
         <div className="admin-table-loading">Loading...</div>
       ) : !data || data.licenses.length === 0 ? (
-        <div className="admin-empty">No licenses found.</div>
+        <div className="admin-empty">No memberships found.</div>
       ) : (
         <>
-          <div className="admin-table-info">{data.total} total licenses</div>
+          <div className="admin-table-info">{data.total} total memberships</div>
           <div className="admin-table-wrap">
             <table className="admin-table">
               <thead>
@@ -164,22 +136,13 @@ export function AdminLicensesPage() {
                     <td>{formatDate(license.created_at)}</td>
                     <td>{license.discount_code ?? '--'}</td>
                     <td>
-                      <div className="admin-actions-cell">
-                        <button
-                          className="admin-icon-btn"
-                          title="View details"
-                          onClick={() => setDetailLicense(license)}
-                        >
-                          <Eye size={16} />
-                        </button>
-                        <button
-                          className="admin-icon-btn admin-icon-btn--danger"
-                          title="Delete license"
-                          onClick={() => handleDeleteClick(license)}
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
+                      <button
+                        className="admin-icon-btn"
+                        title="Edit membership"
+                        onClick={() => setDetailLicense(license)}
+                      >
+                        <Pencil size={16} />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -197,18 +160,10 @@ export function AdminLicensesPage() {
         </>
       )}
 
-      <ConfirmDeleteModal
-        open={!!deletingLicense}
-        license={deletingLicense}
-        loading={deleteLoading}
-        onClose={() => setDeletingLicense(null)}
-        onConfirm={handleConfirmDelete}
-      />
-
       <LicenseDetailModal
         open={!!detailLicense}
         license={detailLicense}
-        onClose={() => setDetailLicense(null)}
+        onClose={handleDetailClose}
         onAction={handleDetailAction}
       />
 
@@ -224,9 +179,9 @@ export function AdminLicensesPage() {
 }
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
+  const d = new Date(iso)
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  const yy = String(d.getFullYear()).slice(-2)
+  return `${mm}/${dd}/${yy}`
 }
