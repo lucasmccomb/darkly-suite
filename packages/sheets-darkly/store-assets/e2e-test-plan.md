@@ -143,12 +143,12 @@ Before starting, verify these are live:
 
 **Setup**: Continue from Test 6.
 
-1. [ ] Set dark mode to ON with a specific theme preset (e.g., Nord)
+1. [ ] Set dark mode to ON
 2. [ ] Close the Sheets tab completely
 3. [ ] Open a new tab and navigate to any spreadsheet on `docs.google.com/spreadsheets`
-4. [ ] **Verify**: Dark mode is still active with the same preset (preferences persisted)
+4. [ ] **Verify**: Dark mode is still active (preferences persisted)
 5. [ ] Open a spreadsheet in a different Chrome window
-6. [ ] **Verify**: Dark mode is active with the same preset there too (chrome.storage.sync)
+6. [ ] **Verify**: Dark mode is active there too (chrome.storage.sync)
 
 ---
 

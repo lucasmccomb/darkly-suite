@@ -142,7 +142,7 @@ Before starting, verify these are live:
 ### Settings Panel on Gmail
 
 18. [ ] Click "All Settings" from the toolbar dropdown (InboxSDK sidebar panel)
-19. [ ] **Verify**: Settings modal/sidebar appears with mode selector and preset options
+19. [ ] **Verify**: Settings modal/sidebar appears with mode selector
 20. [ ] **Verify**: On/Off toggle works
 21. [ ] **Verify**: Theme mode selector shows all 5 modes: Dark, System, Default, Schedule, Sunrise/Sunset
 22. [ ] **Verify**: "Manage Subscription" link is visible
@@ -201,7 +201,7 @@ Before starting, verify these are live:
 35. [ ] **Verify**: Settings modal appears (centered overlay with backdrop)
 36. [ ] **Verify**: Theme mode selector shows all 5 modes
 37. [ ] **Verify**: Sheets-specific "Preserve Grid Colors" section is present
-38. [ ] **Verify**: On/Off toggle, theme presets all work
+38. [ ] **Verify**: On/Off toggle works
 
 ---
 
@@ -282,7 +282,7 @@ Before starting, verify these are live:
 
 49. [ ] **Verify**: Settings modal appears (centered overlay with backdrop)
 50. [ ] **Verify**: Theme mode selector shows all 5 modes
-51. [ ] **Verify**: On/Off toggle, theme presets all work
+51. [ ] **Verify**: On/Off toggle works
 
 ---
 
@@ -290,14 +290,14 @@ Before starting, verify these are live:
 
 **Suite uses per-site storage keys** (`ds_gmail_preferences`, `ds_sheets_preferences`, `ds_docs_preferences`, `ds_drive_preferences`). Each app maintains its own preferences independently.
 
-1. [ ] On Gmail: Set mode to **Dark**, preset to **Nord**
-2. [ ] On Sheets: Set mode to **System**, preset to **Solarized Dark**
-3. [ ] On Docs: Set mode to **Schedule**, preset to **Monokai**
-4. [ ] On Drive: Set mode to **Dark**, preset to **Rose Pine**
-5. [ ] Refresh Gmail — **Verify**: Mode is still Dark with Nord preset
-6. [ ] Refresh Sheets — **Verify**: Mode is still System with Solarized Dark preset
-7. [ ] Refresh Docs — **Verify**: Mode is still Schedule with Monokai preset
-8. [ ] Refresh Drive — **Verify**: Mode is still Dark with Rose Pine preset
+1. [ ] On Gmail: Set mode to **Dark**
+2. [ ] On Sheets: Set mode to **System**
+3. [ ] On Docs: Set mode to **Schedule**
+4. [ ] On Drive: Set mode to **Dark**
+5. [ ] Refresh Gmail — **Verify**: Mode is still Dark
+6. [ ] Refresh Sheets — **Verify**: Mode is still System
+7. [ ] Refresh Docs — **Verify**: Mode is still Schedule
+8. [ ] Refresh Drive — **Verify**: Mode is still Dark
 9. [ ] **Verify**: Changing settings on one app does NOT affect the other apps
 10. [ ] **Verify**: All four apps share the SAME pro status (one payment unlocks all)
 11. [ ] Open Chrome DevTools > Application > Storage > chrome.storage.sync
@@ -334,30 +334,12 @@ For each Google app:
 17. [ ] **Verify**: Sunrise and sunset times are displayed
 18. [ ] **Verify**: Dark mode activates/deactivates based on whether it's currently before/after sunset
 
-### Theme Presets (repeat on Gmail, Sheets, Docs, AND Drive)
-
-For each Google app:
-
-19. [ ] Test each theme preset and verify the UI updates accordingly:
-    - [ ] Default (no preset — standard dark inversion)
-    - [ ] Nord
-    - [ ] Solarized Dark
-    - [ ] Monokai
-    - [ ] Catppuccin Mocha
-    - [ ] Rose Pine
-20. [ ] **Verify**: Each preset applies a distinct color palette to the dark theme
-21. [ ] **Verify**: Switching presets is smooth (no flash or broken intermediate state)
-
 ### Summary Checklist
 
 - [ ] All 5 modes tested on Gmail
 - [ ] All 5 modes tested on Sheets
 - [ ] All 5 modes tested on Docs
 - [ ] All 5 modes tested on Drive
-- [ ] All 6 presets tested on Gmail
-- [ ] All 6 presets tested on Sheets
-- [ ] All 6 presets tested on Docs
-- [ ] All 6 presets tested on Drive
 
 ---
 
@@ -439,16 +421,16 @@ For each Google app:
 
 **Setup**: Pro user.
 
-1. [ ] On Gmail: Set dark mode to ON with **Nord** preset
-2. [ ] On Sheets: Set dark mode to ON with **Catppuccin Mocha** preset, enable "Preserve Grid Colors"
-3. [ ] On Docs: Set dark mode to ON with **Rose Pine** preset
-4. [ ] On Drive: Set dark mode to ON with **Monokai** preset
+1. [ ] On Gmail: Set dark mode to ON
+2. [ ] On Sheets: Set dark mode to ON, enable "Preserve Grid Colors"
+3. [ ] On Docs: Set dark mode to ON
+4. [ ] On Drive: Set dark mode to ON
 5. [ ] Close ALL Google tabs and close the Chrome window
 6. [ ] Reopen Chrome
-7. [ ] Open Gmail — **Verify**: Dark mode is active with Nord preset
-8. [ ] Open Sheets — **Verify**: Dark mode is active with Catppuccin Mocha preset, Preserve Grid Colors is still ON
-9. [ ] Open Docs — **Verify**: Dark mode is active with Rose Pine preset
-10. [ ] Open Drive — **Verify**: Dark mode is active with Monokai preset
+7. [ ] Open Gmail — **Verify**: Dark mode is active
+8. [ ] Open Sheets — **Verify**: Dark mode is active, Preserve Grid Colors is still ON
+9. [ ] Open Docs — **Verify**: Dark mode is active
+10. [ ] Open Drive — **Verify**: Dark mode is active
 11. [ ] Open Gmail in a different Chrome window — **Verify**: Same settings (chrome.storage.sync)
 12. [ ] Open Sheets in a different Chrome window — **Verify**: Same settings
 13. [ ] Open Docs in a different Chrome window — **Verify**: Same settings
