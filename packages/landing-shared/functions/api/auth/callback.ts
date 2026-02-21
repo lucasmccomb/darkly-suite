@@ -42,6 +42,10 @@ export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
     const tokens = await exchangeCodeForTokens(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, code, redirectUri)
     const claims = decodeIdToken(tokens.id_token, GOOGLE_CLIENT_ID)
 
+    if (flowType === 'checkout') {
+      return handleCheckoutFlow(url.origin, state, claims.email)
+    }
+
     if (flowType === 'user') {
       return handleUserFlow(context.env, url.origin, DB, claims.email)
     }
@@ -50,14 +54,43 @@ export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     console.error(`OAuth callback error: ${message}`)
-    const errorRedirect = flowType === 'user' ? '/account' : '/admin'
+    const errorRedirect = flowType === 'checkout' ? '/' : flowType === 'user' ? '/account' : '/admin'
     return redirectWithError(url.origin, 'Authentication failed', errorRedirect)
   }
 }
 
-function parseFlowType(state: string): 'admin' | 'user' {
+function parseFlowType(state: string): 'admin' | 'user' | 'checkout' {
+  if (state.startsWith('checkout:')) return 'checkout'
   if (state.startsWith('user:')) return 'user'
   return 'admin' // 'admin:' prefix or legacy unprefixed state
+}
+
+function handleCheckoutFlow(
+  origin: string,
+  state: string,
+  email: string,
+): Response {
+  // State format: checkout:{token}:{plan}:{product}:{csrf_hex}
+  const parts = state.split(':')
+  const token = parts[1]
+  const plan = parts[2]
+  const product = parts[3]
+
+  const checkoutUrl = new URL('/api/checkout', origin)
+  checkoutUrl.searchParams.set('token', token)
+  checkoutUrl.searchParams.set('plan', plan)
+  checkoutUrl.searchParams.set('product', product)
+  checkoutUrl.searchParams.set('email', email)
+
+  const responseHeaders = new Headers()
+  responseHeaders.set('Location', checkoutUrl.toString())
+  // Clear the OAuth state cookie
+  responseHeaders.append(
+    'Set-Cookie',
+    `darkly_oauth_state=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0`,
+  )
+
+  return new Response(null, { status: 302, headers: responseHeaders })
 }
 
 async function handleAdminFlow(

@@ -130,10 +130,8 @@ export function createPaymentClient(config: ProductConfig): PaymentClient {
 
   async function openPaymentPage(plan: 'monthly' | 'yearly' | 'lifetime' = 'yearly'): Promise<void> {
     const token = await getToken();
-    const email = await getEmail();
-    const params = new URLSearchParams({ token, plan, product: config.productId });
-    if (email) params.set('email', email);
-    const url = `${apiBase}/checkout?${params}`;
+    const params = new URLSearchParams({ type: 'checkout', token, plan, product: config.productId });
+    const url = `${apiBase}/auth/start?${params}`;
     chrome.runtime.sendMessage({ type: 'openTab', url });
     chrome.runtime.sendMessage({ type: 'checkoutStarted' });
   }

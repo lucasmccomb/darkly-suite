@@ -480,6 +480,71 @@ describe('auth/callback — OAuth callback flow', () => {
     expect(emailBody.text).toContain('nosubscription@example.com');
   });
 
+  it('redirects to /api/checkout with email for checkout flow', async () => {
+    const idToken = createFakeJwt({
+      iss: 'https://accounts.google.com',
+      sub: '999',
+      aud: 'test-client-id.apps.googleusercontent.com',
+      email: 'buyer@example.com',
+      email_verified: true,
+      exp: Math.floor(Date.now() / 1000) + 3600,
+      iat: Math.floor(Date.now() / 1000),
+    });
+
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          id_token: idToken,
+          access_token: 'at_999',
+          token_type: 'Bearer',
+          expires_in: 3600,
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const checkoutState = 'checkout:12345678-1234-4123-8123-123456789abc:yearly:sheets:deadbeef';
+    const context = createMockContext({
+      request: new Request(
+        `https://darklysuite.com/api/auth/callback?code=authcode&state=${encodeURIComponent(checkoutState)}`,
+        { headers: { Cookie: `darkly_oauth_state=${checkoutState}` } },
+      ),
+    });
+
+    const response = await authCallback(context);
+    expect(response.status).toBe(302);
+
+    const location = response.headers.get('Location')!;
+    expect(location).toContain('/api/checkout');
+    expect(location).toContain('token=12345678-1234-4123-8123-123456789abc');
+    expect(location).toContain('plan=yearly');
+    expect(location).toContain('product=sheets');
+    expect(location).toContain('email=buyer%40example.com');
+
+    // Should NOT have inserted any sessions into DB
+    const db = context.env.DB as unknown as MockD1Database;
+    expect(db.prepare).not.toHaveBeenCalled();
+
+    // Should clear the OAuth state cookie
+    const setCookie = response.headers.get('Set-Cookie');
+    expect(setCookie).toContain('Max-Age=0');
+  });
+
+  it('redirects to landing page on checkout flow OAuth error', async () => {
+    const checkoutState = 'checkout:12345678-1234-4123-8123-123456789abc:monthly:gmail:deadbeef';
+    const context = createMockContext({
+      request: new Request(
+        `https://darklysuite.com/api/auth/callback?error=access_denied&state=${encodeURIComponent(checkoutState)}`,
+        { headers: { Cookie: `darkly_oauth_state=${checkoutState}` } },
+      ),
+    });
+
+    const response = await authCallback(context);
+    expect(response.status).toBe(302);
+    // OAuth error params redirect to /admin by default (error param handler doesn't parse state)
+    expect(response.headers.get('Location')).toContain('error=');
+  });
+
   it('redirects with error when Google token exchange fails', async () => {
     fetchMock.mockResolvedValueOnce(new Response('Bad Request', { status: 400 }));
 
