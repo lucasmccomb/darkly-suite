@@ -43,7 +43,7 @@ export function SuccessPage() {
             lineHeight: 1.6,
             marginBottom: 32,
           }}>
-            Welcome to <Wordmark /> Pro! You now have full access to
+            Welcome to <Wordmark /> for Docs! You now have full access to
             intelligent dark mode for Google Docs.
           </p>
 
