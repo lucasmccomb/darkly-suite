@@ -15,6 +15,15 @@ interface ProCache {
 
 const CACHE_TTL_PAID_MS = 30 * 60 * 1000; // 30 minutes
 
+async function getEmail(): Promise<string | null> {
+  try {
+    const info = await chrome.identity.getProfileUserInfo({ accountStatus: chrome.identity.AccountStatus.ANY });
+    return info.email || null;
+  } catch {
+    return null;
+  }
+}
+
 function generateToken(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(16));
   bytes[6] = (bytes[6] & 0x0f) | 0x40;
@@ -80,7 +89,10 @@ export function createPaymentClient(config: ProductConfig): PaymentClient {
 
     try {
       const token = await getToken();
-      const response = await fetch(`${apiBase}/status/${token}?product=${config.productId}`);
+      const email = await getEmail();
+      const params = new URLSearchParams({ product: config.productId });
+      if (email) params.set('email', email);
+      const response = await fetch(`${apiBase}/status/${token}?${params}`);
       if (!response.ok) return false;
       const data = await response.json() as { paid: boolean; plan?: string; prices?: PriceInfo };
       await setCachedProStatus(data.paid, data.plan, data.prices);
