@@ -282,6 +282,44 @@ The CLI defaults to **test/sandbox mode** (safe for all operations). To work wit
 - Add `--live` flag (requires explicit user authorization)
 - **Never create, modify, or delete production resources without explicit user confirmation**
 
+### Resetting a User to Free State (License Cleanup)
+
+When the user asks to delete a subscription/license for E2E testing, follow these steps **in order** (FK constraints require this sequence):
+
+```bash
+# 1. Find the customer and subscription in Stripe
+stripe customers list --email "user@example.com"
+stripe subscriptions list --customer cus_XXXXX
+
+# 2. Cancel the Stripe subscription (requires "yes" confirmation)
+echo "yes" | stripe subscriptions cancel sub_XXXXX
+
+# 3. Find the license ID in D1
+yes | npx wrangler d1 execute darkly-suite-db --remote \
+  --command "SELECT id, token, email, product, plan FROM licenses WHERE email = 'user@example.com';"
+
+# 4. Clean up FK references BEFORE deleting the license (order matters)
+yes | npx wrangler d1 execute darkly-suite-db --remote \
+  --command "UPDATE discount_codes SET used_by_license_id = NULL WHERE used_by_license_id = {LICENSE_ID};"
+
+yes | npx wrangler d1 execute darkly-suite-db --remote \
+  --command "DELETE FROM discount_code_usages WHERE license_id = {LICENSE_ID};"
+
+# 5. Delete the license record
+yes | npx wrangler d1 execute darkly-suite-db --remote \
+  --command "DELETE FROM licenses WHERE id = {LICENSE_ID};"
+
+# 6. Also delete any user sessions so account portal login is reset
+yes | npx wrangler d1 execute darkly-suite-db --remote \
+  --command "DELETE FROM user_sessions WHERE email = 'user@example.com';"
+```
+
+**Important notes:**
+- Always pipe `yes |` to wrangler commands — they prompt for confirmation on remote databases
+- Steps 4-5 order is critical: D1 has FK constraints from `discount_codes.used_by_license_id` and `discount_code_usages.license_id` → `licenses.id`
+- After cleanup, tell the user to **remove and re-add the extension** in Chrome to clear local storage and simulate a fresh install
+- If the user has multiple licenses (e.g., sheets + gmail), repeat steps 4-6 for each license ID
+
 ## Conflict Detection
 
 When both a standalone extension and the bundle are installed:
