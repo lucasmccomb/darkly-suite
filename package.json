@@ -14,12 +14,14 @@
     "dev:suite": "pnpm --filter darkly-suite-ext dev",
     "dev:landing": "pnpm --filter @darkly/landing-suite dev",
     "dev:landing-gmail": "pnpm --filter @darkly/landing-gmail dev",
+    "dev:landing-docs": "pnpm --filter @darkly/landing-docs dev",
     "build:gmail": "pnpm --filter gmail-darkly build",
     "build:sheets": "pnpm --filter sheets-darkly build",
     "build:docs": "pnpm --filter docs-darkly build",
     "build:suite": "pnpm --filter darkly-suite-ext build",
     "build:landing": "pnpm --filter @darkly/landing-suite build",
     "build:landing-gmail": "pnpm --filter @darkly/landing-gmail build",
+    "build:landing-docs": "pnpm --filter @darkly/landing-docs build",
     "clean": "pnpm -r exec -- rm -rf dist"
   },
   "engines": {
