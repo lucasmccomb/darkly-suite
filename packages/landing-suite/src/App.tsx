@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ScrollToHash, AdminLayout, AdminLoginPage, LogoDesignPage } from '@darkly/landing-shared'
 import { AdminLicensesPage, AdminDiscountsPage, AdminStatsPage } from '@darkly/landing-shared'
+import { AccountLayout, AccountLoginPage, AccountSubscriptionsPage } from '@darkly/landing-shared'
 import { HomePage } from './pages/HomePage.tsx'
 import { GmailPage } from './pages/GmailPage.tsx'
 import { SheetsPage } from './pages/SheetsPage.tsx'
@@ -39,6 +40,10 @@ export function App() {
           <Route path="/admin/licenses" element={<AdminLicensesPage />} />
           <Route path="/admin/discounts" element={<AdminDiscountsPage />} />
           <Route path="/admin/stats" element={<AdminStatsPage />} />
+        </Route>
+        <Route path="/account" element={<AccountLoginPage />} />
+        <Route element={<AccountLayout />}>
+          <Route path="/account/subscriptions" element={<AccountSubscriptionsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

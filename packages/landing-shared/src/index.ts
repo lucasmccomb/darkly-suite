@@ -31,5 +31,11 @@ export { AdminLicensesPage } from './admin/pages/AdminLicensesPage.tsx'
 export { AdminDiscountsPage } from './admin/pages/AdminDiscountsPage.tsx'
 export { AdminStatsPage } from './admin/pages/AdminStatsPage.tsx'
 
+// Account
+export { AccountAuthProvider, useAccountAuth } from './account/AccountAuthContext.tsx'
+export { AccountLayout } from './account/AccountLayout.tsx'
+export { AccountLoginPage } from './account/pages/AccountLoginPage.tsx'
+export { AccountSubscriptionsPage } from './account/pages/AccountSubscriptionsPage.tsx'
+
 // Types
 export type { PricingTier, ComparisonFeature } from './components/Pricing.tsx'
