@@ -372,6 +372,89 @@ describe('auth/callback — OAuth callback flow', () => {
     expect(insertSql).toContain('INSERT INTO admin_sessions');
   });
 
+  it('creates user session when email has a license', async () => {
+    const idToken = createFakeJwt({
+      iss: 'https://accounts.google.com',
+      sub: '456',
+      aud: 'test-client-id.apps.googleusercontent.com',
+      email: 'subscriber@example.com',
+      email_verified: true,
+      exp: Math.floor(Date.now() / 1000) + 3600,
+      iat: Math.floor(Date.now() / 1000),
+    });
+
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          id_token: idToken,
+          access_token: 'at_456',
+          token_type: 'Bearer',
+          expires_in: 3600,
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const context = createMockContext({
+      request: new Request('https://darklysuite.com/api/auth/callback?code=authcode&state=user%3Aabc123', {
+        headers: { Cookie: 'darkly_oauth_state=user:abc123' },
+      }),
+    });
+
+    // Mock the license check to return a license (the only `first()` call in the user flow)
+    const db = context.env.DB as unknown as MockD1Database;
+    db._statement.first.mockResolvedValueOnce({ id: 1 });
+
+    const response = await authCallback(context);
+    expect(response.status).toBe(302);
+    expect(response.headers.get('Location')).toContain('/account/subscriptions');
+
+    const setCookie = response.headers.get('Set-Cookie');
+    expect(setCookie).toContain('darkly_user_session=');
+  });
+
+  it('rejects user login when email has no licenses', async () => {
+    const idToken = createFakeJwt({
+      iss: 'https://accounts.google.com',
+      sub: '789',
+      aud: 'test-client-id.apps.googleusercontent.com',
+      email: 'nosubscription@example.com',
+      email_verified: true,
+      exp: Math.floor(Date.now() / 1000) + 3600,
+      iat: Math.floor(Date.now() / 1000),
+    });
+
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          id_token: idToken,
+          access_token: 'at_789',
+          token_type: 'Bearer',
+          expires_in: 3600,
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const context = createMockContext({
+      request: new Request('https://darklysuite.com/api/auth/callback?code=authcode&state=user%3Adef456', {
+        headers: { Cookie: 'darkly_oauth_state=user:def456' },
+      }),
+    });
+
+    // Mock: license check returns null (no license found)
+    const db = context.env.DB as unknown as MockD1Database;
+    db._statement.first.mockResolvedValue(null);
+
+    const response = await authCallback(context);
+    expect(response.status).toBe(302);
+    expect(response.headers.get('Location')).toContain('/account');
+    expect(response.headers.get('Location')).toContain('No+subscriptions+found');
+    // Should NOT have set a user session cookie
+    const setCookie = response.headers.get('Set-Cookie');
+    expect(setCookie).toBeNull();
+  });
+
   it('redirects with error when Google token exchange fails', async () => {
     fetchMock.mockResolvedValueOnce(new Response('Bad Request', { status: 400 }));
 

@@ -19,6 +19,7 @@ async function handleCheckout(context: CFContext): Promise<Response> {
   const token = url.searchParams.get('token');
   const plan = url.searchParams.get('plan');
   const product = url.searchParams.get('product') ?? 'gmail';
+  const email = url.searchParams.get('email');
 
   if (!token || !isValidToken(token)) {
     return new Response(
@@ -60,6 +61,7 @@ async function handleCheckout(context: CFContext): Promise<Response> {
       successUrl: `${siteUrl}/success?session_id={CHECKOUT_SESSION_ID}&product=${product}`,
       cancelUrl: `${siteUrl}/${product === 'suite' ? '' : product}#pricing`,
       metadata: { token, plan, product },
+      customerEmail: email ?? undefined,
     });
 
     return new Response(null, {
