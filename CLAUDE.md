@@ -235,6 +235,53 @@ npx wrangler pages dev dist --d1=DB         # Test with D1 locally
 - Checkout flow: Extension → darklysuite.com/api/checkout → Stripe → webhook → D1 license
 - Suite license automatically grants access to individual product queries
 
+### CRITICAL: Use Stripe CLI for All Stripe Tasks
+
+The Stripe CLI (`stripe`) is installed and configured with sandbox/test mode keys. **Always use it directly** to verify, create, update, or manage Stripe resources — do NOT ask the user to do Stripe tasks you can accomplish yourself.
+
+**Self-service first**: Attempt any Stripe-related task autonomously before asking the user. Only escalate if the CLI lacks the needed capability or the task requires live/production mode.
+
+#### Common operations:
+
+```bash
+# List and verify resources
+stripe products list
+stripe prices list --product prod_XXXXX
+stripe coupons list
+stripe customers list --email "user@example.com"
+stripe subscriptions list --customer cus_XXXXX
+
+# Create resources
+stripe products create --name "Product Name"
+stripe prices create --product prod_XXXXX --unit-amount 999 --currency usd --recurring[interval]=month
+stripe coupons create --percent-off 100 --duration once --id "PROMO_CODE_NAME"
+stripe promotion_codes create --coupon "COUPON_ID" --code "USER_FACING_CODE"
+
+# Verify configuration matches wrangler.toml
+stripe prices retrieve price_XXXXX
+
+# Inspect webhook events
+stripe events list --limit 5
+stripe logs tail  # Live tail of API requests
+```
+
+#### When to use the CLI:
+
+| Task | Do this | Don't do this |
+|------|---------|---------------|
+| Verify a price ID exists | `stripe prices retrieve price_XXX` | Ask the user to check Stripe dashboard |
+| Create a promo/coupon code | `stripe coupons create ...` | Ask the user to create it manually |
+| Check a customer's subscription | `stripe subscriptions list --customer cus_XXX` | Ask the user to look it up |
+| Confirm product setup | `stripe products list` | Assume it's correct |
+| Debug a payment issue | `stripe events list --type checkout.session.completed` | Guess at the problem |
+| Wire new prices into wrangler.toml | Retrieve IDs with CLI, then edit the file | Ask the user for the price IDs |
+
+#### Sandbox vs Production:
+
+The CLI defaults to **test/sandbox mode** (safe for all operations). To work with production:
+- Add `--live` flag (requires explicit user authorization)
+- **Never create, modify, or delete production resources without explicit user confirmation**
+
 ## Conflict Detection
 
 When both a standalone extension and the bundle are installed:
