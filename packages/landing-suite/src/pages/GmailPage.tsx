@@ -5,7 +5,7 @@ import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URLS, individualTier
 const gmailFeatures = [
   'Dark mode for Gmail',
   'OS dark mode detection',
-  'Manual toggle & keyboard shortcut',
+  'Manual toggle',
   'Time-based scheduling',
   'Sunrise/sunset scheduling',
   'Cross-device sync',

@@ -39,7 +39,7 @@ Darkly Suite is a family of Chrome extensions providing dark mode for Google Wor
 
 | Extension | Target Sites | CSS Prefix | Key Technology | Manifest Version |
 |-----------|-------------|------------|----------------|------------------|
-| Darkly for Gmail | `mail.google.com` | `gd` | InboxSDK (sidebar panel, toolbar, keyboard shortcut) | MV3 |
+| Darkly for Gmail | `mail.google.com` | `gd` | InboxSDK (sidebar panel, toolbar) | MV3 |
 | Darkly for Sheets | `docs.google.com/spreadsheets` | `sd` | Waffle grid observer, MutationObserver toolbar injection | MV3 |
 | Darkly for Docs | `docs.google.com/document` | `dd` | Kix canvas observer, forceColorSchemeLight | MV3 |
 | Darkly Suite | All three sites + Drive | `ds` | Combined: InboxSDK + Waffle + Kix, unified background worker | MV3 |
@@ -240,7 +240,6 @@ When both a standalone extension (e.g., Darkly for Gmail) and the Darkly Suite b
 - **Three required files (MV3 InboxSDK)**: `background.js` (imports `@inboxsdk/core/background.js`), `pageWorld.js` (webpack entry point, listed in `web_accessible_resources`), `content.js` (calls `InboxSDK.load()`)
 - **Permissions**: `storage`, `alarms`, `offscreen`, `scripting`
 - **Host permissions**: `mail.google.com`, `darklysuite.com`, `api.sunrise-sunset.org`
-- **Keyboard shortcut**: `g` then `Shift+T` (InboxSDK chord, appears in Gmail's keyboard shortcut help)
 - **CSS files**: `themes.css`, `gmail-overrides.css`, `settings-panel.css`
 
 ### Darkly for Sheets
@@ -251,7 +250,6 @@ When both a standalone extension (e.g., Darkly for Gmail) and the Darkly Suite b
 - **Preserve Grid Colors** toggle: re-inverts the spreadsheet canvas so cell background/text colors display accurately
 - **Permissions**: `storage`, `alarms`, `offscreen`
 - **Host permissions**: `docs.google.com`, `darklysuite.com`, `api.sunrise-sunset.org`
-- **Keyboard shortcuts**: `Alt+Shift+D` (toggle dark mode), `Alt+Shift+S` (open settings)
 - **CSS files**: `themes.css`, `sheets-overrides.css`, `settings-panel.css`
 
 ### Darkly for Docs
@@ -262,7 +260,6 @@ When both a standalone extension (e.g., Darkly for Gmail) and the Darkly Suite b
 - **Preserve Page Colors** toggle: re-inverts the Kix canvas tiles so document page backgrounds render in their original colors
 - **Permissions**: `storage`, `alarms`, `offscreen`
 - **Host permissions**: `docs.google.com`, `darklysuite.com`, `api.sunrise-sunset.org`
-- **Keyboard shortcuts**: `Alt+Shift+D` (toggle dark mode), `Alt+Shift+S` (open settings)
 - **CSS files**: `themes.css`, `docs-overrides.css`, `settings-panel.css`
 
 ### Darkly Suite Bundle

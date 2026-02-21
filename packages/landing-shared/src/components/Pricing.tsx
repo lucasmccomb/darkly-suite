@@ -42,7 +42,7 @@ const APP_NAMES: Record<AppId, string> = {
 const defaultFeatures = [
   'Dark mode for Gmail, Sheets, and Docs',
   'OS dark mode detection',
-  'Manual toggle & keyboard shortcut',
+  'Manual toggle',
   'Time-based scheduling',
   'Sunrise/sunset scheduling',
   'Cross-device sync',

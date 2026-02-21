@@ -136,11 +136,6 @@ Before starting, verify these are live:
 25. [ ] **Verify**: Each preset applies a distinct color palette to the dark theme
 26. [ ] **Verify**: Switching presets is smooth (no flash or broken intermediate state)
 
-### Keyboard Shortcuts
-
-27. [ ] Press `Alt+Shift+D` — **Verify**: Dark mode toggles on/off
-28. [ ] Press `Alt+Shift+S` — **Verify**: Settings panel opens
-
 ---
 
 ## Test 6: Pro User — Manage Subscription

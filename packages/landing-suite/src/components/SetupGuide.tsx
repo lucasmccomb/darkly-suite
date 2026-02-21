@@ -106,8 +106,7 @@ function GmailGuide() {
       <Step number={4} title="Toggle dark mode">
         <p>
           Click the <strong>Darkly icon</strong> in Gmail&apos;s toolbar. The mini control panel
-          lets you toggle dark mode on or off instantly. You can also use the keyboard shortcut
-          to toggle.
+          lets you toggle dark mode on or off instantly.
         </p>
       </Step>
 
