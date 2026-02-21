@@ -99,7 +99,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
       await sitePlugin.init(engine, config);
     }
 
-    let proStatus = await payment.isPro();
+    const proStatus = await payment.isPro();
     const prices = await payment.getPrices();
 
     if (proStatus) {
@@ -208,21 +208,11 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
       }
     }
 
-    // Listen for payment status changes
-    payment.onPaymentStatusChange(async (paid) => {
-      const wasPro = proStatus;
-      proStatus = paid;
-      if (paid) {
-        const currentPrefs = await prefs.load();
-        await applyMode(currentPrefs);
-        transitions.init();
-
-        prefs.onChange(async (newPrefs) => {
-          await applyMode(newPrefs);
-        });
-      } else if (wasPro) {
-        // License revoked server-side (refund, chargeback, cancellation) —
-        // reload to revert all UI to paywall state.
+    // Listen for payment status changes — reload on any transition so all UI
+    // panels (settings modal, mini panel, Gmail sidebar) are rebuilt with the
+    // correct isPro value. Without this, panels keep stale React props from init.
+    payment.onPaymentStatusChange((paid) => {
+      if (paid !== proStatus) {
         location.reload();
       }
     });
