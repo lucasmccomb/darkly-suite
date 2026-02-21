@@ -149,7 +149,27 @@ chrome.runtime.onInstalled.addListener(async (details) => {
   if (details.reason === 'install') {
     console.log('[Darkly Suite] Extension installed');
     if (typeof __DEV_MODE__ === 'undefined' || !__DEV_MODE__) {
-      chrome.tabs.create({ url: `${config.siteBase}/setup?product=${config.productId}` });
+      // Get token (already initialized by createSiteWorker → initPayment)
+      const result = await chrome.storage.sync.get(config.tokenKey);
+      const token = result[config.tokenKey] ?? '';
+
+      // Get Chrome Identity email (may be empty if user isn't signed into Chrome)
+      let email = '';
+      try {
+        const info = await chrome.identity.getProfileUserInfo({
+          accountStatus: chrome.identity.AccountStatus.ANY,
+        });
+        email = info.email || '';
+      } catch {
+        // identity.email permission missing or API unavailable — proceed without email
+      }
+
+      const params = new URLSearchParams();
+      if (token) params.set('token', token);
+      if (email) params.set('email', email);
+      params.set('product', 'suite');
+      const qs = params.toString();
+      chrome.tabs.create({ url: `${config.siteBase}/subscribe?${qs}` });
     }
     for (const worker of workers.values()) {
       await worker.setupAlarm();
