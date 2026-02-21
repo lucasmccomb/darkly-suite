@@ -6,7 +6,7 @@
  */
 
 import { createMockEnv } from './test-helpers';
-import { getPriceId } from '../api/_shared/products';
+import { getPriceId, getProductStripeId } from '../api/_shared/products';
 import type { ProductId, Plan } from '../api/_shared/types';
 
 describe('getPriceId', () => {
@@ -34,5 +34,24 @@ describe('getPriceId', () => {
     expect(() => {
       getPriceId(env, 'gmail' as ProductId, 'weekly' as Plan);
     }).toThrow('No Stripe price configured for gmail:weekly');
+  });
+});
+
+describe('getProductStripeId', () => {
+  const env = createMockEnv();
+
+  it.each([
+    ['gmail', 'prod_test_gmail'],
+    ['sheets', 'prod_test_sheets'],
+    ['docs', 'prod_test_docs'],
+    ['suite', 'prod_test_suite'],
+  ] as const)('returns correct product ID for %s', (product, expected) => {
+    expect(getProductStripeId(env, product)).toBe(expected);
+  });
+
+  it('throws for an invalid product', () => {
+    expect(() => {
+      getProductStripeId(env, 'invalid' as ProductId);
+    }).toThrow('No Stripe product configured for invalid');
   });
 });

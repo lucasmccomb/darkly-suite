@@ -400,6 +400,20 @@
   font-style: italic;
 }
 
+/* Read-only Values */
+.admin-readonly-value {
+  color: #e8eaed;
+  font-size: 0.95rem;
+  padding: 0.5rem 0;
+}
+
+.admin-help-text {
+  color: #9aa0a6;
+  font-size: 0.8rem;
+  margin: 0.4rem 0 0;
+  line-height: 1.4;
+}
+
 /* Inactive Row */
 .admin-row-inactive {
   opacity: 0.5;
