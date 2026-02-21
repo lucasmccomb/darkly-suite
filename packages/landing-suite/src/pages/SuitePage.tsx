@@ -1,5 +1,6 @@
-import { Nav, Hero, Features, Pricing, FAQ, Footer } from '@darkly/landing-shared'
-import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URLS, individualTiers, bundleTiers } from '../config.ts'
+import { useCallback } from 'react'
+import { Nav, Hero, Features, Pricing, FAQ, Footer, buildCheckoutUrl, getOrCreateToken } from '@darkly/landing-shared'
+import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URLS, CHECKOUT_API_URL, individualTiers, bundleTiers } from '../config.ts'
 
 const suiteFeatures = [
   'Dark mode for Gmail, Sheets, Docs, and Drive',
@@ -13,6 +14,11 @@ const suiteFeatures = [
 ]
 
 export function SuitePage() {
+  const handleCheckout = useCallback((product: string, plan: string) => {
+    const token = getOrCreateToken()
+    window.location.href = buildCheckoutUrl(CHECKOUT_API_URL, product, plan, token)
+  }, [])
+
   return (
     <>
       <Nav brandLabel="Suite" links={NAV_LINKS} cta={NAV_CTA} />
@@ -26,7 +32,7 @@ export function SuitePage() {
         sectionTitle="Everything in one package"
         sectionSubtitle="The Darkly Suite gives you dark mode for all Google apps with unified settings."
       />
-      <Pricing product="suite" features={suiteFeatures} individualTiers={individualTiers} bundleTiers={bundleTiers} storeUrls={STORE_URLS} />
+      <Pricing product="suite" features={suiteFeatures} individualTiers={individualTiers} bundleTiers={bundleTiers} storeUrls={STORE_URLS} onCheckout={handleCheckout} />
       <FAQ />
       <Footer brandLabel="Suite" links={FOOTER_LINKS} copyrightName={SITE_NAME} />
     </>

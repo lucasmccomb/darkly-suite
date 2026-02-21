@@ -1,6 +1,7 @@
-import { Nav, Hero, Features, Pricing, FAQ, Footer } from '@darkly/landing-shared'
+import { useCallback } from 'react'
+import { Nav, Hero, Features, Pricing, FAQ, Footer, buildCheckoutUrl, getOrCreateToken } from '@darkly/landing-shared'
 import type { ScreenshotImage } from '@darkly/landing-shared'
-import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URLS, individualTiers } from '../config.ts'
+import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URLS, CHECKOUT_API_URL, individualTiers } from '../config.ts'
 
 const gmailFeatures = [
   'Dark mode for Gmail',
@@ -23,6 +24,11 @@ const featureScreenshots: ScreenshotImage[] = [
 ]
 
 export function GmailPage() {
+  const handleCheckout = useCallback((product: string, plan: string) => {
+    const token = getOrCreateToken()
+    window.location.href = buildCheckoutUrl(CHECKOUT_API_URL, product, plan, token)
+  }, [])
+
   return (
     <>
       <Nav brandLabel="Suite" links={NAV_LINKS} cta={NAV_CTA} />
@@ -38,7 +44,7 @@ export function GmailPage() {
         sectionSubtitle="Darkly transforms every part of Gmail with carefully crafted dark styling."
         screenshots={featureScreenshots}
       />
-      <Pricing product="gmail" features={gmailFeatures} individualTiers={individualTiers} storeUrls={STORE_URLS} />
+      <Pricing product="gmail" features={gmailFeatures} individualTiers={individualTiers} storeUrls={STORE_URLS} onCheckout={handleCheckout} />
       <FAQ />
       <Footer brandLabel="Suite" links={FOOTER_LINKS} copyrightName={SITE_NAME} />
     </>

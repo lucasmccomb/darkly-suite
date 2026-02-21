@@ -1,8 +1,9 @@
+import { useCallback } from 'react'
 import { Mail } from 'lucide-react'
-import { Nav, Hero, Features, Pricing, FAQ, Footer } from '@darkly/landing-shared'
+import { Nav, Hero, Features, Pricing, FAQ, Footer, buildCheckoutUrl, getOrCreateToken } from '@darkly/landing-shared'
 import type { ScreenshotImage } from '@darkly/landing-shared'
 import {
-  NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URL,
+  NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URL, CHECKOUT_API_URL,
   GMAIL_FEATURES, GMAIL_FAQ, individualTiers,
 } from '../config.ts'
 
@@ -16,6 +17,11 @@ const featureScreenshots: ScreenshotImage[] = [
 ]
 
 export function HomePage() {
+  const handleCheckout = useCallback((product: string, plan: string) => {
+    const token = getOrCreateToken()
+    window.location.href = buildCheckoutUrl(CHECKOUT_API_URL, product, plan, token)
+  }, [])
+
   return (
     <>
       <Nav brandLabel="for Gmail" links={NAV_LINKS} cta={NAV_CTA} />
@@ -37,6 +43,7 @@ export function HomePage() {
         features={GMAIL_FEATURES}
         individualTiers={individualTiers}
         storeUrls={{ gmail: STORE_URL }}
+        onCheckout={handleCheckout}
       />
       <FAQ items={GMAIL_FAQ} />
       <Footer

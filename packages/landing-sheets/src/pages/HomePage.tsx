@@ -1,8 +1,9 @@
+import { useCallback } from 'react'
 import { Table2, Sunset, Clock, Settings } from 'lucide-react'
-import { Nav, Hero, Features, Pricing, FAQ, Footer } from '@darkly/landing-shared'
+import { Nav, Hero, Features, Pricing, FAQ, Footer, buildCheckoutUrl, getOrCreateToken } from '@darkly/landing-shared'
 import type { ScreenshotImage } from '@darkly/landing-shared'
 import {
-  NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URL,
+  NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URL, CHECKOUT_API_URL,
   SHEETS_FEATURES, SHEETS_FAQ, individualTiers,
 } from '../config.ts'
 
@@ -43,6 +44,11 @@ const sheetsFeatureItems = [
 ]
 
 export function HomePage() {
+  const handleCheckout = useCallback((product: string, plan: string) => {
+    const token = getOrCreateToken()
+    window.location.href = buildCheckoutUrl(CHECKOUT_API_URL, product, plan, token)
+  }, [])
+
   return (
     <>
       <Nav brandLabel="for Sheets" links={NAV_LINKS} cta={NAV_CTA} />
@@ -65,6 +71,7 @@ export function HomePage() {
         features={SHEETS_FEATURES}
         individualTiers={individualTiers}
         storeUrls={{ sheets: STORE_URL }}
+        onCheckout={handleCheckout}
       />
       <FAQ items={SHEETS_FAQ} />
       <Footer

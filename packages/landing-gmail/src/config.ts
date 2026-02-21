@@ -6,6 +6,8 @@ import type { PricingTier } from '@darkly/landing-shared'
  */
 export const STORE_URL = 'https://chromewebstore.google.com/detail/darkly-for-gmail/PLACEHOLDER_GMAIL_ID'
 
+export const CHECKOUT_API_URL = 'https://darklysuite.com/api/checkout'
+
 export const SITE_NAME = 'Darkly for Gmail'
 
 export const NAV_LINKS = [
@@ -65,7 +67,7 @@ export const individualTiers = (): PricingTier[] => [
     period: '/mo',
     subtitle: 'Cancel anytime',
     highlighted: false,
-    cta: 'Get Darkly for Gmail',
+    cta: 'Subscribe',
     link: STORE_URL,
   },
   {
@@ -75,7 +77,7 @@ export const individualTiers = (): PricingTier[] => [
     subtitle: 'Save 16%',
     highlighted: true,
     badge: 'Best Value',
-    cta: 'Get Darkly for Gmail',
+    cta: 'Subscribe',
     link: STORE_URL,
   },
   {
@@ -84,7 +86,7 @@ export const individualTiers = (): PricingTier[] => [
     period: '',
     subtitle: 'One-time payment',
     highlighted: false,
-    cta: 'Get Darkly for Gmail',
+    cta: 'One-time payment',
     link: STORE_URL,
   },
 ]

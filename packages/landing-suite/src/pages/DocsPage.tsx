@@ -1,6 +1,7 @@
-import { Nav, Hero, Features, Pricing, FAQ, Footer } from '@darkly/landing-shared'
+import { useCallback } from 'react'
+import { Nav, Hero, Features, Pricing, FAQ, Footer, buildCheckoutUrl, getOrCreateToken } from '@darkly/landing-shared'
 import { FileText, Sunset, Clock, Settings } from 'lucide-react'
-import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URLS, individualTiers } from '../config.ts'
+import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URLS, CHECKOUT_API_URL, individualTiers } from '../config.ts'
 
 const docsFeatureItems = [
   {
@@ -41,6 +42,11 @@ const docsFeatures = [
 ]
 
 export function DocsPage() {
+  const handleCheckout = useCallback((product: string, plan: string) => {
+    const token = getOrCreateToken()
+    window.location.href = buildCheckoutUrl(CHECKOUT_API_URL, product, plan, token)
+  }, [])
+
   return (
     <>
       <Nav brandLabel="Suite" links={NAV_LINKS} cta={NAV_CTA} />
@@ -55,7 +61,7 @@ export function DocsPage() {
         sectionTitle="Built for documents"
         sectionSubtitle="Darkly understands the Docs editor and styles every element for comfortable writing."
       />
-      <Pricing product="docs" features={docsFeatures} individualTiers={individualTiers} storeUrls={STORE_URLS} />
+      <Pricing product="docs" features={docsFeatures} individualTiers={individualTiers} storeUrls={STORE_URLS} onCheckout={handleCheckout} />
       <FAQ />
       <Footer brandLabel="Suite" links={FOOTER_LINKS} copyrightName={SITE_NAME} />
     </>

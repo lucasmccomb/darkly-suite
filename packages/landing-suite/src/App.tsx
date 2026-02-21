@@ -10,6 +10,7 @@ import { SuitePage } from './pages/SuitePage.tsx'
 import { PrivacyPage } from './pages/PrivacyPage.tsx'
 import { SuccessPage } from './pages/SuccessPage.tsx'
 import { SetupPage } from './pages/SetupPage.tsx'
+import { SubscribePage } from './pages/SubscribePage.tsx'
 import { SupportPage } from './pages/SupportPage.tsx'
 import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME } from './config.ts'
 
@@ -26,6 +27,7 @@ export function App() {
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/success" element={<SuccessPage />} />
         <Route path="/setup" element={<SetupPage />} />
+        <Route path="/subscribe" element={<SubscribePage />} />
         <Route path="/support" element={<SupportPage />} />
         <Route path="/logo-design" element={
           <LogoDesignPage

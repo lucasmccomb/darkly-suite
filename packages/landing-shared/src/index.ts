@@ -9,6 +9,7 @@ export { SuiteIcon } from './components/SuiteIcon.tsx'
 export { Nav } from './components/Nav.tsx'
 export { Footer } from './components/Footer.tsx'
 export { Pricing } from './components/Pricing.tsx'
+export { SubscribeContent } from './components/SubscribeContent.tsx'
 export { SetupGuide } from './components/SetupGuide.tsx'
 export { PromoTile } from './components/PromoTile.tsx'
 export { HeroScreenshots, FeatureScreenshots } from './components/ScreenshotShowcase.tsx'
@@ -19,6 +20,7 @@ export { LogoDesignPage } from './pages/LogoDesignPage.tsx'
 
 // Utilities
 export { ScrollToHash } from './ScrollToHash.tsx'
+export { buildCheckoutUrl, getOrCreateToken } from './utils/checkout.ts'
 
 // Admin
 export { AdminAuthProvider, useAdminAuth } from './admin/AdminAuthContext.tsx'
