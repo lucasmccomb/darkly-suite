@@ -33,6 +33,7 @@ export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
   const token = context.params.token as string;
   const url = new URL(context.request.url);
   const product = url.searchParams.get('product') ?? 'gmail';
+  const email = url.searchParams.get('email');
 
   if (!isValidToken(token)) {
     return new Response(
@@ -50,7 +51,7 @@ export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
 
   try {
     // Check for both the specific product license AND a suite license
-    const result = await context.env.DB.prepare(
+    let result = await context.env.DB.prepare(
       `SELECT * FROM licenses
        WHERE token = ? AND product IN (?, 'suite') AND status = 'active'
        ORDER BY CASE WHEN product = ? THEN 0 ELSE 1 END
@@ -58,6 +59,29 @@ export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
     )
       .bind(token, product, product)
       .first<License>();
+
+    // Email fallback: if no token match and email is provided, look up by email
+    if (!result && email) {
+      const emailResult = await context.env.DB.prepare(
+        `SELECT * FROM licenses
+         WHERE email = ? AND product IN (?, 'suite') AND status = 'active'
+         ORDER BY CASE WHEN product = ? THEN 0 ELSE 1 END
+         LIMIT 1`,
+      )
+        .bind(email, product, product)
+        .first<License>();
+
+      if (emailResult) {
+        // Re-link the license to the current token so future lookups use the fast token path
+        await context.env.DB.prepare(
+          `UPDATE licenses SET token = ? WHERE id = ?`,
+        )
+          .bind(token, emailResult.id)
+          .run();
+
+        result = emailResult;
+      }
+    }
 
     // Fetch live prices from Stripe (best-effort — omitted on failure)
     let prices: { monthly: string; yearly: string; lifetime: string } | undefined;
