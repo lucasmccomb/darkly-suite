@@ -157,6 +157,87 @@ export async function createPortalSession(
   return res.json() as Promise<PortalSession>;
 }
 
+// -- Subscription Retrieval -----------------------------------------------
+
+export interface StripeSubscription {
+  id: string;
+  status: string;
+  current_period_start: number;
+  current_period_end: number;
+  cancel_at_period_end: boolean;
+  canceled_at: number | null;
+  ended_at: number | null;
+  created: number;
+  plan?: {
+    amount: number;
+    currency: string;
+    interval: string;
+  };
+}
+
+export async function retrieveSubscription(
+  secretKey: string,
+  subscriptionId: string,
+): Promise<StripeSubscription> {
+  const res = await fetch(`${STRIPE_API}/subscriptions/${subscriptionId}`, {
+    method: 'GET',
+    headers: authHeaders(secretKey),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Stripe retrieveSubscription failed (${res.status}): ${err}`);
+  }
+
+  return res.json() as Promise<StripeSubscription>;
+}
+
+// -- Customer Retrieval ---------------------------------------------------
+
+export interface StripeCustomer {
+  id: string;
+  email: string | null;
+  name: string | null;
+  created: number;
+}
+
+export async function retrieveCustomer(
+  secretKey: string,
+  customerId: string,
+): Promise<StripeCustomer> {
+  const res = await fetch(`${STRIPE_API}/customers/${customerId}`, {
+    method: 'GET',
+    headers: authHeaders(secretKey),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Stripe retrieveCustomer failed (${res.status}): ${err}`);
+  }
+
+  return res.json() as Promise<StripeCustomer>;
+}
+
+// -- Subscription Cancellation (at period end) ----------------------------
+
+export async function cancelSubscriptionAtPeriodEnd(
+  secretKey: string,
+  subscriptionId: string,
+): Promise<StripeSubscription> {
+  const res = await fetch(`${STRIPE_API}/subscriptions/${subscriptionId}`, {
+    method: 'POST',
+    headers: authHeaders(secretKey),
+    body: encodeParams({ cancel_at_period_end: 'true' }),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Stripe cancelSubscriptionAtPeriodEnd failed (${res.status}): ${err}`);
+  }
+
+  return res.json() as Promise<StripeSubscription>;
+}
+
 // -- Coupons & Promotion Codes -------------------------------------------
 
 interface StripeCoupon {

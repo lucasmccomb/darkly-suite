@@ -1,6 +1,6 @@
 import type { Env } from './_shared/types.ts';
 import { verifyWebhookSignature, retrieveCheckoutSession } from './_shared/stripe.ts';
-import { sendAdminEmail } from './_shared/email.ts';
+import { sendAdminEmail, sendUserEmail } from './_shared/email.ts';
 
 type CFContext = EventContext<Env, string, unknown>;
 
@@ -191,18 +191,9 @@ async function handleSubscriptionUpdated(env: Env, event: StripeEvent): Promise<
     | undefined;
   const previousStatus = previousAttributes?.status as string | undefined;
 
-  const statusMap: Record<string, string> = {
-    active: 'active',
-    past_due: 'past_due',
-    canceled: 'cancelled',
-    unpaid: 'past_due',
-    incomplete: 'past_due',
-    incomplete_expired: 'expired',
-    trialing: 'active',
-    paused: 'cancelled',
-  };
-
-  const licenseStatus = statusMap[status] ?? 'active';
+  // Binary access gate: only 'active' and 'trialing' grant access
+  const activeStatuses = new Set(['active', 'trialing']);
+  const licenseStatus = activeStatuses.has(status) ? 'active' : 'inactive';
 
   await env.DB.prepare(
     `UPDATE licenses SET status = ? WHERE stripe_subscription_id = ?`,
@@ -210,7 +201,7 @@ async function handleSubscriptionUpdated(env: Env, event: StripeEvent): Promise<
     .bind(licenseStatus, subscriptionId)
     .run();
 
-  // Tier 2: Only notify on status changes to problematic states
+  // Notify admin on status changes to non-active states
   if (previousStatus && previousStatus !== status && status !== 'active') {
     const license = await env.DB.prepare(
       `SELECT email, product, plan FROM licenses WHERE stripe_subscription_id = ? LIMIT 1`,
@@ -225,7 +216,7 @@ async function handleSubscriptionUpdated(env: Env, event: StripeEvent): Promise<
     await sendAdminEmail(
       env,
       `Subscription ${status}: ${capitalize(product)} ${capitalize(plan)} — ${email}`,
-      `Product: ${capitalize(product)}\nPlan: ${capitalize(plan)}\nEmail: ${email}\nStatus change: ${previousStatus} → ${status}\nSubscription: ${subscriptionId}`,
+      `Product: ${capitalize(product)}\nPlan: ${capitalize(plan)}\nEmail: ${email}\nStripe status: ${previousStatus} → ${status}\nSubscription: ${subscriptionId}`,
     );
   }
 }
@@ -242,7 +233,7 @@ async function handleSubscriptionDeleted(env: Env, event: StripeEvent): Promise<
     .first<{ email: string | null; product: string; plan: string }>();
 
   await env.DB.prepare(
-    `UPDATE licenses SET status = 'cancelled' WHERE stripe_subscription_id = ?`,
+    `UPDATE licenses SET status = 'inactive' WHERE stripe_subscription_id = ?`,
   )
     .bind(subscriptionId)
     .run();
@@ -266,12 +257,11 @@ async function handlePaymentFailed(env: Env, event: StripeEvent): Promise<void> 
   if (!subscriptionId) return;
 
   await env.DB.prepare(
-    `UPDATE licenses SET status = 'past_due' WHERE stripe_subscription_id = ?`,
+    `UPDATE licenses SET status = 'inactive' WHERE stripe_subscription_id = ?`,
   )
     .bind(subscriptionId)
     .run();
 
-  // Tier 1: Payment failed notification
   const license = await env.DB.prepare(
     `SELECT email, product, plan FROM licenses WHERE stripe_subscription_id = ? LIMIT 1`,
   )
@@ -282,9 +272,20 @@ async function handlePaymentFailed(env: Env, event: StripeEvent): Promise<void> 
   const product = license?.product ?? 'unknown';
   const plan = license?.plan ?? 'unknown';
 
+  // Notify admin
   await sendAdminEmail(
     env,
     `Payment failed: ${capitalize(product)} ${capitalize(plan)} — ${email}`,
     `Product: ${capitalize(product)}\nPlan: ${capitalize(plan)}\nEmail: ${email}\nSubscription: ${subscriptionId}`,
   );
+
+  // Notify user to update payment info
+  if (license?.email) {
+    await sendUserEmail(
+      env,
+      license.email,
+      `Action required: Update your payment method for Darkly`,
+      `Hi,\n\nYour recent payment for Darkly for ${capitalize(product)} (${capitalize(plan)} plan) was unsuccessful.\n\nPlease update your payment information to restore access:\nhttps://darklysuite.com/account/subscriptions\n\nIf you believe this is an error, please contact us at admin@darklysuite.com.\n\nThanks,\nDarkly Suite`,
+    );
+  }
 }

@@ -716,6 +716,131 @@
   margin: 0 0 1.25rem;
 }
 
+/* Subscription badge */
+.badge--subscription { background: rgba(138, 180, 248, 0.15); color: #8ab4f8; }
+.badge--stripe-active { background: rgba(129, 201, 149, 0.15); color: #81c995; }
+.badge--stripe-trialing { background: rgba(129, 201, 149, 0.15); color: #81c995; }
+.badge--stripe-past_due { background: rgba(251, 188, 4, 0.15); color: #fbc004; }
+.badge--stripe-canceled { background: rgba(154, 160, 166, 0.15); color: #9aa0a6; }
+.badge--stripe-unpaid { background: rgba(242, 139, 130, 0.15); color: #f28b82; }
+.badge--stripe-incomplete { background: rgba(251, 188, 4, 0.15); color: #fbc004; }
+.badge--stripe-incomplete_expired { background: rgba(242, 139, 130, 0.15); color: #f28b82; }
+.badge--stripe-paused { background: rgba(154, 160, 166, 0.15); color: #9aa0a6; }
+
+/* License Detail Modal */
+.admin-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.admin-detail-section {
+  background: #1a1a2e;
+  border: 1px solid rgba(138, 180, 248, 0.08);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+}
+
+.admin-detail-section-title {
+  color: #9aa0a6;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.75rem;
+}
+
+.admin-detail-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.admin-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #e8eaed;
+  font-size: 0.9rem;
+}
+
+.admin-detail-label {
+  color: #9aa0a6;
+  font-size: 0.85rem;
+  min-width: 100px;
+}
+
+.admin-detail-value {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-detail-tag {
+  font-size: 0.72rem;
+  color: #fbc004;
+  background: rgba(251, 188, 4, 0.1);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+}
+
+.admin-detail-muted {
+  color: #6b6b80;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.admin-detail-warning {
+  color: #fbc004;
+  font-size: 0.8rem;
+  background: rgba(251, 188, 4, 0.08);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.admin-detail-error {
+  color: #f28b82;
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 1rem;
+}
+
+.admin-detail-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Warning Button */
+.admin-btn-warning {
+  background: rgba(251, 188, 4, 0.15);
+  color: #fbc004;
+  border: 1px solid rgba(251, 188, 4, 0.3);
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.admin-btn-warning:hover {
+  background: rgba(251, 188, 4, 0.25);
+  border-color: rgba(251, 188, 4, 0.5);
+}
+
+.admin-btn-warning:disabled,
+.admin-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Wider modal for detail view */
+.admin-modal-card:has(.admin-detail-content) {
+  max-width: 560px;
+}
+
 /* Mobile: share modal */
 @media (max-width: 480px) {
   .admin-modal-overlay {

@@ -7,9 +7,7 @@ interface ProductStats {
   product: string
   total: number
   active: number
-  cancelled: number
-  expired: number
-  past_due: number
+  inactive: number
   monthly: number
   yearly: number
   lifetime: number
@@ -28,9 +26,7 @@ export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
        product,
        COUNT(*) as total,
        SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active,
-       SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) as cancelled,
-       SUM(CASE WHEN status = 'expired' THEN 1 ELSE 0 END) as expired,
-       SUM(CASE WHEN status = 'past_due' THEN 1 ELSE 0 END) as past_due,
+       SUM(CASE WHEN status = 'inactive' THEN 1 ELSE 0 END) as inactive,
        SUM(CASE WHEN plan = 'monthly' THEN 1 ELSE 0 END) as monthly,
        SUM(CASE WHEN plan = 'yearly' THEN 1 ELSE 0 END) as yearly,
        SUM(CASE WHEN plan = 'lifetime' THEN 1 ELSE 0 END) as lifetime
@@ -44,9 +40,7 @@ export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
     `SELECT
        COUNT(*) as total,
        SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active,
-       SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) as cancelled,
-       SUM(CASE WHEN status = 'expired' THEN 1 ELSE 0 END) as expired,
-       SUM(CASE WHEN status = 'past_due' THEN 1 ELSE 0 END) as past_due,
+       SUM(CASE WHEN status = 'inactive' THEN 1 ELSE 0 END) as inactive,
        SUM(CASE WHEN plan = 'monthly' THEN 1 ELSE 0 END) as monthly,
        SUM(CASE WHEN plan = 'yearly' THEN 1 ELSE 0 END) as yearly,
        SUM(CASE WHEN plan = 'lifetime' THEN 1 ELSE 0 END) as lifetime
@@ -64,7 +58,7 @@ export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
   return new Response(
     JSON.stringify({
       byProduct: result.results,
-      totals: totals ?? { total: 0, active: 0, cancelled: 0, expired: 0, past_due: 0, monthly: 0, yearly: 0, lifetime: 0 },
+      totals: totals ?? { total: 0, active: 0, inactive: 0, monthly: 0, yearly: 0, lifetime: 0 },
       recentSignups: recentResult.results,
     }),
     {

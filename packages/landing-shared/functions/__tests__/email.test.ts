@@ -50,7 +50,7 @@ describe('sendAdminEmail', () => {
     const env = createMockEnv();
     await expect(sendAdminEmail(env, 'Subject', 'Body')).resolves.not.toThrow();
 
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('sendAdminEmail failed (401)'));
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('sendEmail failed (401)'));
     consoleSpy.mockRestore();
   });
 
