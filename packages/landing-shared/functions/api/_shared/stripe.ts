@@ -36,6 +36,7 @@ export interface CheckoutSession {
   customer: string | null;
   subscription: string | null;
   customer_details?: { email: string | null };
+  amount_total?: number | null;
 }
 
 export async function createCheckoutSession(

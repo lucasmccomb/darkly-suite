@@ -80,6 +80,7 @@ export function createMockEnv(overrides: Partial<Env> = {}): Env {
     GOOGLE_CLIENT_ID: 'test-client-id.apps.googleusercontent.com',
     GOOGLE_CLIENT_SECRET: 'test-client-secret',
     ADMIN_EMAIL: 'admin@example.com',
+    RESEND_API_KEY: 'test_resend_key',
     ...overrides,
   };
 }

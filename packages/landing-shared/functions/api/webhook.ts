@@ -1,5 +1,6 @@
 import type { Env } from './_shared/types.ts';
 import { verifyWebhookSignature, retrieveCheckoutSession } from './_shared/stripe.ts';
+import { sendAdminEmail } from './_shared/email.ts';
 
 type CFContext = EventContext<Env, string, unknown>;
 
@@ -73,7 +74,18 @@ export const onRequestPost: PagesFunction<Env> = async (context: CFContext) => {
   });
 };
 
-// -- Event Handlers -------------------------------------------------------
+// -- Helpers ----------------------------------------------------------------
+
+function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function formatAmount(cents: unknown): string {
+  if (typeof cents !== 'number') return 'N/A';
+  return `$${(cents / 100).toFixed(2)}`;
+}
+
+// -- Event Handlers ---------------------------------------------------------
 
 async function handleCheckoutCompleted(env: Env, event: StripeEvent): Promise<void> {
   const session = event.data.object as Record<string, unknown>;
@@ -109,7 +121,20 @@ async function handleCheckoutCompleted(env: Env, event: StripeEvent): Promise<vo
     .bind(token, product, email, plan, customerId, subscriptionId, expiresAt)
     .run();
 
-  await trackDiscountUsage(env, sessionId, email, token, product);
+  const promoInfo = await trackDiscountUsage(env, sessionId, email, token, product);
+
+  // Tier 1: New purchase notification
+  const amount = fullSession.amount_total;
+  let body = `Product: ${capitalize(product)}\nPlan: ${capitalize(plan)}\nEmail: ${email ?? 'unknown'}\nAmount: ${formatAmount(amount)}`;
+  if (promoInfo) {
+    body += `\nPromo code: ${promoInfo}`;
+  }
+
+  await sendAdminEmail(
+    env,
+    `New purchase: ${capitalize(product)} ${capitalize(plan)} — ${email ?? 'unknown'}`,
+    body,
+  );
 }
 
 async function trackDiscountUsage(
@@ -118,7 +143,7 @@ async function trackDiscountUsage(
   _email: string | null,
   _token: string,
   _product: string,
-): Promise<void> {
+): Promise<string | null> {
   // Stripe tracks promotion code usage natively (times_redeemed).
   // We just log when a discount was used for observability.
   try {
@@ -129,26 +154,31 @@ async function trackDiscountUsage(
       },
     );
 
-    if (!res.ok) return;
+    if (!res.ok) return null;
 
     const session = (await res.json()) as Record<string, unknown>;
     const totalDetails = session.total_details as Record<string, unknown> | undefined;
     const breakdown = totalDetails?.breakdown as Record<string, unknown> | undefined;
     const discounts = breakdown?.discounts as Array<Record<string, unknown>> | undefined;
 
-    if (!discounts || discounts.length === 0) return;
+    if (!discounts || discounts.length === 0) return null;
 
     const discount = discounts[0];
-    const promoCodeId =
+    const discountObj =
       typeof discount.discount === 'object' && discount.discount
-        ? (discount.discount as Record<string, unknown>).promotion_code
+        ? (discount.discount as Record<string, unknown>)
         : null;
+    const promoCodeId = discountObj?.promotion_code as string | null;
+    const couponName = (discountObj?.coupon as Record<string, unknown> | undefined)?.name as string | undefined;
 
     if (promoCodeId) {
       console.log(`Checkout ${sessionId} used promotion code ${promoCodeId}`);
     }
+
+    return couponName ?? promoCodeId ?? null;
   } catch {
     console.error('Failed to track discount code usage');
+    return null;
   }
 }
 
@@ -156,6 +186,10 @@ async function handleSubscriptionUpdated(env: Env, event: StripeEvent): Promise<
   const subscription = event.data.object as Record<string, unknown>;
   const subscriptionId = subscription.id as string;
   const status = subscription.status as string;
+  const previousAttributes = (event.data as Record<string, unknown>).previous_attributes as
+    | Record<string, unknown>
+    | undefined;
+  const previousStatus = previousAttributes?.status as string | undefined;
 
   const statusMap: Record<string, string> = {
     active: 'active',
@@ -175,17 +209,54 @@ async function handleSubscriptionUpdated(env: Env, event: StripeEvent): Promise<
   )
     .bind(licenseStatus, subscriptionId)
     .run();
+
+  // Tier 2: Only notify on status changes to problematic states
+  if (previousStatus && previousStatus !== status && status !== 'active') {
+    const license = await env.DB.prepare(
+      `SELECT email, product, plan FROM licenses WHERE stripe_subscription_id = ? LIMIT 1`,
+    )
+      .bind(subscriptionId)
+      .first<{ email: string | null; product: string; plan: string }>();
+
+    const email = license?.email ?? 'unknown';
+    const product = license?.product ?? 'unknown';
+    const plan = license?.plan ?? 'unknown';
+
+    await sendAdminEmail(
+      env,
+      `Subscription ${status}: ${capitalize(product)} ${capitalize(plan)} — ${email}`,
+      `Product: ${capitalize(product)}\nPlan: ${capitalize(plan)}\nEmail: ${email}\nStatus change: ${previousStatus} → ${status}\nSubscription: ${subscriptionId}`,
+    );
+  }
 }
 
 async function handleSubscriptionDeleted(env: Env, event: StripeEvent): Promise<void> {
   const subscription = event.data.object as Record<string, unknown>;
   const subscriptionId = subscription.id as string;
 
+  // Look up license before updating so we have context for the notification
+  const license = await env.DB.prepare(
+    `SELECT email, product, plan FROM licenses WHERE stripe_subscription_id = ? LIMIT 1`,
+  )
+    .bind(subscriptionId)
+    .first<{ email: string | null; product: string; plan: string }>();
+
   await env.DB.prepare(
     `UPDATE licenses SET status = 'cancelled' WHERE stripe_subscription_id = ?`,
   )
     .bind(subscriptionId)
     .run();
+
+  // Tier 1: Subscription cancelled notification
+  const email = license?.email ?? 'unknown';
+  const product = license?.product ?? 'unknown';
+  const plan = license?.plan ?? 'unknown';
+
+  await sendAdminEmail(
+    env,
+    `Subscription cancelled: ${capitalize(product)} ${capitalize(plan)} — ${email}`,
+    `Product: ${capitalize(product)}\nPlan: ${capitalize(plan)}\nEmail: ${email}\nSubscription: ${subscriptionId}`,
+  );
 }
 
 async function handlePaymentFailed(env: Env, event: StripeEvent): Promise<void> {
@@ -199,4 +270,21 @@ async function handlePaymentFailed(env: Env, event: StripeEvent): Promise<void> 
   )
     .bind(subscriptionId)
     .run();
+
+  // Tier 1: Payment failed notification
+  const license = await env.DB.prepare(
+    `SELECT email, product, plan FROM licenses WHERE stripe_subscription_id = ? LIMIT 1`,
+  )
+    .bind(subscriptionId)
+    .first<{ email: string | null; product: string; plan: string }>();
+
+  const email = license?.email ?? 'unknown';
+  const product = license?.product ?? 'unknown';
+  const plan = license?.plan ?? 'unknown';
+
+  await sendAdminEmail(
+    env,
+    `Payment failed: ${capitalize(product)} ${capitalize(plan)} — ${email}`,
+    `Product: ${capitalize(product)}\nPlan: ${capitalize(plan)}\nEmail: ${email}\nSubscription: ${subscriptionId}`,
+  );
 }

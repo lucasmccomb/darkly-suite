@@ -37,6 +37,8 @@ export interface Env {
   SITE_URL_GMAIL?: string;
   SITE_URL_SHEETS?: string;
   SITE_URL_DOCS?: string;
+  // Resend API key for admin email notifications
+  RESEND_API_KEY?: string;
   // CORS — comma-separated list of allowed Chrome extension IDs (stable CWS IDs)
   // When unset, all chrome-extension:// origins are allowed (for local development)
   ALLOWED_EXTENSION_IDS?: string;

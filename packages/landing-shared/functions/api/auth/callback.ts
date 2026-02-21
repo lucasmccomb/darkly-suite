@@ -1,6 +1,7 @@
 import type { Env } from '../_shared/types.ts'
 import { exchangeCodeForTokens, decodeIdToken } from '../_shared/google-oauth.ts'
 import { generateSessionToken, parseCookie } from '../admin/_shared/auth.ts'
+import { sendAdminEmail } from '../_shared/email.ts'
 
 type CFContext = EventContext<Env, string, unknown>
 
@@ -42,10 +43,10 @@ export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
     const claims = decodeIdToken(tokens.id_token, GOOGLE_CLIENT_ID)
 
     if (flowType === 'user') {
-      return handleUserFlow(url.origin, DB, claims.email)
+      return handleUserFlow(context.env, url.origin, DB, claims.email)
     }
 
-    return handleAdminFlow(url.origin, DB, claims.email, ADMIN_EMAIL)
+    return handleAdminFlow(context.env, url.origin, DB, claims.email, ADMIN_EMAIL)
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     console.error(`OAuth callback error: ${message}`)
@@ -60,6 +61,7 @@ function parseFlowType(state: string): 'admin' | 'user' {
 }
 
 async function handleAdminFlow(
+  env: Env,
   origin: string,
   db: D1Database,
   email: string,
@@ -79,6 +81,13 @@ async function handleAdminFlow(
     .bind(sessionToken, email, expiresAt)
     .run()
 
+  // Tier 3: Admin login notification
+  await sendAdminEmail(
+    env,
+    `Admin login: ${email}`,
+    `Admin login detected.\n\nEmail: ${email}\nTime: ${new Date().toISOString()}`,
+  )
+
   const responseHeaders = new Headers()
   responseHeaders.set('Location', `${origin}/admin/licenses`)
   responseHeaders.set(
@@ -94,6 +103,7 @@ async function handleAdminFlow(
 }
 
 async function handleUserFlow(
+  env: Env,
   origin: string,
   db: D1Database,
   email: string,
@@ -108,6 +118,13 @@ async function handleUserFlow(
     .first()
 
   if (!license) {
+    // Tier 3: Failed login attempt (no subscription)
+    await sendAdminEmail(
+      env,
+      `Failed login attempt: ${email}`,
+      `A user tried to log in but has no subscriptions.\n\nEmail: ${email}\nTime: ${new Date().toISOString()}`,
+    )
+
     return redirectWithError(
       origin,
       'No subscriptions found for this email. Please sign in with the email you used to purchase your subscription.',
