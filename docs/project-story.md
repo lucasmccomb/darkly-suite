@@ -81,6 +81,8 @@ Later refinements added rate limiting (PR #181): a D1-based sliding window rate 
 
 The discount code system went through its own evolution. An admin portal (PR #113 in gmail-darkly) was built with Google OAuth, session management via HttpOnly cookies with 24-hour TTL, and a full CRUD interface for discount codes. A Resend email integration was built for sharing codes (PR #149), but was immediately abandoned when the free tier turned out to be limited to one domain and the $20/month Pro plan was overkill for an unproven product. The replacement: a simple copy-to-clipboard share text modal (PR #157).
 
+The discount system had a subtler bug that took three rounds of debugging to surface (PR #368). The admin panel's "Product Scope" dropdown stored the product in promotion code metadata, but metadata is cosmetic -- Stripe doesn't enforce it at checkout. Any promo code worked on any product. The actual enforcement mechanism is `applies_to.products` on the *coupon* object (not the promotion code), and it's immutable after creation. The fix added `STRIPE_PRODUCT_*` env vars alongside the existing `STRIPE_PRICE_*` vars, wired `getProductStripeId()` into coupon creation, and made the admin panel's edit modal read-only since product scope can't be changed post-creation.
+
 Pricing settled at: individual extensions $0.99/month, $9.99/year, $29.99 lifetime; the bundle at $2.99/month, $29.99/year, $49.99 lifetime. Twelve Stripe prices (4 products times 3 plans) are mapped through a `getPriceId()` registry.
 
 ## The Build System
