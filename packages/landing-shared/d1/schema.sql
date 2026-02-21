@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS licenses (
 CREATE INDEX IF NOT EXISTS idx_licenses_token ON licenses(token);
 CREATE INDEX IF NOT EXISTS idx_licenses_product ON licenses(product);
 CREATE INDEX IF NOT EXISTS idx_licenses_stripe_customer ON licenses(stripe_customer_id);
+CREATE INDEX IF NOT EXISTS idx_licenses_email ON licenses(email);
 
 CREATE TABLE IF NOT EXISTS discount_codes (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
