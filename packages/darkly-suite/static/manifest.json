@@ -3,7 +3,7 @@
   "name": "Darkly Suite",
   "description": "Dark mode for Gmail, Sheets, Docs, and Drive with OS theme sync, sunset scheduling, and unified settings. One extension, four Google apps.",
   "version": "1.0.0",
-  "permissions": ["storage", "alarms", "offscreen", "scripting"],
+  "permissions": ["storage", "alarms", "offscreen", "scripting", "identity"],
   "host_permissions": [
     "https://mail.google.com/*",
     "https://docs.google.com/spreadsheets/*",
