@@ -28,6 +28,7 @@ export function createMockConfig(overrides?: Partial<ProductConfig>): ProductCon
 export function createMockChromeStorage() {
   const syncStorage: Record<string, unknown> = {};
   const localStorage: Record<string, unknown> = {};
+  const sessionStorage: Record<string, unknown> = {};
 
   type StorageChangeListener = (
     changes: { [key: string]: chrome.storage.StorageChange },
@@ -68,6 +69,18 @@ export function createMockChromeStorage() {
     delete localStorage[key];
   });
 
+  const mockSessionGet = jest.fn(async (key: string) => ({
+    [key]: sessionStorage[key],
+  }));
+
+  const mockSessionSet = jest.fn(async (items: Record<string, unknown>) => {
+    Object.assign(sessionStorage, items);
+  });
+
+  const mockSessionRemove = jest.fn(async (key: string) => {
+    delete sessionStorage[key];
+  });
+
   const mockAddListener = jest.fn((cb: StorageChangeListener) => {
     changeListeners.push(cb);
   });
@@ -95,10 +108,19 @@ export function createMockChromeStorage() {
           addListener: mockLocalAddListener,
         },
       },
+      session: {
+        get: mockSessionGet,
+        set: mockSessionSet,
+        remove: mockSessionRemove,
+      },
       onChanged: {
         addListener: mockAddListener,
         removeListener: mockRemoveListener,
       },
+    },
+    alarms: {
+      create: jest.fn(async () => {}),
+      clear: jest.fn(async () => true),
     },
     runtime: {
       sendMessage: jest.fn(),
@@ -116,6 +138,7 @@ export function createMockChromeStorage() {
   function clearStorages() {
     for (const key of Object.keys(syncStorage)) delete syncStorage[key];
     for (const key of Object.keys(localStorage)) delete localStorage[key];
+    for (const key of Object.keys(sessionStorage)) delete sessionStorage[key];
     changeListeners.length = 0;
     localOnChangedListeners.length = 0;
   }
@@ -124,6 +147,7 @@ export function createMockChromeStorage() {
     chromeMock,
     syncStorage,
     localStorage,
+    sessionStorage,
     changeListeners,
     localOnChangedListeners,
     install,

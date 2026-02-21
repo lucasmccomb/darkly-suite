@@ -17,7 +17,7 @@
 // InboxSDK integration silently fails with "Couldn't inject pageWorld.js".
 import '@inboxsdk/core/background.js';
 
-import { createSiteWorker } from '@darkly/core';
+import { createSiteWorker, createCheckoutPoller } from '@darkly/core';
 import type { SiteWorkerHandlers } from '@darkly/core';
 import type { SiteId } from '@darkly/core';
 import { config, getSiteConfig, siteConfigs } from './darkly.config';
@@ -32,6 +32,9 @@ for (const siteId of sites) {
 // Use the first worker for shared operations (payment, geolocation) since
 // all site workers share the same token, API base, and offscreen document.
 const sharedWorker = workers.get('gmail')!;
+
+// Checkout poller uses suite-level config (all sites share one payment token)
+const checkoutPoller = createCheckoutPoller(config);
 
 /**
  * Determine which site a message came from by examining the sender's tab URL.
@@ -106,6 +109,11 @@ chrome.runtime.onMessage.addListener(
       return false;
     }
 
+    if (message.type === 'checkoutStarted') {
+      checkoutPoller.start();
+      return false;
+    }
+
     if (message.type === 'getProductConfig') {
       sendResponse(config);
       return true;
@@ -117,6 +125,10 @@ chrome.runtime.onMessage.addListener(
 
 // --- Single alarm listener ---
 chrome.alarms.onAlarm.addListener(async (alarm) => {
+  if (alarm.name === checkoutPoller.alarmName) {
+    await checkoutPoller.handleAlarm();
+    return;
+  }
   for (const worker of workers.values()) {
     if (alarm.name === worker.config.alarmName) {
       await worker.handleAlarm();

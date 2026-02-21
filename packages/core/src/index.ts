@@ -38,6 +38,8 @@ export type { PreferencesManager } from './storage/preferences';
 export { createPaymentClient } from './payment/client';
 export type { PaymentClient, PriceInfo } from './payment/client';
 export { isPro, canUseFeature } from './payment/gates';
+export { createCheckoutPoller } from './payment/checkout-poller';
+export type { CheckoutPoller } from './payment/checkout-poller';
 
 // Geo
 export { getSunTimes } from './geo/sun-times';
