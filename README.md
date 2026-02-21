@@ -290,22 +290,24 @@ When both a standalone extension (e.g., Darkly for Gmail) and the Darkly Suite b
 
 ## Testing
 
-**328 tests** across 2 test suites (17 test files):
+**379 tests** across 2 test suites (19 test files):
 
 **@darkly/core** (9 test files, 179 tests):
 - Theme engine, presets, contrast
 - Scheduler (time-based and sunrise/sunset)
 - Preferences storage
-- Payment gates and client
+- Payment gates, client, and checkout poller
 - Sun-times geolocation
 - Conflict detection
 
-**@darkly/landing-shared** (8 test files, 149 tests):
+**@darkly/landing-shared** (10 test files, 200 tests):
 - Stripe integration
-- Webhook processing
+- Webhook processing (binary status model)
 - License status endpoint
 - Checkout flow
 - Auth (Google OAuth)
+- Admin license management
+- Email notifications (admin + user)
 - CORS handling
 - Product/price types
 - Products configuration
@@ -366,3 +368,25 @@ Lint, type check, and test run in parallel. Build runs after all three pass. Con
 - **Infrastructure**: Cloudflare Wrangler Action with API token + account ID from GitHub secrets
 
 **Environment**: Node 20, pnpm 9, `--frozen-lockfile` for reproducible installs.
+
+### Deployment Pipeline (Three Paths)
+
+Landing pages deploy to Cloudflare Pages through three independent paths, providing redundancy when any single path fails:
+
+| Path | Trigger | Build Location | Speed |
+|------|---------|---------------|-------|
+| **Cloudflare git integration** | Push to `main` | Cloudflare's build environment | ~2-3 min |
+| **GitHub Actions** (`deploy-landing.yml`) | Push to `main` (change detection) | GitHub Actions runner → `wrangler pages deploy` | ~3-5 min |
+| **Manual deploy** | Developer runs `wrangler pages deploy dist` | Local machine (pre-built) | ~30 sec |
+
+**Why three paths?** Cloudflare's automatic git-triggered builds occasionally fail due to build environment issues (observed intermittently, not related to code changes). When this happens, the GitHub Actions workflow provides a second automatic path. If both fail, manual deploy from a local build is the immediate fallback:
+
+```bash
+cd packages/landing-suite
+pnpm build                                    # Build locally (already verified via pnpm -r build)
+npx wrangler pages deploy dist \
+  --project-name=darkly-suite \
+  --branch=main                               # Push pre-built dist/ directly — skips remote build
+```
+
+Manual deploy uploads the pre-built `dist/` directory directly to Cloudflare's CDN, bypassing the remote build step entirely. This is the fastest and most reliable path when you've already verified the build locally.
