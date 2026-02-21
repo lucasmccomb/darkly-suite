@@ -277,8 +277,27 @@ export function createBackgroundWorker(config: ProductConfig): void {
     console.log(`[${config.productName}] Extension installed:`, details.reason);
     if (details.reason === 'install') {
       if (typeof __DEV_MODE__ === 'undefined' || !__DEV_MODE__) {
-        const setupUrl = `${config.siteBase}/setup`;
-        chrome.tabs.create({ url: setupUrl });
+        // Get token (already initialized by createSiteWorker → initPayment)
+        const result = await chrome.storage.sync.get(config.tokenKey);
+        const token = result[config.tokenKey] ?? '';
+
+        // Get Chrome Identity email (may be empty if user isn't signed into Chrome)
+        let email = '';
+        try {
+          const info = await chrome.identity.getProfileUserInfo({
+            accountStatus: chrome.identity.AccountStatus.ANY,
+          });
+          email = info.email || '';
+        } catch {
+          // identity.email permission missing or API unavailable — proceed without email
+        }
+
+        const params = new URLSearchParams();
+        if (token) params.set('token', token);
+        if (email) params.set('email', email);
+        const qs = params.toString();
+        const subscribeUrl = `${config.siteBase}/subscribe${qs ? `?${qs}` : ''}`;
+        chrome.tabs.create({ url: subscribeUrl });
       }
       await worker.setupAlarm();
     }
