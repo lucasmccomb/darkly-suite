@@ -99,7 +99,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
       await sitePlugin.init(engine, config);
     }
 
-    const proStatus = await payment.isPro();
+    let proStatus = await payment.isPro();
     const prices = await payment.getPrices();
 
     if (proStatus) {
@@ -166,8 +166,11 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
           prices: prices ?? undefined,
           onAllSettings: miniPanel
             ? () => {
-                // Sheets/Docs: toggle mini panel anchored to toolbar button
-                if (miniPanel!.isVisible()) {
+                // Sheets/Docs: unpaid users see full settings modal (paywall with pricing tiers);
+                // paid users get the mini panel with quick controls.
+                if (!proStatus) {
+                  settingsModal.show();
+                } else if (miniPanel!.isVisible()) {
                   miniPanel!.hide();
                 } else if (toolbarButton) {
                   miniPanel!.show(toolbarButton);
@@ -207,6 +210,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
 
     // Listen for payment status changes
     payment.onPaymentStatusChange(async (paid) => {
+      proStatus = paid;
       if (paid) {
         const currentPrefs = await prefs.load();
         await applyMode(currentPrefs);
