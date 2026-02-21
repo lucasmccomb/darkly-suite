@@ -1,0 +1,61 @@
+# Chrome Web Store Listing — Darkly for Google Docs
+
+## Extension Name
+
+Darkly for Google Docs
+
+## Short Description (132 chars max)
+
+Document-aware dark mode for Google Docs with Kix canvas theming, color presets, automatic scheduling, and OS sync.
+
+## Detailed Description
+
+Darkly for Google Docs adds a carefully engineered dark mode designed specifically for document editing — not a generic filter that breaks your formatting.
+
+FEATURES
+
+- Document-aware dark mode — Darkens the toolbar, ruler, menus, and sidebar while intelligently handling the Kix editor canvas where you write
+- Preserve Page Colors toggle — Keep document pages in their original light appearance while the surrounding UI goes dark, so your carefully chosen page formatting stays accurate
+- Color picker swatch preservation — Text color and highlight color swatches display their true colors even in dark mode, so you always pick the right shade
+- Collaboration cursor preservation — Other users' colored cursors and name labels stay visible and accurate during real-time editing
+- Comment and suggestion support — Comments panel and suggestion mode highlights render correctly in dark mode, keeping collaborative review workflows intact
+- Image and media re-inversion — Embedded images, drawings, and other media display in their original colors, not inverted
+- 5 theme presets — Choose from Nord, Solarized Dark, Monokai, Catppuccin Mocha, and Rose Pine to match your preferred aesthetic
+- Automatic scheduling — Set dark mode to activate and deactivate at specific times each day
+- Sunrise/sunset sync — Automatically follow your local daylight hours so dark mode turns on at dusk and off at dawn
+- OS theme sync — Match your system's light/dark preference so Docs follows your desktop setting
+- Settings panel inside Docs — Access all settings from a toolbar button or sidebar icon without leaving your document
+- Smooth transitions — No jarring white flashes when toggling between light and dark modes
+- Cross-device sync — Preferences sync across all your Chrome browsers via Chrome's built-in storage
+
+HOW IT WORKS
+
+After installing, you'll see a dark mode toggle button in the Google Docs toolbar. Click it to enable dark mode instantly. A sidebar icon also provides quick access.
+
+Open the settings panel to configure scheduling, sunrise/sunset mode, OS sync, or choose a theme preset. Toggle "Preserve Page Colors" to keep your document pages in their original light appearance while the UI around them stays dark — particularly useful for documents with carefully designed page colors, embedded images, or complex formatting.
+
+Your preferences sync across devices using Chrome's built-in sync. No account required.
+
+PRIVACY
+
+Darkly for Google Docs does not read your document content, collect personal information, or send analytics. Your preferences are stored locally using Chrome's storage API. See our full privacy policy at https://docsdarkly.com/privacy.
+
+SUPPORT
+
+Visit https://docsdarkly.com for documentation and support, or email admin@darklysuite.com.
+
+## Category
+
+Functionality & UI
+
+## Language
+
+English
+
+## Website
+
+https://docsdarkly.com
+
+## Pricing
+
+Free (premium features available via in-app purchase)
