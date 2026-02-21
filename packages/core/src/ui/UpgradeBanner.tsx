@@ -11,9 +11,9 @@ export function UpgradeBanner({ onUpgrade }: UpgradeBannerProps) {
   return (
     <div className={`${p}-settings-upgrade-banner`}>
       <div className={`${p}-settings-upgrade-content`}>
-        <span className={`${p}-settings-upgrade-title`}>Unlock All Themes</span>
+        <span className={`${p}-settings-upgrade-title`}>Unlock Darkly Pro</span>
         <p className={`${p}-settings-upgrade-description`}>
-          Get access to Nord, Solarized, Monokai, and more with Darkly Pro.
+          Get access to all dark mode features with Darkly Pro.
         </p>
       </div>
       <button

@@ -6,7 +6,6 @@ FEATURES
 - Preserve Grid Colors toggle — Keep your spreadsheet cells in their original colors while the surrounding UI goes dark, so conditional formatting, colored cells, and data bars remain accurate
 - Color picker swatch preservation — Cell background and text color swatches display their true colors even in dark mode, so you always pick the right shade
 - Chart re-inversion — Embedded charts and chart editor previews display in their original colors, keeping your visualizations readable
-- 5 theme presets — Choose from Nord, Solarized Dark, Monokai, Catppuccin Mocha, and Rose Pine to match your preferred aesthetic
 - Automatic scheduling — Set dark mode to activate and deactivate at specific times each day
 - Sunrise/sunset sync — Automatically follow your local daylight hours so dark mode turns on at dusk and off at dawn
 - OS theme sync — Match your system's light/dark preference so Sheets follows your desktop setting
@@ -18,7 +17,7 @@ HOW IT WORKS
 
 After installing, you'll see a dark mode toggle button in the Google Sheets toolbar. Click it to enable dark mode instantly. A sidebar icon also provides quick access.
 
-Open the settings panel to configure scheduling, sunrise/sunset mode, OS sync, or choose a theme preset. Toggle "Preserve Grid Colors" to keep your spreadsheet data colors intact while the UI around it stays dark — particularly useful for spreadsheets with color-coded data, conditional formatting, or charts.
+Open the settings panel to configure scheduling, sunrise/sunset mode, or OS sync. Toggle "Preserve Grid Colors" to keep your spreadsheet data colors intact while the UI around it stays dark — particularly useful for spreadsheets with color-coded data, conditional formatting, or charts.
 
 Your preferences sync across devices using Chrome's built-in sync. No account required.
 

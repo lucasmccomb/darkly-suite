@@ -14,7 +14,7 @@ PERMISSION JUSTIFICATIONS
 --------------------------
 
 storage:
-Stores user preferences (dark mode on/off, schedule times, theme preset, preserve grid
+Stores user preferences (dark mode on/off, schedule times, preserve grid
 colors setting) using chrome.storage.sync so settings persist across sessions and sync
 across the user's Chrome browsers. Also uses chrome.storage.local for pro status cache
 and sunrise/sunset times cache. No personal data is stored.
