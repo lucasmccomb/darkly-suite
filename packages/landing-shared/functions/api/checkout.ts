@@ -59,7 +59,9 @@ async function handleCheckout(context: CFContext): Promise<Response> {
       priceId,
       mode,
       successUrl: `${siteUrl}/success?session_id={CHECKOUT_SESSION_ID}&product=${product}`,
-      cancelUrl: `${siteUrl}/${product === 'suite' ? '' : product}#pricing`,
+      cancelUrl: siteUrl !== context.env.SITE_URL
+        ? `${siteUrl}/#pricing`
+        : `${siteUrl}/${product === 'suite' ? '' : product}#pricing`,
       metadata: { token, plan, product },
       customerEmail: email ?? undefined,
     });

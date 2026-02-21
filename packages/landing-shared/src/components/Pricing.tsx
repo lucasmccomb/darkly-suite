@@ -31,6 +31,11 @@ interface PricingProps {
   bundleTiers?: PricingTier[]
   comparisonFeatures?: ComparisonFeature[]
   storeUrls: Record<string, string>
+  onCheckout?: (product: string, plan: string) => void
+}
+
+function checkoutLabel(plan: string): string {
+  return plan.toLowerCase() === 'lifetime' ? 'One-time payment' : 'Subscribe'
 }
 
 const APP_NAMES: Record<AppId, string> = {
@@ -59,6 +64,7 @@ export function Pricing({
   bundleTiers,
   comparisonFeatures,
   storeUrls,
+  onCheckout,
 }: PricingProps) {
   const isDualMode = onAppChange !== undefined
   const appLink = selectedApp ?? 'gmail'
@@ -92,9 +98,19 @@ export function Pricing({
                   {tier.period && <span>{tier.period}</span>}
                 </div>
                 <div className="pricing-subtitle">{tier.subtitle}</div>
-                <a href={tier.link} className="btn btn-primary" target="_blank" rel="noopener noreferrer">
-                  {tier.cta}
-                </a>
+                {onCheckout ? (
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => onCheckout(product, tier.plan.toLowerCase())}
+                  >
+                    {checkoutLabel(tier.plan)}
+                  </button>
+                ) : (
+                  <a href={tier.link} className="btn btn-primary" target="_blank" rel="noopener noreferrer">
+                    {tier.cta}
+                  </a>
+                )}
               </div>
             ))}
           </div>
@@ -154,9 +170,19 @@ export function Pricing({
                     {tier.period && <span>{tier.period}</span>}
                   </div>
                   <div className="pricing-subtitle">{tier.subtitle}</div>
-                  <a href={storeUrls.suite} className="btn btn-primary" target="_blank" rel="noopener noreferrer">
-                    Get the Suite
-                  </a>
+                  {onCheckout ? (
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={() => onCheckout('suite', tier.plan.toLowerCase())}
+                    >
+                      {checkoutLabel(tier.plan)}
+                    </button>
+                  ) : (
+                    <a href={storeUrls.suite} className="btn btn-primary" target="_blank" rel="noopener noreferrer">
+                      Get the Suite
+                    </a>
+                  )}
                 </div>
               ))}
             </div>
@@ -215,14 +241,27 @@ export function Pricing({
                   </select>
                 </div>
                 {selectedApp ? (
-                  <a href={storeUrls[selectedApp]} className="btn btn-primary" target="_blank" rel="noopener noreferrer">
-                    {selectedApp === 'gmail' && <Mail size={16} color="#ea4335" strokeWidth={1.8} />}
-                    {selectedApp === 'sheets' && <Table2 size={16} color="#81c995" strokeWidth={1.8} />}
-                    {selectedApp === 'docs' && <FileText size={16} color="#4285f4" strokeWidth={1.8} />}
-                    Get {APP_NAMES[selectedApp]}
-                  </a>
+                  onCheckout ? (
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={() => onCheckout(selectedApp, tier.plan.toLowerCase())}
+                    >
+                      {selectedApp === 'gmail' && <Mail size={16} color="#ea4335" strokeWidth={1.8} />}
+                      {selectedApp === 'sheets' && <Table2 size={16} color="#81c995" strokeWidth={1.8} />}
+                      {selectedApp === 'docs' && <FileText size={16} color="#4285f4" strokeWidth={1.8} />}
+                      {checkoutLabel(tier.plan)}
+                    </button>
+                  ) : (
+                    <a href={storeUrls[selectedApp]} className="btn btn-primary" target="_blank" rel="noopener noreferrer">
+                      {selectedApp === 'gmail' && <Mail size={16} color="#ea4335" strokeWidth={1.8} />}
+                      {selectedApp === 'sheets' && <Table2 size={16} color="#81c995" strokeWidth={1.8} />}
+                      {selectedApp === 'docs' && <FileText size={16} color="#4285f4" strokeWidth={1.8} />}
+                      Get {APP_NAMES[selectedApp]}
+                    </a>
+                  )
                 ) : (
-                  <span className="btn btn-primary btn-disabled">Get Single App</span>
+                  <span className="btn btn-primary btn-disabled">Select an app</span>
                 )}
               </div>
             ))}

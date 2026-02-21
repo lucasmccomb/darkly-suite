@@ -1,5 +1,7 @@
 import type { PricingTier, ComparisonFeature } from '@darkly/landing-shared'
 
+export const CHECKOUT_API_URL = '/api/checkout'
+
 /**
  * Chrome Web Store listing URLs.
  * Replace placeholder IDs with real extension IDs after publishing.
@@ -42,7 +44,7 @@ export const individualTiers = (product: string): PricingTier[] => [
     period: '/mo',
     subtitle: 'Cancel anytime',
     highlighted: false,
-    cta: 'Get Started',
+    cta: 'Subscribe',
     link: STORE_URLS[product] ?? `/${product}`,
   },
   {
@@ -52,7 +54,7 @@ export const individualTiers = (product: string): PricingTier[] => [
     subtitle: 'Save 16%',
     highlighted: true,
     badge: 'Best Value',
-    cta: 'Get Started',
+    cta: 'Subscribe',
     link: STORE_URLS[product] ?? `/${product}`,
   },
   {
@@ -61,7 +63,7 @@ export const individualTiers = (product: string): PricingTier[] => [
     period: '',
     subtitle: 'One-time payment',
     highlighted: false,
-    cta: 'Get Started',
+    cta: 'One-time payment',
     link: STORE_URLS[product] ?? `/${product}`,
   },
 ]
@@ -73,7 +75,7 @@ export const bundleTiers: PricingTier[] = [
     period: '/mo',
     subtitle: 'Cancel anytime',
     highlighted: false,
-    cta: 'Get the Suite',
+    cta: 'Subscribe',
     link: STORE_URLS.suite,
   },
   {
@@ -83,7 +85,7 @@ export const bundleTiers: PricingTier[] = [
     subtitle: 'Save 16%',
     highlighted: true,
     badge: 'Best Value',
-    cta: 'Get the Suite',
+    cta: 'Subscribe',
     link: STORE_URLS.suite,
   },
   {
@@ -92,7 +94,7 @@ export const bundleTiers: PricingTier[] = [
     period: '',
     subtitle: 'One-time payment',
     highlighted: false,
-    cta: 'Get the Suite',
+    cta: 'One-time payment',
     link: STORE_URLS.suite,
   },
 ]
