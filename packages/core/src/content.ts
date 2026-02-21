@@ -210,6 +210,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
 
     // Listen for payment status changes
     payment.onPaymentStatusChange(async (paid) => {
+      const wasPro = proStatus;
       proStatus = paid;
       if (paid) {
         const currentPrefs = await prefs.load();
@@ -219,6 +220,10 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
         prefs.onChange(async (newPrefs) => {
           await applyMode(newPrefs);
         });
+      } else if (wasPro) {
+        // License revoked server-side (refund, chargeback, cancellation) —
+        // reload to revert all UI to paywall state.
+        location.reload();
       }
     });
 
@@ -235,6 +240,21 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
       document.addEventListener('visibilitychange', handleVisibility);
       payment.onPaymentStatusChange((paid) => {
         if (paid) document.removeEventListener('visibilitychange', handleVisibility);
+      });
+    }
+
+    // When paid, periodically revalidate on tab focus to catch license revocation.
+    // Throttled to 30 min to match the pro cache TTL — at most one API call per
+    // 30 min of active tab use. If the API returns unpaid, setCachedProStatus
+    // writes to storage which triggers onPaymentStatusChange → reload above.
+    if (proStatus) {
+      let lastRevalidation = Date.now();
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState !== 'visible') return;
+        const now = Date.now();
+        if (now - lastRevalidation < 30 * 60 * 1000) return;
+        lastRevalidation = now;
+        payment.refreshProStatus();
       });
     }
 
