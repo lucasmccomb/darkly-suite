@@ -1,0 +1,72 @@
+Darkly Suite brings a carefully engineered dark mode to Gmail, Google Sheets, and Google Docs — all from a single extension with a single subscription. Stop juggling three separate dark mode extensions. Darkly Suite gives you unified dark mode across Google Workspace with per-app settings, shared theme presets, and one license that covers everything.
+
+WHY DARKLY SUITE?
+
+Most dark mode extensions only work on one Google app. If you use Gmail, Sheets, and Docs daily, that means installing three extensions, managing three subscriptions, and dealing with three separate settings panels. Darkly Suite replaces all of that with one extension that's purpose-built for each app.
+
+- One extension, three apps — Gmail, Sheets, and Docs dark mode in a single install
+- One subscription — covers all three apps at a lower price than buying individually
+- Per-app settings — configure dark mode independently for each app
+- Shared preferences — theme presets and scheduling sync across all three apps
+- Conflict detection — works gracefully alongside standalone Darkly extensions if you have them installed
+
+GMAIL FEATURES
+
+- Instant dark mode — Toggle dark mode on and off from a button inside Gmail
+- Gmail-specific overrides — Carefully tuned for Gmail's interface including compose windows, email threads, popovers, and settings pages
+- Settings panel inside Gmail — Access all settings from a toolbar button or sidebar icon without leaving your inbox
+
+GOOGLE SHEETS FEATURES
+
+- Grid-aware dark mode — Darkens the toolbar, formula bar, menus, and sidebar while intelligently handling the spreadsheet grid
+- Preserve Grid Colors toggle — Keep your spreadsheet cells in their original colors while the surrounding UI goes dark, so conditional formatting, colored cells, and data bars remain accurate
+- Color picker swatch preservation — Cell background and text color swatches display their true colors even in dark mode, so you always pick the right shade
+- Chart re-inversion — Embedded charts and chart editor previews display in their original colors, keeping your visualizations readable
+
+GOOGLE DOCS FEATURES
+
+- Document-aware dark mode — Darkens the toolbar, ruler, menus, and sidebar while intelligently handling the Kix editor canvas where you write
+- Preserve Page Colors toggle — Keep document pages in their original light appearance while the surrounding UI goes dark, so your carefully chosen page formatting stays accurate
+- Color picker swatch preservation — Text color and highlight color swatches display their true colors even in dark mode, so you always pick the right shade
+- Collaboration cursor preservation — Other users' colored cursors and name labels stay visible and accurate during real-time editing
+- Comment and suggestion support — Comments panel and suggestion mode highlights render correctly in dark mode, keeping collaborative review workflows intact
+- Image and media re-inversion — Embedded images, drawings, and other media display in their original colors, not inverted
+
+SHARED FEATURES ACROSS ALL APPS
+
+- 5 theme presets — Choose from Nord, Solarized Dark, Monokai, Catppuccin Mocha, and Rose Pine to match your preferred aesthetic
+- Automatic scheduling — Set dark mode to activate and deactivate at specific times each day
+- Sunrise/sunset sync — Automatically follow your local daylight hours so dark mode turns on at dusk and off at dawn
+- OS theme sync — Match your system's light/dark preference so Google Workspace follows your desktop setting
+- Smooth transitions — No jarring white flashes when toggling between light and dark modes
+- Cross-device sync — Preferences sync across all your Chrome browsers via Chrome's built-in storage
+
+PRICING
+
+Darkly Suite offers bundle pricing that saves you money compared to purchasing individual extensions:
+
+- Monthly: $2.99/mo (vs $2.97/mo for three separate extensions)
+- Yearly: $29.99/yr (vs $29.97/yr individually) — save with annual billing
+- Lifetime: $49.99 one-time (vs $89.97 for three separate lifetime licenses) — save over 44%
+
+The lifetime plan is the best value: pay once and get dark mode for Gmail, Sheets, and Docs forever. All plans include full access to every feature across all three apps.
+
+HOW IT WORKS
+
+Install Darkly Suite and dark mode is ready across Gmail, Google Sheets, and Google Docs. Each app gets its own toggle button in the toolbar for instant on/off control.
+
+Open the settings panel in any app to configure that app's dark mode independently. Set scheduling, choose a theme preset, enable Preserve Grid Colors in Sheets or Preserve Page Colors in Docs — each app remembers its own preferences.
+
+Your preferences sync across devices using Chrome's built-in sync. No account required for preference syncing.
+
+WORKS WITH STANDALONE DARKLY EXTENSIONS
+
+Already using Darkly for Gmail, Darkly for Sheets, or Darkly for Docs? Darkly Suite detects installed standalone extensions and prevents double-injection. The first extension to load on a page claims it, and the other gracefully steps aside. You can transition to the Suite at your own pace.
+
+PRIVACY
+
+Darkly Suite does not read your emails, spreadsheet data, or document content. It does not collect personal information or send analytics. Your preferences are stored locally using Chrome's storage API. See our full privacy policy at https://darklysuite.com/privacy.
+
+SUPPORT
+
+Visit https://darklysuite.com for documentation and support, or email admin@darklysuite.com.
