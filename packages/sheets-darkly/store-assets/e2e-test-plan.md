@@ -11,7 +11,7 @@ Before starting, verify these are live:
 
 - [ ] **darklysuite.com** — Payment API deployed on Cloudflare Pages with D1 + Stripe bindings
 - [ ] **darklysuite.com/api/status/{any-token}?product=sheets** — Returns `{"paid":false}` (not a 500 or DNS error)
-- [ ] **darklysuite.com/privacy** — Privacy policy page is accessible
+- [ ] **sheetsdarkly.com/privacy** — Privacy policy page is accessible
 - [ ] **Stripe test mode** — Products and prices configured for sheets (monthly/yearly/lifetime)
 - [ ] **Promo code** — `CWSREVIEWSHEETS2026` (or equivalent test code) created in Stripe dashboard
 - [ ] **Production zip** — Built from latest main: `pnpm --filter sheets-darkly build`, then zip `dist/`
@@ -214,6 +214,6 @@ If ANY of these fail, do NOT submit to Chrome Web Store:
 - [ ] Preserve Grid Colors toggle works
 - [ ] Settings persist across sessions
 - [ ] No console errors that would concern a Google reviewer
-- [ ] `darklysuite.com/privacy` is accessible
+- [ ] `sheetsdarkly.com/privacy` is accessible
 - [ ] `darklysuite.com/api/status/{token}?product=sheets` responds correctly
 - [ ] Color picker swatches show accurate colors in dark mode

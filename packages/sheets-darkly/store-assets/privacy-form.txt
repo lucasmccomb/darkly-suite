@@ -81,4 +81,4 @@ All code is bundled in the extension package. No remote scripts are loaded or ex
 
 PRIVACY POLICY URL
 -------------------
-https://darklysuite.com/privacy
+https://sheetsdarkly.com/privacy
