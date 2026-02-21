@@ -1,4 +1,5 @@
 import type { Env } from '../_shared/types.ts'
+import { cancelSubscription } from '../_shared/stripe.ts'
 import { requireAdmin } from './_shared/auth.ts'
 
 type CFContext = EventContext<Env, string, unknown>
@@ -77,4 +78,67 @@ export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
       headers: { 'Content-Type': 'application/json' },
     },
   )
+}
+
+function errorResponse(status: number, message: string): Response {
+  return new Response(JSON.stringify({ error: message }), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  })
+}
+
+/**
+ * DELETE /api/admin/licenses?id=123
+ * Cancels the Stripe subscription (if any) and deletes the license + FK references.
+ */
+export const onRequestDelete: PagesFunction<Env> = async (context: CFContext) => {
+  const unauthorized = await requireAdmin(context.request, context.env.DB)
+  if (unauthorized) return unauthorized
+
+  const url = new URL(context.request.url)
+  const id = url.searchParams.get('id')
+
+  if (!id) {
+    return errorResponse(400, 'Missing required parameter: id')
+  }
+
+  try {
+    // Look up the license to get stripe_subscription_id
+    const license = await context.env.DB.prepare(
+      'SELECT id, stripe_subscription_id FROM licenses WHERE id = ?',
+    )
+      .bind(id)
+      .first<{ id: number; stripe_subscription_id: string | null }>()
+
+    if (!license) {
+      return new Response(JSON.stringify({ ok: true }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Cancel Stripe subscription if present (best-effort)
+    if (license.stripe_subscription_id) {
+      try {
+        await cancelSubscription(context.env.STRIPE_SECRET_KEY, license.stripe_subscription_id)
+      } catch (err) {
+        console.warn(`Failed to cancel Stripe subscription ${license.stripe_subscription_id}:`, err)
+      }
+    }
+
+    // Clean up FK references and delete the license atomically
+    await context.env.DB.batch([
+      context.env.DB.prepare('UPDATE discount_codes SET used_by_license_id = NULL WHERE used_by_license_id = ?').bind(id),
+      context.env.DB.prepare('DELETE FROM discount_code_usages WHERE license_id = ?').bind(id),
+      context.env.DB.prepare('DELETE FROM licenses WHERE id = ?').bind(id),
+    ])
+
+    return new Response(JSON.stringify({ ok: true }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  } catch (err) {
+    console.error('License deletion failed:', err)
+    return errorResponse(500, 'Failed to delete license')
+  }
 }
