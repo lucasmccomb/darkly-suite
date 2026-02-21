@@ -1,0 +1,84 @@
+/* @darkly/site-drive -- Filter-based dark mode for Google Drive
+ *
+ * Core approach: invert(1) + hue-rotate(180deg) on <body>, then selectively
+ * re-invert elements that should keep original colors (images, videos, SVG images,
+ * file type icons, thumbnails, and profile avatars).
+ *
+ * Drive is dashboard-only — there is no editor mode.
+ */
+
+/* ============================================================
+ * 1. Core inversion -- dark mode filter on body
+ * ============================================================ */
+
+[data-darkly-theme="dark"] body {
+  filter: invert(1) hue-rotate(180deg) !important;
+  background-color: #fff !important;
+}
+
+/* ============================================================
+ * 2. Re-invert media elements -- keep images/video/SVG looking correct
+ * ============================================================ */
+
+[data-darkly-theme="dark"] img,
+[data-darkly-theme="dark"] video,
+[data-darkly-theme="dark"] svg image,
+[data-darkly-theme="dark"] [style*="background-image"] {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* ============================================================
+ * 3. File type icons and thumbnails -- keep original colors
+ * Drive uses colored icons for Docs (blue), Sheets (green),
+ * Slides (yellow), Forms (purple), etc.
+ * ============================================================ */
+
+/* File type icon images in list and grid views */
+[data-darkly-theme="dark"] [data-tooltip] img[src*="icon"],
+[data-darkly-theme="dark"] img[src*="docs.google.com/images"],
+[data-darkly-theme="dark"] img[src*="drive-thirdparty"],
+[data-darkly-theme="dark"] img[src*="ssl.gstatic.com"] {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* Grid view file thumbnails */
+[data-darkly-theme="dark"] [data-target="thumbnail"] img {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* ============================================================
+ * 4. Profile avatars -- keep original colors
+ * ============================================================ */
+
+[data-darkly-theme="dark"] [data-ogsr-up] img,
+[data-darkly-theme="dark"] img[data-src*="googleusercontent.com"],
+[data-darkly-theme="dark"] .gb_F img {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* ============================================================
+ * 5. Extension UI isolation -- our settings panel is already dark
+ * ============================================================ */
+
+[data-darkly-theme="dark"] .darkly-settings-container,
+[data-darkly-theme="dark"] .darkly-mini-panel {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* ============================================================
+ * 6. Scrollbar styling for dark mode
+ * Colors are PRE-INVERTED because the body filter inverts them.
+ * ============================================================ */
+
+[data-darkly-theme="dark"] ::-webkit-scrollbar {
+  background: #ffffff;
+}
+
+[data-darkly-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #bbbbbb;
+  border-radius: 4px;
+}
+
+[data-darkly-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: #999999;
+}

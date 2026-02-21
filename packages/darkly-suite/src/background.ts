@@ -1,7 +1,7 @@
 /**
  * Darkly Suite — Unified background service worker
  *
- * Creates a site worker for each site (gmail, sheets, docs) and routes all
+ * Creates a site worker for each site (gmail, sheets, docs, drive) and routes all
  * Chrome events through a single set of listeners. This avoids the N-listener
  * duplication that would occur if createBackgroundWorker() were called per-site.
  *
@@ -9,6 +9,7 @@
  *   - ds_gmail_preferences
  *   - ds_sheets_preferences
  *   - ds_docs_preferences
+ *   - ds_drive_preferences
  */
 
 // InboxSDK requires its background handler for pageWorld.js injection via
@@ -42,6 +43,7 @@ function getSiteIdFromSender(sender: chrome.runtime.MessageSender): SiteId | nul
   if (url.startsWith('https://mail.google.com')) return 'gmail';
   if (url.includes('docs.google.com/spreadsheets')) return 'sheets';
   if (url.includes('docs.google.com/document')) return 'docs';
+  if (url.startsWith('https://drive.google.com')) return 'drive';
   return null;
 }
 

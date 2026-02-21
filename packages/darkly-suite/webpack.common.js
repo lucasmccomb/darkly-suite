@@ -49,6 +49,7 @@ module.exports = {
       '@darkly/site-gmail': path.resolve(__dirname, '../site-gmail/src'),
       '@darkly/site-sheets': path.resolve(__dirname, '../site-sheets/src'),
       '@darkly/site-docs': path.resolve(__dirname, '../site-docs/src'),
+      '@darkly/site-drive': path.resolve(__dirname, '../site-drive/src'),
     },
     modules: [path.resolve(__dirname, 'node_modules'), 'node_modules'],
   },
@@ -86,6 +87,11 @@ module.exports = {
         {
           from: path.resolve(__dirname, '../site-docs/src/styles/docs-overrides.css'),
           to: 'styles/docs-overrides.css',
+          transform: transformPrefix,
+        },
+        {
+          from: path.resolve(__dirname, '../site-drive/src/styles/drive-overrides.css'),
+          to: 'styles/drive-overrides.css',
           transform: transformPrefix,
         },
         { from: 'src/offscreen.html', to: 'offscreen.html' },

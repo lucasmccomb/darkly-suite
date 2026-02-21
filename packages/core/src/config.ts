@@ -3,7 +3,7 @@
 
 import type React from 'react';
 
-export type SiteId = 'gmail' | 'sheets' | 'docs';
+export type SiteId = 'gmail' | 'sheets' | 'docs' | 'drive';
 export type ProductId = 'gmail' | 'sheets' | 'docs' | 'suite';
 export type Plan = 'monthly' | 'yearly' | 'lifetime';
 export type PageContext = 'editor' | 'dashboard';

@@ -71,6 +71,9 @@ importers:
       '@darkly/site-docs':
         specifier: workspace:*
         version: link:../site-docs
+      '@darkly/site-drive':
+        specifier: workspace:*
+        version: link:../site-drive
       '@darkly/site-gmail':
         specifier: workspace:*
         version: link:../site-gmail
@@ -501,6 +504,19 @@ importers:
       '@types/react':
         specifier: ^18.3.12
         version: 18.3.28
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
+
+  packages/site-drive:
+    dependencies:
+      '@darkly/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@types/chrome':
+        specifier: ^0.0.270
+        version: 0.0.270
       typescript:
         specifier: ^5.6.3
         version: 5.9.3

@@ -1,0 +1,19 @@
+{
+  "name": "@darkly/site-drive",
+  "version": "1.0.0",
+  "description": "Google Drive-specific plugin with dashboard dark mode and CSS overrides",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "lint": "eslint src/ --ext .ts,.tsx",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@darkly/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.270",
+    "typescript": "^5.6.3"
+  }
+}
