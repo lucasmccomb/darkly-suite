@@ -383,7 +383,7 @@ describe('webhook — customer.subscription.updated', () => {
     expect(db._statement.bind).toHaveBeenCalledWith('active', 'sub_123');
   });
 
-  it('maps "canceled" Stripe status to "cancelled" license status', async () => {
+  it('maps "canceled" Stripe status to "inactive" license status', async () => {
     const env = createMockEnv();
     const eventBody = makeWebhookEvent('customer.subscription.updated', {
       id: 'sub_456',
@@ -392,10 +392,10 @@ describe('webhook — customer.subscription.updated', () => {
     await callWebhook(eventBody, env);
 
     const db = env.DB as unknown as MockD1Database;
-    expect(db._statement.bind).toHaveBeenCalledWith('cancelled', 'sub_456');
+    expect(db._statement.bind).toHaveBeenCalledWith('inactive', 'sub_456');
   });
 
-  it('maps "past_due" Stripe status to "past_due"', async () => {
+  it('maps "past_due" Stripe status to "inactive"', async () => {
     const env = createMockEnv();
     const eventBody = makeWebhookEvent('customer.subscription.updated', {
       id: 'sub_pd',
@@ -404,10 +404,10 @@ describe('webhook — customer.subscription.updated', () => {
     await callWebhook(eventBody, env);
 
     const db = env.DB as unknown as MockD1Database;
-    expect(db._statement.bind).toHaveBeenCalledWith('past_due', 'sub_pd');
+    expect(db._statement.bind).toHaveBeenCalledWith('inactive', 'sub_pd');
   });
 
-  it('maps "incomplete_expired" to "expired"', async () => {
+  it('maps "incomplete_expired" to "inactive"', async () => {
     const env = createMockEnv();
     const eventBody = makeWebhookEvent('customer.subscription.updated', {
       id: 'sub_ie',
@@ -416,7 +416,7 @@ describe('webhook — customer.subscription.updated', () => {
     await callWebhook(eventBody, env);
 
     const db = env.DB as unknown as MockD1Database;
-    expect(db._statement.bind).toHaveBeenCalledWith('expired', 'sub_ie');
+    expect(db._statement.bind).toHaveBeenCalledWith('inactive', 'sub_ie');
   });
 
   it('maps "trialing" to "active"', async () => {
@@ -431,7 +431,7 @@ describe('webhook — customer.subscription.updated', () => {
     expect(db._statement.bind).toHaveBeenCalledWith('active', 'sub_trial');
   });
 
-  it('defaults unknown Stripe status to "active"', async () => {
+  it('defaults unknown Stripe status to "inactive"', async () => {
     const env = createMockEnv();
     const eventBody = makeWebhookEvent('customer.subscription.updated', {
       id: 'sub_unknown',
@@ -440,7 +440,7 @@ describe('webhook — customer.subscription.updated', () => {
     await callWebhook(eventBody, env);
 
     const db = env.DB as unknown as MockD1Database;
-    expect(db._statement.bind).toHaveBeenCalledWith('active', 'sub_unknown');
+    expect(db._statement.bind).toHaveBeenCalledWith('inactive', 'sub_unknown');
   });
 
   it('sends notification when status changes to a problematic state', async () => {
@@ -500,7 +500,7 @@ describe('webhook — customer.subscription.updated', () => {
 });
 
 describe('webhook — customer.subscription.deleted', () => {
-  it('sets license status to "cancelled" and sends notification', async () => {
+  it('sets license status to "inactive" and sends notification', async () => {
     // sendAdminEmail
     mockResendSuccess();
 
@@ -519,7 +519,7 @@ describe('webhook — customer.subscription.deleted', () => {
 
     // Second call: UPDATE license status
     const updateSql = db.prepare.mock.calls[1][0] as string;
-    expect(updateSql).toContain("status = 'cancelled'");
+    expect(updateSql).toContain("status = 'inactive'");
 
     // Verify email was sent
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -529,29 +529,40 @@ describe('webhook — customer.subscription.deleted', () => {
 });
 
 describe('webhook — invoice.payment_failed', () => {
-  it('sets license status to "past_due" and sends notification', async () => {
-    // sendAdminEmail
+  it('sets license status to "inactive" and sends admin + user notifications', async () => {
+    // sendAdminEmail + sendUserEmail
+    mockResendSuccess();
     mockResendSuccess();
 
     const env = createMockEnv();
+    // Mock the SELECT to return a license with an email so sendUserEmail fires
+    const db = env.DB as unknown as MockD1Database;
+    db._statement.first.mockResolvedValueOnce({ email: 'user@example.com', product: 'gmail', plan: 'yearly' });
+
     const eventBody = makeWebhookEvent('invoice.payment_failed', {
       subscription: 'sub_pastdue',
     });
     const response = await callWebhook(eventBody, env);
 
     expect(response.status).toBe(200);
-    const db = env.DB as unknown as MockD1Database;
 
     // First call: UPDATE status
     const updateSql = db.prepare.mock.calls[0][0] as string;
-    expect(updateSql).toContain("status = 'past_due'");
+    expect(updateSql).toContain("status = 'inactive'");
 
     // Second call: SELECT license for notification
     const selectSql = db.prepare.mock.calls[1][0] as string;
     expect(selectSql).toContain('SELECT email, product, plan');
 
-    // Verify email was sent
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    // Verify both emails were sent (admin + user)
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock.mock.calls[0][0]).toBe('https://api.resend.com/emails');
+    expect(fetchMock.mock.calls[1][0]).toBe('https://api.resend.com/emails');
+
+    // Second email should be the user notification
+    const userEmailBody = JSON.parse(fetchMock.mock.calls[1][1]?.body as string);
+    expect(userEmailBody.to).toBe('user@example.com');
+    expect(userEmailBody.subject).toContain('Update your payment method');
   });
 
   it('does nothing when subscription ID is null', async () => {

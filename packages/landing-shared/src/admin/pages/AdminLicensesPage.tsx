@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Trash2 } from 'lucide-react'
+import { Trash2, Eye } from 'lucide-react'
 import { ConfirmDeleteModal } from '../components/ConfirmDeleteModal'
+import { LicenseDetailModal } from '../components/LicenseDetailModal'
 import { AdminToast } from '../components/AdminToast'
 
 interface License {
@@ -11,6 +12,7 @@ interface License {
   status: string
   created_at: string
   expires_at: string | null
+  stripe_subscription_id: string | null
   discount_code: string | null
 }
 
@@ -36,6 +38,7 @@ export function AdminLicensesPage() {
   const [page, setPage] = useState(1)
   const [deletingLicense, setDeletingLicense] = useState<License | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
+  const [detailLicense, setDetailLicense] = useState<License | null>(null)
   const [toast, setToast] = useState<Toast | null>(null)
 
   const fetchLicenses = useCallback(async () => {
@@ -87,6 +90,11 @@ export function AdminLicensesPage() {
     }
   }
 
+  const handleDetailAction = () => {
+    setToast({ message: 'Action completed successfully', type: 'success' })
+    fetchLicenses()
+  }
+
   const totalPages = data ? Math.ceil(data.total / data.limit) : 0
 
   return (
@@ -110,9 +118,7 @@ export function AdminLicensesPage() {
         <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1) }} className="admin-select">
           <option value="">All statuses</option>
           <option value="active">Active</option>
-          <option value="cancelled">Cancelled</option>
-          <option value="expired">Expired</option>
-          <option value="past_due">Past Due</option>
+          <option value="inactive">Inactive</option>
         </select>
         <select value={plan} onChange={(e) => { setPlan(e.target.value); setPage(1) }} className="admin-select">
           <option value="">All plans</option>
@@ -136,9 +142,9 @@ export function AdminLicensesPage() {
                   <th>Email</th>
                   <th>Product</th>
                   <th>Plan</th>
-                  <th>Status</th>
+                  <th>Access</th>
+                  <th>Subscription</th>
                   <th>Signed Up</th>
-                  <th>Expires</th>
                   <th>Discount</th>
                   <th>Actions</th>
                 </tr>
@@ -150,11 +156,22 @@ export function AdminLicensesPage() {
                     <td><span className={`badge badge--${license.product}`}>{license.product}</span></td>
                     <td><span className={`badge badge--${license.plan}`}>{license.plan}</span></td>
                     <td><span className={`badge badge--${license.status}`}>{license.status}</span></td>
+                    <td>
+                      {license.stripe_subscription_id
+                        ? <span className="badge badge--subscription">subscription</span>
+                        : <span className="admin-detail-muted">none</span>}
+                    </td>
                     <td>{formatDate(license.created_at)}</td>
-                    <td>{license.expires_at ? formatDate(license.expires_at) : '--'}</td>
                     <td>{license.discount_code ?? '--'}</td>
                     <td>
                       <div className="admin-actions-cell">
+                        <button
+                          className="admin-icon-btn"
+                          title="View details"
+                          onClick={() => setDetailLicense(license)}
+                        >
+                          <Eye size={16} />
+                        </button>
                         <button
                           className="admin-icon-btn admin-icon-btn--danger"
                           title="Delete license"
@@ -186,6 +203,13 @@ export function AdminLicensesPage() {
         loading={deleteLoading}
         onClose={() => setDeletingLicense(null)}
         onConfirm={handleConfirmDelete}
+      />
+
+      <LicenseDetailModal
+        open={!!detailLicense}
+        license={detailLicense}
+        onClose={() => setDetailLicense(null)}
+        onAction={handleDetailAction}
       />
 
       {toast && (

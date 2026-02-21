@@ -25,11 +25,13 @@ const PRODUCT_LABELS: Record<string, string> = {
 function statusBadgeClass(status: string): string {
   switch (status) {
     case 'active': return 'badge badge--active'
-    case 'cancelled': return 'badge badge--cancelled'
-    case 'past_due': return 'badge badge--expired'
-    case 'expired': return 'badge badge--expired'
+    case 'inactive': return 'badge badge--inactive'
     default: return 'badge'
   }
+}
+
+function statusLabel(status: string): string {
+  return status === 'active' ? 'Active' : 'Inactive'
 }
 
 export function AccountSubscriptionsPage() {
@@ -76,7 +78,7 @@ export function AccountSubscriptionsPage() {
                 <tr key={sub.id}>
                   <td><span className={`badge badge--${sub.product}`}>{PRODUCT_LABELS[sub.product] ?? sub.product}</span></td>
                   <td><span className={`badge badge--${sub.plan}`}>{sub.plan}</span></td>
-                  <td><span className={statusBadgeClass(sub.status)}>{sub.status}</span></td>
+                  <td><span className={statusBadgeClass(sub.status)}>{statusLabel(sub.status)}</span></td>
                   <td>{formatDate(sub.created_at)}</td>
                   <td>{sub.expires_at ? formatDate(sub.expires_at) : '--'}</td>
                   <td>{sub.discount_code ?? '--'}</td>

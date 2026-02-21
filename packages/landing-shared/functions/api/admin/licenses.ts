@@ -1,5 +1,5 @@
 import type { Env } from '../_shared/types.ts'
-import { cancelSubscription } from '../_shared/stripe.ts'
+import { cancelSubscription, cancelSubscriptionAtPeriodEnd } from '../_shared/stripe.ts'
 import { requireAdmin } from './_shared/auth.ts'
 
 type CFContext = EventContext<Env, string, unknown>
@@ -56,7 +56,7 @@ export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
 
   const licenses = await context.env.DB.prepare(
     `SELECT l.id, l.email, l.product, l.plan, l.status, l.created_at, l.expires_at,
-            d.code as discount_code
+            l.stripe_subscription_id, d.code as discount_code
      FROM licenses l
      LEFT JOIN discount_codes d ON l.discount_code_id = d.id
      ${where}
@@ -140,5 +140,96 @@ export const onRequestDelete: PagesFunction<Env> = async (context: CFContext) =>
   } catch (err) {
     console.error('License deletion failed:', err)
     return errorResponse(500, 'Failed to delete license')
+  }
+}
+
+type PatchAction = 'cancel_subscription' | 'cancel_immediately' | 'revoke_access' | 'grant_access'
+
+const VALID_ACTIONS = new Set<PatchAction>([
+  'cancel_subscription',
+  'cancel_immediately',
+  'revoke_access',
+  'grant_access',
+])
+
+/**
+ * PATCH /api/admin/licenses?id=123&action=cancel_subscription
+ * Manages subscription and access independently.
+ *
+ * Actions:
+ * - cancel_subscription: Cancel at period end via Stripe (D1 unchanged until webhook)
+ * - cancel_immediately: Cancel in Stripe + set D1 status to 'inactive' immediately
+ * - revoke_access: Set D1 status to 'inactive' (does NOT touch Stripe)
+ * - grant_access: Set D1 status to 'active' (does NOT touch Stripe)
+ */
+export const onRequestPatch: PagesFunction<Env> = async (context: CFContext) => {
+  const unauthorized = await requireAdmin(context.request, context.env.DB)
+  if (unauthorized) return unauthorized
+
+  const url = new URL(context.request.url)
+  const id = url.searchParams.get('id')
+  const action = url.searchParams.get('action') as PatchAction | null
+
+  if (!id) return errorResponse(400, 'Missing required parameter: id')
+  if (!action || !VALID_ACTIONS.has(action)) {
+    return errorResponse(400, `Invalid action. Must be one of: ${[...VALID_ACTIONS].join(', ')}`)
+  }
+
+  try {
+    const license = await context.env.DB.prepare(
+      'SELECT id, stripe_subscription_id FROM licenses WHERE id = ?',
+    )
+      .bind(id)
+      .first<{ id: number; stripe_subscription_id: string | null }>()
+
+    if (!license) return errorResponse(404, 'License not found')
+
+    switch (action) {
+      case 'cancel_subscription': {
+        if (!license.stripe_subscription_id) {
+          return errorResponse(400, 'License has no Stripe subscription to cancel')
+        }
+        await cancelSubscriptionAtPeriodEnd(
+          context.env.STRIPE_SECRET_KEY,
+          license.stripe_subscription_id,
+        )
+        break
+      }
+
+      case 'cancel_immediately': {
+        if (license.stripe_subscription_id) {
+          await cancelSubscription(
+            context.env.STRIPE_SECRET_KEY,
+            license.stripe_subscription_id,
+          )
+        }
+        await context.env.DB.prepare(
+          'UPDATE licenses SET status = ? WHERE id = ?',
+        ).bind('inactive', id).run()
+        break
+      }
+
+      case 'revoke_access': {
+        await context.env.DB.prepare(
+          'UPDATE licenses SET status = ? WHERE id = ?',
+        ).bind('inactive', id).run()
+        break
+      }
+
+      case 'grant_access': {
+        await context.env.DB.prepare(
+          'UPDATE licenses SET status = ? WHERE id = ?',
+        ).bind('active', id).run()
+        break
+      }
+    }
+
+    return new Response(JSON.stringify({ ok: true, action }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  } catch (err) {
+    console.error(`License action '${action}' failed:`, err)
+    return errorResponse(500, `Failed to ${action.replace(/_/g, ' ')}`)
   }
 }

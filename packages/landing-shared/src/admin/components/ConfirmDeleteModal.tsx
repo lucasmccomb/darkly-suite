@@ -38,7 +38,7 @@ export function ConfirmDeleteModal({ open, license, loading, onClose, onConfirm 
           <span className={`badge badge--${license.plan}`}>{license.plan}</span>
         </div>
         <div className="admin-confirm-row">
-          <span className="admin-confirm-label">Status</span>
+          <span className="admin-confirm-label">Access</span>
           <span className={`badge badge--${license.status}`}>{license.status}</span>
         </div>
       </div>

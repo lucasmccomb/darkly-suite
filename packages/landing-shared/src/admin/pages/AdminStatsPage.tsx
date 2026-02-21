@@ -4,9 +4,7 @@ interface ProductStats {
   product: string
   total: number
   active: number
-  cancelled: number
-  expired: number
-  past_due: number
+  inactive: number
   monthly: number
   yearly: number
   lifetime: number
@@ -67,12 +65,8 @@ export function AdminStatsPage() {
           <div className="admin-stat-label">Active</div>
         </div>
         <div className="admin-stat-card">
-          <div className="admin-stat-value">{data.totals.cancelled}</div>
-          <div className="admin-stat-label">Cancelled</div>
-        </div>
-        <div className="admin-stat-card">
-          <div className="admin-stat-value">{data.totals.past_due}</div>
-          <div className="admin-stat-label">Past Due</div>
+          <div className="admin-stat-value">{data.totals.inactive}</div>
+          <div className="admin-stat-label">Inactive</div>
         </div>
       </div>
 
@@ -87,10 +81,10 @@ export function AdminStatsPage() {
                 <th>Product</th>
                 <th>Total</th>
                 <th>Active</th>
+                <th>Inactive</th>
                 <th>Monthly</th>
                 <th>Yearly</th>
                 <th>Lifetime</th>
-                <th>Cancelled</th>
               </tr>
             </thead>
             <tbody>
@@ -99,10 +93,10 @@ export function AdminStatsPage() {
                   <td><span className={`badge badge--${row.product}`}>{row.product}</span></td>
                   <td>{row.total}</td>
                   <td>{row.active}</td>
+                  <td>{row.inactive}</td>
                   <td>{row.monthly}</td>
                   <td>{row.yearly}</td>
                   <td>{row.lifetime}</td>
-                  <td>{row.cancelled}</td>
                 </tr>
               ))}
             </tbody>

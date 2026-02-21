@@ -50,7 +50,7 @@ export interface License {
   product: ProductId;
   email: string | null;
   plan: 'monthly' | 'yearly' | 'lifetime';
-  status: 'active' | 'cancelled' | 'expired' | 'past_due';
+  status: 'active' | 'inactive';
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
   discount_code_id: number | null;
