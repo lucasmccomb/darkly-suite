@@ -18,7 +18,7 @@ export function Footer({
   brandLabel,
   links,
   copyrightName,
-  trademarkText = 'Gmail, Google Sheets, and Google Docs are trademarks of Google LLC. Darkly is not affiliated with or endorsed by Google.',
+  trademarkText = 'Gmail, Google Sheets, Google Docs, and Google Drive are trademarks of Google LLC. Darkly is not affiliated with or endorsed by Google.',
 }: FooterProps) {
   return (
     <footer className="footer">

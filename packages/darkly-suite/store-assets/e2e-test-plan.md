@@ -3,7 +3,7 @@
 Run this checklist before Chrome Web Store submission.
 Use a **fresh Google account** and a **production build** (`pnpm --filter darkly-suite build`).
 
-Darkly Suite is the **bundle extension** covering Gmail, Sheets, and Docs with a single subscription. This test plan covers all three apps plus cross-app behavior, conflict detection, and the Drive stub.
+Darkly Suite is the **bundle extension** covering Gmail, Sheets, Docs, and Drive with a single subscription. This test plan covers all four apps plus cross-app behavior and conflict detection.
 
 ---
 
@@ -18,6 +18,7 @@ Before starting, verify these are live:
 - [ ] **Promo code** — `CWSREVIEWSUITE2026` created in Stripe dashboard (100% off, `duration:once`)
 - [ ] **Production zip** — Built from latest main: `pnpm --filter darkly-suite build`, then zip `dist/`
 - [ ] **No standalone Darkly extensions installed** — Uninstall Gmail Darkly, Sheets Darkly, and Docs Darkly before starting (conflict detection is tested separately in Test 12)
+- [ ] **Drive access** — The test Google account has access to Google Drive at drive.google.com
 
 ---
 
@@ -69,7 +70,7 @@ Before starting, verify these are live:
 30. [ ] **Verify**: Console logs show `[Darkly Suite] Sheets content script loaded (prefix: ds, storage: ds_sheets_preferences)`
 31. [ ] **Verify**: Console logs show `[Darkly Suite] Docs content script loaded (prefix: ds, storage: ds_docs_preferences)`
 
-**Expected behavior for free users**: The toolbar button, sidebar icon, and paywall should be visible on all three apps, but dark mode functionality should be gated behind payment. The paywall should show a "Subscribe Now" option.
+**Expected behavior for free users**: The toolbar button, sidebar icon, and paywall should be visible on all four apps, but dark mode functionality should be gated behind payment. The paywall should show a "Subscribe Now" option.
 
 ---
 
@@ -90,7 +91,7 @@ Before starting, verify these are live:
 10. [ ] Navigate to Sheets — **Verify**: Pro access is active (no paywall)
 11. [ ] Navigate to Docs — **Verify**: Pro access is active (no paywall)
 
-**Note**: The payment flow is: Extension > darklysuite.com/api/checkout > Stripe hosted checkout > Stripe webhook > D1 license record > Extension checks /api/status and gets `paid: true`. Because all three sites share `ds_token` and `ds_pro_cache`, a single payment unlocks all apps.
+**Note**: The payment flow is: Extension > darklysuite.com/api/checkout > Stripe hosted checkout > Stripe webhook > D1 license record > Extension checks /api/status and gets `paid: true`. Because all four sites share `ds_token` and `ds_pro_cache`, a single payment unlocks all apps.
 
 ---
 
@@ -287,20 +288,22 @@ Before starting, verify these are live:
 
 ## Test 7: Cross-App Settings Independence
 
-**Suite uses per-site storage keys** (`ds_gmail_preferences`, `ds_sheets_preferences`, `ds_docs_preferences`). Each app maintains its own preferences independently.
+**Suite uses per-site storage keys** (`ds_gmail_preferences`, `ds_sheets_preferences`, `ds_docs_preferences`, `ds_drive_preferences`). Each app maintains its own preferences independently.
 
 1. [ ] On Gmail: Set mode to **Dark**, preset to **Nord**
 2. [ ] On Sheets: Set mode to **System**, preset to **Solarized Dark**
 3. [ ] On Docs: Set mode to **Schedule**, preset to **Monokai**
-4. [ ] Refresh Gmail — **Verify**: Mode is still Dark with Nord preset
-5. [ ] Refresh Sheets — **Verify**: Mode is still System with Solarized Dark preset
-6. [ ] Refresh Docs — **Verify**: Mode is still Schedule with Monokai preset
-7. [ ] **Verify**: Changing settings on one app does NOT affect the other two apps
-8. [ ] **Verify**: All three apps share the SAME pro status (one payment unlocks all)
-9. [ ] Open Chrome DevTools > Application > Storage > chrome.storage.sync
-10. [ ] **Verify**: Three separate storage keys exist: `ds_gmail_preferences`, `ds_sheets_preferences`, `ds_docs_preferences`
-11. [ ] **Verify**: A shared `ds_token` key exists (used for payment across all sites)
-12. [ ] **Verify**: A shared `ds_pro_cache` key exists (payment cache shared across all sites)
+4. [ ] On Drive: Set mode to **Dark**, preset to **Rose Pine**
+5. [ ] Refresh Gmail — **Verify**: Mode is still Dark with Nord preset
+6. [ ] Refresh Sheets — **Verify**: Mode is still System with Solarized Dark preset
+7. [ ] Refresh Docs — **Verify**: Mode is still Schedule with Monokai preset
+8. [ ] Refresh Drive — **Verify**: Mode is still Dark with Rose Pine preset
+9. [ ] **Verify**: Changing settings on one app does NOT affect the other apps
+10. [ ] **Verify**: All four apps share the SAME pro status (one payment unlocks all)
+11. [ ] Open Chrome DevTools > Application > Storage > chrome.storage.sync
+12. [ ] **Verify**: Four separate storage keys exist: `ds_gmail_preferences`, `ds_sheets_preferences`, `ds_docs_preferences`, `ds_drive_preferences`
+13. [ ] **Verify**: A shared `ds_token` key exists (used for payment across all sites)
+14. [ ] **Verify**: A shared `ds_pro_cache` key exists (payment cache shared across all sites)
 
 ---
 
@@ -308,7 +311,7 @@ Before starting, verify these are live:
 
 **Setup**: Pro user.
 
-### Mode Switching (repeat on Gmail, Sheets, AND Docs)
+### Mode Switching (repeat on Gmail, Sheets, Docs, AND Drive)
 
 For each Google app:
 
@@ -331,7 +334,7 @@ For each Google app:
 17. [ ] **Verify**: Sunrise and sunset times are displayed
 18. [ ] **Verify**: Dark mode activates/deactivates based on whether it's currently before/after sunset
 
-### Theme Presets (repeat on Gmail, Sheets, AND Docs)
+### Theme Presets (repeat on Gmail, Sheets, Docs, AND Drive)
 
 For each Google app:
 
@@ -350,9 +353,11 @@ For each Google app:
 - [ ] All 5 modes tested on Gmail
 - [ ] All 5 modes tested on Sheets
 - [ ] All 5 modes tested on Docs
+- [ ] All 5 modes tested on Drive
 - [ ] All 6 presets tested on Gmail
 - [ ] All 6 presets tested on Sheets
 - [ ] All 6 presets tested on Docs
+- [ ] All 6 presets tested on Drive
 
 ---
 
@@ -383,11 +388,21 @@ For each Google app:
 18. [ ] Open a document from the dashboard
 19. [ ] **Verify**: Transition from dashboard to editor preserves dark mode state
 
+### Drive Dashboard
+
+20. [ ] Navigate to `drive.google.com` (Drive is dashboard-only)
+21. [ ] **Verify**: Dark mode filter applies to the Drive dashboard
+22. [ ] **Verify**: The Darkly settings icon (FAB) appears in the Drive header toolbar area
+23. [ ] Click the FAB icon
+24. [ ] **Verify**: Settings modal opens
+25. [ ] **Verify**: File list is readable with proper contrast
+26. [ ] **Verify**: Sidebar navigation is themed
+
 ### Gmail (No Dashboard Distinction)
 
-20. [ ] Navigate to `mail.google.com` — Gmail inbox IS the main view
-21. [ ] **Verify**: Darkly toolbar button appears (InboxSDK manages this)
-22. [ ] **Verify**: Dark mode works on the inbox view
+27. [ ] Navigate to `mail.google.com` — Gmail inbox IS the main view
+28. [ ] **Verify**: Darkly toolbar button appears (InboxSDK manages this)
+29. [ ] **Verify**: Dark mode works on the inbox view
 
 ---
 
@@ -402,18 +417,21 @@ For each Google app:
 5. [ ] Close the portal tab
 6. [ ] **Verify**: The same "Manage Subscription" link appears on Sheets settings panel
 7. [ ] **Verify**: The same "Manage Subscription" link appears on Docs settings panel
+8. [ ] **Verify**: The same "Manage Subscription" link appears on Drive settings panel
 
 ### Cancellation Flow (test LAST — this disables pro access)
 
-8. [ ] Open Stripe customer portal from any app's settings
-9. [ ] Cancel the subscription
-10. [ ] Return to Gmail — clear `ds_pro_cache` — refresh
-11. [ ] **Verify**: Paywall reappears on Gmail
-12. [ ] Navigate to Sheets — refresh
-13. [ ] **Verify**: Paywall reappears on Sheets
-14. [ ] Navigate to Docs — refresh
-15. [ ] **Verify**: Paywall reappears on Docs
-16. [ ] **Verify**: Cancellation removes pro access from ALL three apps (single subscription controls all)
+9. [ ] Open Stripe customer portal from any app's settings
+10. [ ] Cancel the subscription
+11. [ ] Return to Gmail — clear `ds_pro_cache` — refresh
+12. [ ] **Verify**: Paywall reappears on Gmail
+13. [ ] Navigate to Sheets — refresh
+14. [ ] **Verify**: Paywall reappears on Sheets
+15. [ ] Navigate to Docs — refresh
+16. [ ] **Verify**: Paywall reappears on Docs
+17. [ ] Navigate to Drive — refresh
+18. [ ] **Verify**: Paywall reappears on Drive
+19. [ ] **Verify**: Cancellation removes pro access from ALL four apps (single subscription controls all)
 
 ---
 
@@ -424,14 +442,17 @@ For each Google app:
 1. [ ] On Gmail: Set dark mode to ON with **Nord** preset
 2. [ ] On Sheets: Set dark mode to ON with **Catppuccin Mocha** preset, enable "Preserve Grid Colors"
 3. [ ] On Docs: Set dark mode to ON with **Rose Pine** preset
-4. [ ] Close ALL Google tabs and close the Chrome window
-5. [ ] Reopen Chrome
-6. [ ] Open Gmail — **Verify**: Dark mode is active with Nord preset
-7. [ ] Open Sheets — **Verify**: Dark mode is active with Catppuccin Mocha preset, Preserve Grid Colors is still ON
-8. [ ] Open Docs — **Verify**: Dark mode is active with Rose Pine preset
-9. [ ] Open Gmail in a different Chrome window — **Verify**: Same settings (chrome.storage.sync)
-10. [ ] Open Sheets in a different Chrome window — **Verify**: Same settings
-11. [ ] Open Docs in a different Chrome window — **Verify**: Same settings
+4. [ ] On Drive: Set dark mode to ON with **Monokai** preset
+5. [ ] Close ALL Google tabs and close the Chrome window
+6. [ ] Reopen Chrome
+7. [ ] Open Gmail — **Verify**: Dark mode is active with Nord preset
+8. [ ] Open Sheets — **Verify**: Dark mode is active with Catppuccin Mocha preset, Preserve Grid Colors is still ON
+9. [ ] Open Docs — **Verify**: Dark mode is active with Rose Pine preset
+10. [ ] Open Drive — **Verify**: Dark mode is active with Monokai preset
+11. [ ] Open Gmail in a different Chrome window — **Verify**: Same settings (chrome.storage.sync)
+12. [ ] Open Sheets in a different Chrome window — **Verify**: Same settings
+13. [ ] Open Docs in a different Chrome window — **Verify**: Same settings
+14. [ ] Open Drive in a different Chrome window — **Verify**: Same settings
 
 ---
 
@@ -486,20 +507,57 @@ For each Google app:
 
 ---
 
-## Test 13: Drive Stub
+## Test 13: Drive Dark Mode
 
-**Setup**: Darkly Suite installed.
+**Setup**: Pro user with Darkly Suite installed.
+
+### Basic Toggle
 
 1. [ ] Navigate to `drive.google.com`
 2. [ ] **Verify**: The page loads normally — no crashes, no broken UI
-3. [ ] Open DevTools Console
-4. [ ] **Verify**: Console shows: `[Darkly Suite] Drive dark mode is coming in v1.1. Stub loaded.`
-5. [ ] **Verify**: No JavaScript errors or unhandled exceptions
-6. [ ] **Verify**: No dark mode filter is applied to Drive (stub only claims the page, does not inject CSS)
-7. [ ] **Verify**: `data-darkly-active` attribute is set to `ds-drive` on `<html>` (page claimed to prevent future conflicts)
-8. [ ] **Verify**: Drive remains fully functional — file browsing, uploads, sharing all work normally
-9. [ ] Navigate from Drive to a Sheets spreadsheet — **Verify**: Darkly Suite activates normally on Sheets
-10. [ ] Navigate from Drive to a Docs document — **Verify**: Darkly Suite activates normally on Docs
+3. [ ] **Verify**: The Darkly settings icon (FAB) appears in the Drive header toolbar area (right-side of the global bar `#gb`)
+4. [ ] Click the FAB icon
+5. [ ] **Verify**: Settings modal opens
+6. [ ] Toggle dark mode ON
+7. [ ] **Verify**: Drive background goes dark — file list, sidebar, toolbar all themed
+8. [ ] **Verify**: Transition is smooth (no flash of unstyled content)
+9. [ ] Toggle dark mode OFF
+10. [ ] **Verify**: Drive returns to normal light theme smoothly
+
+### Drive UI Coverage
+
+11. [ ] **File list** — Verify file/folder rows are themed with readable text
+12. [ ] **Sidebar navigation** — My Drive, Shared with me, Recent, Starred, Trash — all themed
+13. [ ] **Toolbar** — New button, search bar, view toggle, sort options all themed
+14. [ ] **Header** — Google account menu, apps grid, notifications area themed
+15. [ ] **Right-click context menus** — Right-click a file — verify context menu is readable
+16. [ ] **File previews** — Click a file to preview — verify preview panel is themed
+17. [ ] **Search results** — Use the search bar — verify results dropdown is themed
+
+### Preservation
+
+18. [ ] **File type icons** — Verify Google Docs, Sheets, Slides, PDF icons display in their original colors (re-inverted)
+19. [ ] **Folder icons** — Verify folder icons show in their original colors
+20. [ ] **Thumbnails** — Verify file thumbnails display in their original colors
+21. [ ] **Profile avatars** — Verify user profile photos and avatars are not inverted
+
+### Keyboard Shortcuts
+
+22. [ ] Press `Alt+Shift+D` — **Verify**: Dark mode toggles on/off
+23. [ ] Press `Alt+Shift+S` — **Verify**: Settings modal opens
+
+### Console Check
+
+24. [ ] Open DevTools Console
+25. [ ] **Verify**: Console shows `[Darkly Suite] Drive content script loaded (prefix: ds, storage: ds_drive_preferences)`
+26. [ ] **Verify**: No JavaScript errors
+27. [ ] **Verify**: `data-darkly-active` attribute is set to `ds-drive` on `<html>`
+
+### Cross-Navigation
+
+28. [ ] Navigate from Drive to a Sheets spreadsheet — **Verify**: Darkly Suite activates normally on Sheets
+29. [ ] Navigate from Drive to a Docs document — **Verify**: Darkly Suite activates normally on Docs
+30. [ ] **Verify**: Drive remains fully functional — file browsing, uploads, sharing all work normally
 
 ---
 
@@ -507,13 +565,14 @@ For each Google app:
 
 ### Multiple Simultaneous Tabs
 
-- [ ] Open Gmail, Sheets, AND Docs in separate tabs simultaneously
+- [ ] Open Gmail, Sheets, Docs, AND Drive in separate tabs simultaneously
 - [ ] **Verify**: Dark mode works independently on each tab
 - [ ] **Verify**: Changing settings on one tab does not break another
-- [ ] Toggle dark mode on Gmail tab — **Verify**: Sheets and Docs tabs are unaffected
+- [ ] Toggle dark mode on Gmail tab — **Verify**: Sheets, Docs, and Drive tabs are unaffected
 - [ ] Open 2+ Gmail tabs — **Verify**: Dark mode state is consistent across both
 - [ ] Open 2+ Sheets tabs — **Verify**: Dark mode state is consistent across both
 - [ ] Open 2+ Docs tabs — **Verify**: Dark mode state is consistent across both
+- [ ] Open 2+ Drive tabs — **Verify**: Dark mode state is consistent across both
 
 ### Extension Reload
 
@@ -521,6 +580,7 @@ For each Google app:
 - [ ] Refresh Gmail tab — **Verify**: Settings persist, dark mode reactivates
 - [ ] Refresh Sheets tab — **Verify**: Settings persist, dark mode reactivates
 - [ ] Refresh Docs tab — **Verify**: Settings persist, dark mode reactivates
+- [ ] Refresh Drive tab — **Verify**: Settings persist, dark mode reactivates
 - [ ] **Verify**: The setup page does NOT reopen on reload (`onInstalled` fires only for `reason: install`, not `update`)
 
 ### Print/Export Skipping
@@ -552,15 +612,15 @@ For each Google app:
 
 ### Network / Offline
 
-- [ ] Disconnect from the internet, refresh each Google app
+- [ ] Disconnect from the internet, refresh each Google app (Gmail, Sheets, Docs, Drive)
 - [ ] **Verify**: Extension doesn't crash on any app
-- [ ] **Verify**: Paid users with cached `ds_pro_cache` status still have dark mode on all apps
+- [ ] **Verify**: Paid users with cached `ds_pro_cache` status still have dark mode on all four apps
 - [ ] **Verify**: Free users see the paywall but no errors
 
 ### Google Account Switching
 
 - [ ] Switch to a different Google account within the same Chrome profile
-- [ ] **Verify**: Extension continues to work on all three apps
+- [ ] **Verify**: Extension continues to work on all four apps
 - [ ] **Verify**: Payment status is tied to the extension token, not the Google account
 
 ### Keyboard Shortcuts
@@ -568,20 +628,23 @@ For each Google app:
 - [ ] On Gmail: **Verify** keyboard shortcut toggles dark mode (InboxSDK keyboard API)
 - [ ] On Sheets: **Verify** keyboard shortcut toggles dark mode
 - [ ] On Docs: **Verify** keyboard shortcut toggles dark mode
+- [ ] On Drive: **Verify** keyboard shortcut toggles dark mode (Alt+Shift+D)
 - [ ] On Sheets: **Verify** keyboard shortcut opens settings
 - [ ] On Docs: **Verify** keyboard shortcut opens settings
+- [ ] On Drive: **Verify** keyboard shortcut opens settings (Alt+Shift+S)
 
 ---
 
 ## Test 15: Background Service Worker
 
 1. [ ] Open `chrome://extensions` and click "Service worker" link for Darkly Suite
-2. [ ] **Verify**: Console shows `[Darkly Suite] Background service worker initialized (3 sites)`
+2. [ ] **Verify**: Console shows `[Darkly Suite] Background service worker initialized (4 sites)`
 3. [ ] **Verify**: No errors in the service worker console
-4. [ ] **Verify**: Alarms are set up for all three sites (ds-gmail-schedule-check, ds-sheets-schedule-check, ds-docs-schedule-check) when using Schedule or Sunrise/Sunset mode
+4. [ ] **Verify**: Alarms are set up for all four sites (ds-gmail-schedule-check, ds-sheets-schedule-check, ds-docs-schedule-check, ds-drive-schedule-check) when using Schedule or Sunrise/Sunset mode
 5. [ ] **Verify**: Messages from Gmail tabs route to the gmail site worker
 6. [ ] **Verify**: Messages from Sheets tabs route to the sheets site worker
 7. [ ] **Verify**: Messages from Docs tabs route to the docs site worker
+8. [ ] **Verify**: Messages from Drive tabs route to the drive site worker
 
 ---
 
@@ -599,11 +662,11 @@ If ANY of these fail, do NOT submit to Chrome Web Store:
 
 - [ ] Paywall shows "Darkly Suite" branding (not standalone product names)
 - [ ] Paywall shows correct pricing (Monthly/Yearly/Lifetime)
-- [ ] Paywall blocks dark mode for free users on ALL three apps
+- [ ] Paywall blocks dark mode for free users on ALL four apps
 - [ ] Normal payment flow completes successfully
 - [ ] Promo code payment flow completes successfully
-- [ ] ONE subscription unlocks ALL three apps
-- [ ] Cancellation revokes access on ALL three apps
+- [ ] ONE subscription unlocks ALL four apps
+- [ ] Cancellation revokes access on ALL four apps
 - [ ] `darklysuite.com/api/status/{uuid-v4-token}?product=suite` responds correctly
 
 ### Dark Mode — Gmail
@@ -634,10 +697,10 @@ If ANY of these fail, do NOT submit to Chrome Web Store:
 
 ### Cross-App
 
-- [ ] Per-site preferences are independent (ds_gmail_preferences, ds_sheets_preferences, ds_docs_preferences)
+- [ ] Per-site preferences are independent (ds_gmail_preferences, ds_sheets_preferences, ds_docs_preferences, ds_drive_preferences)
 - [ ] Shared payment token works across all apps (ds_token, ds_pro_cache)
-- [ ] Settings persist across browser restarts on all three apps
-- [ ] Dashboard pages work on Sheets and Docs (FAB icon injected)
+- [ ] Settings persist across browser restarts on all four apps
+- [ ] Dashboard pages work on Sheets, Docs, and Drive (FAB icon injected)
 
 ### Conflict Detection
 
@@ -646,17 +709,19 @@ If ANY of these fail, do NOT submit to Chrome Web Store:
 - [ ] Conflict detection works with standalone Docs Darkly
 - [ ] No double-injection, no duplicate UI elements, no visual artifacts
 
-### Drive Stub
+### Dark Mode — Drive
 
-- [ ] Drive stub loads without errors
-- [ ] Drive stub claims the page (`data-darkly-active="ds-drive"`)
-- [ ] Drive stub does NOT inject any CSS or dark mode
-- [ ] Drive remains fully functional
+- [ ] Dark mode activates and deactivates smoothly on Drive
+- [ ] File list, sidebar, toolbar, header all themed
+- [ ] File type icons and thumbnails are re-inverted to show original colors
+- [ ] Profile avatars are preserved (not inverted)
+- [ ] FAB settings icon appears in header toolbar
+- [ ] Drive remains fully functional with dark mode active
 
 ### General
 
 - [ ] No console errors on any app (except expected conflict warnings)
-- [ ] No performance degradation on large documents/spreadsheets/inboxes
+- [ ] No performance degradation on large documents/spreadsheets/inboxes/Drive folders
 - [ ] Print/export views are skipped (no inversion on print preview)
 - [ ] Iframes are skipped (no double-inversion)
 - [ ] `darklysuite.com/privacy` is accessible

@@ -28,7 +28,7 @@ export function HomePage() {
       <Nav brandLabel="Suite" links={NAV_LINKS} cta={NAV_CTA} />
       <Hero
         title="Premium dark mode<br />for Google apps"
-        subtitle="Automatic dark mode scheduling, OS theme sync, and intelligent styling for Gmail, Sheets, and Docs."
+        subtitle="Automatic dark mode scheduling, OS theme sync, and intelligent styling for Gmail, Sheets, Docs, and Drive."
         ctaText="Get the Suite"
         ctaLink="/suite"
         screenshots={heroScreenshots}
@@ -69,7 +69,7 @@ export function HomePage() {
             />
             <ProductCard
               name="Darkly Suite"
-              description="All three apps in one bundle. One license, one price, full coverage."
+              description="All four apps in one bundle. One license, one price, full coverage."
               icon={<SuiteIcon size={28} />}
               link="/suite"
               price="$2.99/mo"

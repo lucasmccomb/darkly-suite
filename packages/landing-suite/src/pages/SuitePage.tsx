@@ -2,7 +2,7 @@ import { Nav, Hero, Features, Pricing, FAQ, Footer } from '@darkly/landing-share
 import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URLS, individualTiers, bundleTiers } from '../config.ts'
 
 const suiteFeatures = [
-  'Dark mode for Gmail, Sheets, and Docs',
+  'Dark mode for Gmail, Sheets, Docs, and Drive',
   'OS dark mode detection',
   'Manual toggle',
   'Time-based scheduling',
@@ -18,7 +18,7 @@ export function SuitePage() {
       <Nav brandLabel="Suite" links={NAV_LINKS} cta={NAV_CTA} />
       <Hero
         title="The complete dark mode<br />suite for Google"
-        subtitle="One extension, one license. Premium dark mode for Gmail, Sheets, and Docs with automatic scheduling and OS sync."
+        subtitle="One extension, one license. Premium dark mode for Gmail, Sheets, Docs, and Drive with automatic scheduling and OS sync."
         ctaText="Get the Suite"
         ctaLink="#pricing"
       />

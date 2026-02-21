@@ -6,4 +6,5 @@
 6. Return to Gmail, click Darkly icon to toggle dark mode
 7. Open docs.google.com/spreadsheets - verify dark mode
 8. Open docs.google.com/document - verify dark mode
-9. Confirm settings persist across all three apps
+9. Open drive.google.com - verify dark mode
+10. Confirm settings persist across all four apps

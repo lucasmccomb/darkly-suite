@@ -100,6 +100,7 @@ export const COMPARISON_FEATURES: ComparisonFeature[] = [
   { name: 'Gmail dark mode', gmail: true, sheets: false, docs: false, suite: true },
   { name: 'Sheets dark mode', gmail: false, sheets: true, docs: false, suite: true },
   { name: 'Docs dark mode', gmail: false, sheets: false, docs: true, suite: true },
+  { name: 'Drive dark mode', gmail: false, sheets: false, docs: false, suite: true },
   { name: 'OS theme sync', gmail: true, sheets: true, docs: true, suite: true },
   { name: 'Time-based scheduling', gmail: true, sheets: true, docs: true, suite: true },
   { name: 'Sunrise/sunset scheduling', gmail: true, sheets: true, docs: true, suite: true },
@@ -110,7 +111,7 @@ export const COMPARISON_FEATURES: ComparisonFeature[] = [
 ]
 
 export const DEFAULT_FEATURES = [
-  'Dark mode for Gmail, Sheets, and Docs',
+  'Dark mode for Gmail, Sheets, Docs, and Drive',
   'OS dark mode detection',
   'Manual toggle',
   'Time-based scheduling',
