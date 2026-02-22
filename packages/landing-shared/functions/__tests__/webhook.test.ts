@@ -526,6 +526,44 @@ describe('webhook — customer.subscription.deleted', () => {
     const [emailUrl] = fetchMock.mock.calls[0];
     expect(emailUrl).toBe('https://api.resend.com/emails');
   });
+
+  it('falls back to Stripe data when license is deleted from D1', async () => {
+    // D1 first() returns null by default (license already deleted)
+
+    // retrieveCustomer — Stripe API fallback for email
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ id: 'cus_del', email: 'deleted@example.com', name: null, created: 1700000000 }),
+        { status: 200 },
+      ),
+    );
+
+    // sendAdminEmail
+    mockResendSuccess();
+
+    const env = createMockEnv();
+    const eventBody = makeWebhookEvent('customer.subscription.deleted', {
+      id: 'sub_deleted_no_d1',
+      customer: 'cus_del',
+      items: { data: [{ price: { id: 'price_sheets_yearly' } }] },
+    });
+    const response = await callWebhook(eventBody, env);
+
+    expect(response.status).toBe(200);
+
+    // Verify retrieveCustomer was called
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock.mock.calls[0][0]).toContain('/customers/cus_del');
+
+    // Verify email contains correct info from Stripe fallback
+    const emailBody = JSON.parse(fetchMock.mock.calls[1][1]?.body as string);
+    expect(emailBody.subject).toContain('Sheets');
+    expect(emailBody.subject).toContain('Yearly');
+    expect(emailBody.subject).toContain('deleted@example.com');
+    expect(emailBody.text).toContain('Sheets');
+    expect(emailBody.text).toContain('Yearly');
+    expect(emailBody.text).toContain('deleted@example.com');
+  });
 });
 
 describe('webhook — invoice.payment_failed', () => {

@@ -51,6 +51,32 @@ export function getPriceId(env: Env, product: ProductId, plan: Plan): string {
   return priceId;
 }
 
+/**
+ * Reverse lookup: given a Stripe price ID, return the product and plan.
+ * Used when D1 data is unavailable (e.g. license already deleted).
+ */
+export function getProductPlanFromPriceId(env: Env, priceId: string): { product: string; plan: string } | null {
+  const entries: [string, string, string][] = [
+    [env.STRIPE_PRICE_GMAIL_MONTHLY, 'gmail', 'monthly'],
+    [env.STRIPE_PRICE_GMAIL_YEARLY, 'gmail', 'yearly'],
+    [env.STRIPE_PRICE_GMAIL_LIFETIME, 'gmail', 'lifetime'],
+    [env.STRIPE_PRICE_SHEETS_MONTHLY, 'sheets', 'monthly'],
+    [env.STRIPE_PRICE_SHEETS_YEARLY, 'sheets', 'yearly'],
+    [env.STRIPE_PRICE_SHEETS_LIFETIME, 'sheets', 'lifetime'],
+    [env.STRIPE_PRICE_DOCS_MONTHLY, 'docs', 'monthly'],
+    [env.STRIPE_PRICE_DOCS_YEARLY, 'docs', 'yearly'],
+    [env.STRIPE_PRICE_DOCS_LIFETIME, 'docs', 'lifetime'],
+    [env.STRIPE_PRICE_SUITE_MONTHLY, 'suite', 'monthly'],
+    [env.STRIPE_PRICE_SUITE_YEARLY, 'suite', 'yearly'],
+    [env.STRIPE_PRICE_SUITE_LIFETIME, 'suite', 'lifetime'],
+  ];
+
+  for (const [id, product, plan] of entries) {
+    if (id === priceId) return { product, plan };
+  }
+  return null;
+}
+
 export interface ProductPrices {
   monthly: string;
   yearly: string;
