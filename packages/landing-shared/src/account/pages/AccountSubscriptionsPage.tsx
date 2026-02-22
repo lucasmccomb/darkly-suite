@@ -83,7 +83,21 @@ export function AccountSubscriptionsPage() {
                   <td>{sub.expires_at ? formatDate(sub.expires_at) : '--'}</td>
                   <td>{sub.discount_code ?? '--'}</td>
                   <td>
-                    {sub.stripe_customer_id ? (
+                    {sub.plan === 'lifetime' ? (
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ color: 'var(--color-success, #81c995)', fontSize: '0.8rem', fontWeight: 600 }}>
+                          Lifetime access
+                        </span>
+                        {sub.stripe_customer_id && (
+                          <a
+                            href={`/api/account/portal?customer_id=${sub.stripe_customer_id}`}
+                            style={{ color: 'var(--color-text-secondary, #999)', fontSize: '0.75rem', textDecoration: 'underline', textUnderlineOffset: 2 }}
+                          >
+                            View receipt
+                          </a>
+                        )}
+                      </span>
+                    ) : sub.stripe_customer_id ? (
                       <a
                         href={`/api/account/portal?customer_id=${sub.stripe_customer_id}`}
                         className="admin-btn-primary"
