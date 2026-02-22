@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { ChevronRight, AlertTriangle } from 'lucide-react'
 import { AdminModal } from './AdminModal'
 import { PRODUCT_LABELS } from '../constants'
 
@@ -53,6 +54,8 @@ export function LicenseDetailModal({ open, license, onClose, onAction }: License
   const [loading, setLoading] = useState(false)
   const [actionState, setActionState] = useState<ActionState>({ loading: false, action: null })
   const [error, setError] = useState<string | null>(null)
+  const [deleteExpanded, setDeleteExpanded] = useState(false)
+  const [deleteConfirmed, setDeleteConfirmed] = useState(false)
 
   const fetchDetail = useCallback(async () => {
     if (!license) return
@@ -75,12 +78,14 @@ export function LicenseDetailModal({ open, license, onClose, onAction }: License
   useEffect(() => {
     if (open && license) {
       setDetail(null)
+      setDeleteExpanded(false)
+      setDeleteConfirmed(false)
       fetchDetail()
     }
   }, [open, license, fetchDetail])
 
   const handleCancelSubscription = async () => {
-    if (!license || !confirm('Cancel subscription immediately and revoke access? This cannot be undone.')) return
+    if (!license) return
     setActionState({ loading: true, action: 'cancel' })
     try {
       const res = await fetch(`/api/admin/licenses?id=${license.id}&action=cancel_immediately`, {
@@ -102,7 +107,7 @@ export function LicenseDetailModal({ open, license, onClose, onAction }: License
   }
 
   const handleDeleteMembership = async () => {
-    if (!license || !confirm('Permanently delete this membership? This will remove the license and cancel any active Stripe subscription. This cannot be undone.')) return
+    if (!license) return
     setActionState({ loading: true, action: 'delete' })
     try {
       const res = await fetch(`/api/admin/licenses?id=${license.id}`, {
@@ -206,23 +211,54 @@ export function LicenseDetailModal({ open, license, onClose, onAction }: License
           {error && <div className="admin-detail-error">{error}</div>}
 
           {/* Actions */}
-          <div className="admin-detail-actions">
+          <div className="admin-detail-footer">
             {hasSubscription && subActive && (
-              <button
-                className="admin-btn-danger"
-                disabled={actionState.loading}
-                onClick={handleCancelSubscription}
-              >
-                {actionState.action === 'cancel' ? 'Canceling...' : 'Cancel Subscription'}
-              </button>
+              <div className="admin-detail-footer-primary">
+                <button
+                  className="admin-btn-danger"
+                  disabled={actionState.loading}
+                  onClick={handleCancelSubscription}
+                >
+                  {actionState.action === 'cancel' ? 'Canceling...' : 'Cancel Subscription'}
+                </button>
+              </div>
             )}
-            <button
-              className="admin-btn-danger"
-              disabled={actionState.loading}
-              onClick={handleDeleteMembership}
-            >
-              {actionState.action === 'delete' ? 'Deleting...' : 'Delete Membership'}
-            </button>
+
+            {/* Collapsible delete section */}
+            <div className="admin-delete-section">
+              <button
+                className="admin-delete-toggle"
+                onClick={() => { setDeleteExpanded(!deleteExpanded); setDeleteConfirmed(false) }}
+                type="button"
+              >
+                <ChevronRight size={16} className={`admin-delete-chevron${deleteExpanded ? ' admin-delete-chevron--open' : ''}`} />
+                Delete Membership
+              </button>
+
+              {deleteExpanded && (
+                <div className="admin-delete-expanded">
+                  <div className="admin-delete-warning">
+                    <AlertTriangle size={16} />
+                    <span>This cannot be undone. You will lose all membership information for this user. Any active Stripe subscription will also be cancelled.</span>
+                  </div>
+                  <label className="admin-delete-confirm-label">
+                    <input
+                      type="checkbox"
+                      checked={deleteConfirmed}
+                      onChange={(e) => setDeleteConfirmed(e.target.checked)}
+                    />
+                    Are you sure you want to delete this membership?
+                  </label>
+                  <button
+                    className="admin-btn-danger"
+                    disabled={!deleteConfirmed || actionState.loading}
+                    onClick={handleDeleteMembership}
+                  >
+                    {actionState.action === 'delete' ? 'Deleting...' : 'Delete Membership'}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       ) : null}
