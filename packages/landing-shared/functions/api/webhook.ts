@@ -1,5 +1,6 @@
 import type { Env } from './_shared/types.ts';
-import { verifyWebhookSignature, retrieveCheckoutSession } from './_shared/stripe.ts';
+import { verifyWebhookSignature, retrieveCheckoutSession, retrieveCustomer } from './_shared/stripe.ts';
+import { getProductPlanFromPriceId } from './_shared/products.ts';
 import { sendAdminEmail, sendUserEmail } from './_shared/email.ts';
 
 type CFContext = EventContext<Env, string, unknown>;
@@ -238,15 +239,45 @@ async function handleSubscriptionDeleted(env: Env, event: StripeEvent): Promise<
     .bind(subscriptionId)
     .run();
 
+  // If license was already deleted from D1 (e.g. admin "Delete Membership"),
+  // fall back to extracting info from the Stripe event data
+  let email = license?.email ?? null;
+  let product = license?.product ?? null;
+  let plan = license?.plan ?? null;
+
+  if (!license) {
+    // Get customer email from Stripe
+    const customerId = subscription.customer as string | null;
+    if (customerId) {
+      try {
+        const customer = await retrieveCustomer(env.STRIPE_SECRET_KEY, customerId);
+        email = customer.email;
+      } catch {
+        // Stripe lookup failed — continue with null
+      }
+    }
+
+    // Get product/plan by reverse-mapping the subscription's price ID
+    const items = subscription.items as { data?: Array<{ price?: { id?: string } }> } | undefined;
+    const priceId = items?.data?.[0]?.price?.id;
+    if (priceId) {
+      const match = getProductPlanFromPriceId(env, priceId);
+      if (match) {
+        product = match.product;
+        plan = match.plan;
+      }
+    }
+  }
+
   // Tier 1: Subscription cancelled notification
-  const email = license?.email ?? 'unknown';
-  const product = license?.product ?? 'unknown';
-  const plan = license?.plan ?? 'unknown';
+  const displayEmail = email ?? 'unknown';
+  const displayProduct = product ?? 'unknown';
+  const displayPlan = plan ?? 'unknown';
 
   await sendAdminEmail(
     env,
-    `Subscription cancelled: ${capitalize(product)} ${capitalize(plan)} — ${email}`,
-    `Product: ${capitalize(product)}\nPlan: ${capitalize(plan)}\nEmail: ${email}\nSubscription: ${subscriptionId}`,
+    `Subscription cancelled: ${capitalize(displayProduct)} ${capitalize(displayPlan)} — ${displayEmail}`,
+    `Product: ${capitalize(displayProduct)}\nPlan: ${capitalize(displayPlan)}\nEmail: ${displayEmail}\nSubscription: ${subscriptionId}`,
   );
 }
 

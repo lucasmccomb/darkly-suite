@@ -6,7 +6,7 @@
  */
 
 import { createMockEnv } from './test-helpers';
-import { getPriceId, getProductStripeId } from '../api/_shared/products';
+import { getPriceId, getProductStripeId, getProductPlanFromPriceId } from '../api/_shared/products';
 import type { ProductId, Plan } from '../api/_shared/types';
 
 describe('getPriceId', () => {
@@ -53,5 +53,23 @@ describe('getProductStripeId', () => {
     expect(() => {
       getProductStripeId(env, 'invalid' as ProductId);
     }).toThrow('No Stripe product configured for invalid');
+  });
+});
+
+describe('getProductPlanFromPriceId', () => {
+  const env = createMockEnv();
+
+  it.each([
+    ['price_gmail_monthly', 'gmail', 'monthly'],
+    ['price_sheets_yearly', 'sheets', 'yearly'],
+    ['price_docs_lifetime', 'docs', 'lifetime'],
+    ['price_suite_monthly', 'suite', 'monthly'],
+  ] as const)('reverse-maps %s to %s/%s', (priceId, expectedProduct, expectedPlan) => {
+    const result = getProductPlanFromPriceId(env, priceId);
+    expect(result).toEqual({ product: expectedProduct, plan: expectedPlan });
+  });
+
+  it('returns null for an unknown price ID', () => {
+    expect(getProductPlanFromPriceId(env, 'price_unknown')).toBeNull();
   });
 });
