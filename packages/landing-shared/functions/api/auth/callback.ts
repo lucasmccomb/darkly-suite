@@ -122,7 +122,7 @@ async function handleAdminFlow(
   )
 
   const responseHeaders = new Headers()
-  responseHeaders.set('Location', `${origin}/admin/licenses`)
+  responseHeaders.set('Location', `${origin}/admin/memberships`)
   responseHeaders.set(
     'Set-Cookie',
     `darkly_admin_session=${sessionToken}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=86400`,
