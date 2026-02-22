@@ -143,9 +143,50 @@ CSS support exists for this feature via `data-darkly-page="preserve"`. A UI togg
 
 ---
 
-## Test 7: Persistence Across Sessions
+## Test 7: Account Portal
 
-**Setup**: Continue from Test 6.
+**Setup**: Pro user (paid via Test 2 or 3). Use Chrome signed into the same Google account.
+
+### Login and View Subscriptions
+
+1. [ ] Navigate to `darklysuite.com/account`
+2. [ ] **Verify**: Google OAuth login page appears
+3. [ ] Sign in with the same Google account used for the extension
+4. [ ] **Verify**: Redirected to `/account/subscriptions`
+5. [ ] **Verify**: Subscriptions table shows a row for "Docs" with the correct plan (monthly/yearly/lifetime) and status ("active")
+6. [ ] **Verify**: Created date matches when you subscribed
+7. [ ] **Verify**: Promo code column shows the code used (if any), or `--`
+
+### Manage Billing (Monthly/Yearly Plans)
+
+8. [ ] **Verify**: "Manage Billing" button appears in the Actions column
+9. [ ] Click "Manage Billing"
+10. [ ] **Verify**: Redirected to Stripe's customer portal
+11. [ ] **Verify**: Portal shows the active subscription for "Darkly for Docs"
+12. [ ] **Verify**: Options to update payment method and cancel subscription are visible
+13. [ ] **Do NOT cancel** — just verify the portal loads correctly
+14. [ ] Click the back/return link to return to `/account/subscriptions`
+
+### Lifetime Plan Display
+
+15. [ ] *(If testing with a lifetime plan)*: **Verify** "Lifetime access" label appears in green instead of "Manage Billing"
+16. [ ] **Verify**: A "View receipt" link appears next to it
+17. [ ] Click "View receipt" — **Verify**: Stripe portal opens showing the one-time payment receipt
+
+### Cancellation Flow (Test LAST — Disables Pro Access)
+
+18. [ ] Click "Manage Billing" in the account portal
+19. [ ] In Stripe portal, cancel the subscription
+20. [ ] Return to `/account/subscriptions`
+21. [ ] **Verify**: Subscription status changes to "cancelled"
+22. [ ] Return to Docs tab, clear `dd_pro_cache` from extension storage, refresh
+23. [ ] **Verify**: Paywall reappears (pro access revoked)
+
+---
+
+## Test 8: Persistence Across Sessions
+
+**Setup**: Continue from Test 7 (re-subscribe if you cancelled, or use a fresh promo code).
 
 1. [ ] Set dark mode to ON
 2. [ ] Close the Docs tab completely
@@ -156,7 +197,7 @@ CSS support exists for this feature via `data-darkly-page="preserve"`. A UI togg
 
 ---
 
-## Test 8: Docs UI Coverage
+## Test 9: Docs UI Coverage
 
 **Setup**: Pro user with dark mode ON.
 
@@ -248,7 +289,7 @@ Test dark mode appearance across all Google Docs UI elements:
 
 ---
 
-## Test 9: Edge Cases
+## Test 10: Edge Cases
 
 - [ ] **Multiple Docs tabs** — open 2+ documents; verify dark mode state is consistent across all tabs
 - [ ] **Document switching** — navigate between documents within Docs; verify toolbar button persists (DOM observer re-injection via `startCanvasObserver`)
@@ -268,7 +309,7 @@ Test dark mode appearance across all Google Docs UI elements:
 
 ---
 
-## Test 10: Dashboard Page
+## Test 11: Dashboard Page
 
 **Setup**: Navigate to `docs.google.com/document/` (home/dashboard page).
 
@@ -287,7 +328,7 @@ Test dark mode appearance across all Google Docs UI elements:
 
 ---
 
-## Test 11: Conflict Detection
+## Test 12: Conflict Detection
 
 **Setup**: Install both Darkly for Docs (standalone) and Darkly Suite (bundle) extensions.
 
@@ -317,6 +358,9 @@ If ANY of these fail, do NOT submit to Chrome Web Store:
 - [ ] No console errors that would concern a Google reviewer
 - [ ] `docsdarkly.com/privacy` is accessible
 - [ ] `darklysuite.com/api/status/{uuid-v4-token}?product=docs` responds correctly
+- [ ] Account portal login and subscription display works at `darklysuite.com/account`
+- [ ] Manage Billing opens Stripe customer portal for recurring plans
+- [ ] Lifetime plans show "Lifetime access" label (not "Manage Billing")
 - [ ] Color picker swatches show accurate colors in dark mode (re-inverted, not doubly inverted)
 - [ ] Collaboration cursors stay visible and correctly colored
 - [ ] Images and embedded content re-invert to show original colors

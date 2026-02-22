@@ -417,9 +417,54 @@ For each Google app:
 
 ---
 
-## Test 11: Persistence Across Sessions
+## Test 11: Account Portal
 
-**Setup**: Pro user.
+**Setup**: Pro user (paid via Test 2 or 3). Use Chrome signed into the same Google account.
+
+### Login and View Subscriptions
+
+1. [ ] Navigate to `darklysuite.com/account`
+2. [ ] **Verify**: Google OAuth login page appears
+3. [ ] Sign in with the same Google account used for the extension
+4. [ ] **Verify**: Redirected to `/account/subscriptions`
+5. [ ] **Verify**: Subscriptions table shows a row for "Suite" with the correct plan (monthly/yearly/lifetime) and status ("active")
+6. [ ] **Verify**: Created date matches when you subscribed
+7. [ ] **Verify**: Promo code column shows the code used (if any), or `--`
+
+### Manage Billing (Monthly/Yearly Plans)
+
+8. [ ] **Verify**: "Manage Billing" button appears in the Actions column
+9. [ ] Click "Manage Billing"
+10. [ ] **Verify**: Redirected to Stripe's customer portal
+11. [ ] **Verify**: Portal shows the active subscription for "Darkly Suite"
+12. [ ] **Verify**: Options to update payment method and cancel subscription are visible
+13. [ ] **Do NOT cancel yet** — just verify the portal loads correctly
+14. [ ] Click the back/return link to return to `/account/subscriptions`
+
+### Lifetime Plan Display
+
+15. [ ] *(If testing with a lifetime plan)*: **Verify** "Lifetime access" label appears in green instead of "Manage Billing"
+16. [ ] **Verify**: A "View receipt" link appears next to it
+17. [ ] Click "View receipt" — **Verify**: Stripe portal opens showing the one-time payment receipt
+
+### Cancellation via Account Portal (Test LAST — Disables Pro Access)
+
+18. [ ] Click "Manage Billing" in the account portal
+19. [ ] In Stripe portal, cancel the subscription
+20. [ ] Return to `/account/subscriptions`
+21. [ ] **Verify**: Subscription status changes to "cancelled"
+22. [ ] Return to Gmail tab, clear `ds_pro_cache` from extension storage, refresh
+23. [ ] **Verify**: Paywall reappears on Gmail
+24. [ ] Navigate to Sheets — refresh — **Verify**: Paywall reappears
+25. [ ] Navigate to Docs — refresh — **Verify**: Paywall reappears
+26. [ ] Navigate to Drive — refresh — **Verify**: Paywall reappears
+27. [ ] **Verify**: Cancellation via account portal revokes access on ALL four apps
+
+---
+
+## Test 12: Persistence Across Sessions
+
+**Setup**: Pro user (re-subscribe if you cancelled in Test 11, or use a fresh promo code).
 
 1. [ ] On Gmail: Set dark mode to ON
 2. [ ] On Sheets: Set dark mode to ON, enable "Preserve Grid Colors"
@@ -438,7 +483,7 @@ For each Google app:
 
 ---
 
-## Test 12: Conflict Detection
+## Test 13: Conflict Detection
 
 **Setup**: Install a standalone Darkly extension alongside Darkly Suite.
 
@@ -489,7 +534,7 @@ For each Google app:
 
 ---
 
-## Test 13: Drive Dark Mode
+## Test 14: Drive Dark Mode
 
 **Setup**: Pro user with Darkly Suite installed.
 
@@ -538,7 +583,7 @@ For each Google app:
 
 ---
 
-## Test 14: Edge Cases
+## Test 15: Edge Cases
 
 ### Multiple Simultaneous Tabs
 
@@ -602,7 +647,7 @@ For each Google app:
 
 ---
 
-## Test 15: Background Service Worker
+## Test 16: Background Service Worker
 
 1. [ ] Open `chrome://extensions` and click "Service worker" link for Darkly Suite
 2. [ ] **Verify**: Console shows `[Darkly Suite] Background service worker initialized (4 sites)`
@@ -634,6 +679,10 @@ If ANY of these fail, do NOT submit to Chrome Web Store:
 - [ ] Promo code payment flow completes successfully
 - [ ] ONE subscription unlocks ALL four apps
 - [ ] Cancellation revokes access on ALL four apps
+- [ ] Account portal login and subscription display works at `darklysuite.com/account`
+- [ ] Manage Billing opens Stripe customer portal for recurring plans
+- [ ] Lifetime plans show "Lifetime access" label (not "Manage Billing")
+- [ ] Cancellation via account portal also revokes access on all four apps
 - [ ] `darklysuite.com/api/status/{uuid-v4-token}?product=suite` responds correctly
 
 ### Dark Mode — Gmail
