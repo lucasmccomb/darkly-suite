@@ -12,6 +12,7 @@ Before starting, verify these are live:
 - [ ] **darklysuite.com** — Payment API deployed on Cloudflare Pages with D1 + Stripe bindings
 - [ ] **darklysuite.com/api/status/00000000-0000-4000-8000-000000000000?product=sheets** — Returns `{"paid":false}` (not a 500 or DNS error). Token must be a valid UUID v4.
 - [ ] **sheetsdarkly.com/privacy** — Privacy policy page is accessible
+- [ ] **sheetsdarkly.com/subscribe** — Subscribe page loads with pricing tiers
 - [ ] **Stripe test mode** — Products and prices configured for sheets (monthly/yearly/lifetime)
 - [ ] **Promo code** — `CWSREVIEWSHEETS` (or equivalent test code) created in Stripe dashboard
 - [ ] **Production zip** — Built from latest main: `pnpm --filter sheets-darkly build`, then zip `dist/`
@@ -23,8 +24,8 @@ Before starting, verify these are live:
 **Setup**: Use a Chrome profile signed into the fresh Google account. No previous Darkly extension installed.
 
 1. [ ] Load the extension as unpacked from the production `dist/` directory
-2. [ ] **Verify**: Browser opens `sheetsdarkly.com/setup` in a new tab
-3. [ ] **Verify**: The setup page loads correctly (not a DNS error)
+2. [ ] **Verify**: Browser opens `sheetsdarkly.com/subscribe?token=...&email=...` in a new tab
+3. [ ] **Verify**: The subscribe page loads with pricing tiers (monthly/yearly/lifetime)
 4. [ ] Navigate to `docs.google.com/spreadsheets` and open any spreadsheet
 5. [ ] **Verify**: Google Sheets loads normally (no crashes, no console errors)
 6. [ ] **Verify**: The Darkly toolbar button appears in the Sheets header bar
@@ -44,16 +45,17 @@ Before starting, verify these are live:
 **Setup**: Continue from Test 1 (extension installed, free user on Sheets).
 
 1. [ ] In the paywall, click "Subscribe Now" (or equivalent payment button)
-2. [ ] **Verify**: A new tab opens to `darklysuite.com/api/checkout?token=...&plan=yearly&product=sheets`
-3. [ ] **Verify**: You're redirected to Stripe Checkout (stripe.com hosted page)
-4. [ ] **Verify**: The checkout page shows the correct product ("Darkly for Sheets") and price
-5. [ ] Complete payment using Stripe test card: `4242 4242 4242 4242`, any future expiry, any CVC, any zip
-6. [ ] **Verify**: After payment, you're redirected to a success/thank-you page
-7. [ ] Return to the Sheets tab
-8. [ ] **Verify**: Within 30 minutes (cache TTL), or after closing and reopening the spreadsheet, dark mode becomes available
-   - To speed this up: clear the extension's local storage for the `sd_pro_cache` key, then refresh Sheets
+2. [ ] **Verify**: A new tab opens to `darklysuite.com/api/auth/start?type=checkout&token=...&plan=yearly&product=sheets`
+3. [ ] **Verify**: You're redirected through Google OAuth (may auto-approve if already signed in)
+4. [ ] **Verify**: After OAuth, you're redirected to Stripe Checkout (stripe.com hosted page) with your Google email prefilled
+5. [ ] **Verify**: The checkout page shows the correct product ("Darkly for Sheets") and price
+6. [ ] Complete payment using Stripe test card: `4242 4242 4242 4242`, any future expiry, any CVC, any zip
+7. [ ] **Verify**: After payment, you're redirected to a success/thank-you page
+8. [ ] Return to the Sheets tab
+9. [ ] **Verify**: Within ~30 seconds, the paywall auto-dismisses and dark mode becomes available (background checkout polling detects the new license)
+   - If auto-dismiss doesn't fire, refresh the Sheets tab to trigger a status check
 
-**Note**: The payment flow is: Extension → darklysuite.com/api/checkout → Stripe hosted checkout → Stripe webhook → D1 license record → Extension checks /api/status and gets `paid: true`.
+**Note**: The payment flow is: Extension → Google OAuth (`/api/auth/start?type=checkout`) → OAuth callback extracts email → `/api/checkout` with email prefilled → Stripe hosted checkout → Stripe webhook → D1 license record → Background checkout polling detects `paid: true` → paywall auto-dismisses on all tabs.
 
 ---
 
@@ -62,13 +64,13 @@ Before starting, verify these are live:
 **Setup**: Fresh install (or clear extension storage to simulate a new free user).
 
 1. [ ] Click "Subscribe Now" in the paywall
-2. [ ] **Verify**: New tab opens to Stripe Checkout
+2. [ ] **Verify**: New tab opens to Google OAuth, then redirects to Stripe Checkout with email prefilled
 3. [ ] At Stripe Checkout, locate the promo code field
 4. [ ] Enter `CWSREVIEWSHEETS` (or the configured test code)
 5. [ ] **Verify**: Discount is applied (100% off if configured as such)
 6. [ ] Complete checkout with test card `4242 4242 4242 4242` (still required for `duration:once` coupons)
 7. [ ] **Verify**: Redirected to success page
-8. [ ] Return to Sheets tab and refresh (or clear `sd_pro_cache`)
+8. [ ] Return to Sheets tab — paywall should auto-dismiss within ~30 seconds (or refresh to trigger status check)
 9. [ ] **Verify**: License is created, dark mode unlocks
 
 ---
@@ -226,7 +228,7 @@ Test dark mode appearance across all Sheets UI elements:
 - [ ] **Embedded sheets (iframes)**: Verify extension skips iframes and only applies to the main Sheets UI
 - [ ] **Large spreadsheet**: Open a sheet with 1000+ rows — verify no performance degradation (scrolling remains smooth)
 - [ ] **Extension reload**: Go to `chrome://extensions`, click the refresh button on Darkly for Sheets — refresh the Sheets page and verify settings persist
-- [ ] **Setup page does NOT reopen on reload**: After extension reload, the setup page should NOT open again (`onInstalled` should only fire for `reason: install`, not `update`)
+- [ ] **Subscribe page does NOT reopen on reload**: After extension reload, the subscribe page should NOT open again (`onInstalled` should only fire for `reason: install`, not `update`)
 - [ ] **Network offline**: Disconnect from the internet, refresh Sheets — verify extension doesn't crash (dark mode may not activate for new unpaid users, but paid users with cached status should still work)
 
 ---
