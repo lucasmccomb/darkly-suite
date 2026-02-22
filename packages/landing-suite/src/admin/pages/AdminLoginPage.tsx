@@ -11,7 +11,7 @@ function LoginContent() {
 
   useEffect(() => {
     if (authenticated && !loading) {
-      navigate('/admin/licenses', { replace: true })
+      navigate('/admin/memberships', { replace: true })
     }
   }, [authenticated, loading, navigate])
 

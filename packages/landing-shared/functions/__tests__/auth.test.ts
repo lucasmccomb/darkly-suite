@@ -362,7 +362,7 @@ describe('auth/callback — OAuth callback flow', () => {
 
     const response = await authCallback(context);
     expect(response.status).toBe(302);
-    expect(response.headers.get('Location')).toContain('/admin/licenses');
+    expect(response.headers.get('Location')).toContain('/admin/memberships');
 
     // Should set session cookie
     const setCookie = response.headers.get('Set-Cookie');
