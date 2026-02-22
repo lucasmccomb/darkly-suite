@@ -189,7 +189,21 @@ export async function retrieveSubscription(
     throw new Error(`Stripe retrieveSubscription failed (${res.status}): ${err}`);
   }
 
-  return res.json() as Promise<StripeSubscription>;
+  // Stripe moved current_period_start/end from subscription to items.data[0].
+  // Extract from the first item and promote to top level for our interface.
+  const raw = await res.json() as StripeSubscription & {
+    items?: { data: Array<{ current_period_start?: number; current_period_end?: number }> };
+  };
+  const firstItem = raw.items?.data?.[0];
+  if (firstItem) {
+    if (!raw.current_period_start && firstItem.current_period_start) {
+      raw.current_period_start = firstItem.current_period_start;
+    }
+    if (!raw.current_period_end && firstItem.current_period_end) {
+      raw.current_period_end = firstItem.current_period_end;
+    }
+  }
+  return raw;
 }
 
 // -- Customer Retrieval ---------------------------------------------------
