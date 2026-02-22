@@ -812,6 +812,87 @@
   flex-wrap: wrap;
 }
 
+/* Detail Modal Footer */
+.admin-detail-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-detail-footer-primary {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Collapsible Delete Section */
+.admin-delete-section {
+  border-top: 1px solid rgba(138, 180, 248, 0.08);
+  padding-top: 0.75rem;
+}
+
+.admin-delete-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: none;
+  border: none;
+  color: #9aa0a6;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  transition: color 0.15s;
+}
+
+.admin-delete-toggle:hover {
+  color: #f28b82;
+}
+
+.admin-delete-chevron {
+  transition: transform 0.2s ease;
+}
+
+.admin-delete-chevron--open {
+  transform: rotate(90deg);
+}
+
+.admin-delete-expanded {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-delete-warning {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  background: rgba(242, 139, 130, 0.08);
+  border: 1px solid rgba(242, 139, 130, 0.2);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: #f28b82;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.admin-delete-warning svg {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.admin-delete-confirm-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #e8eaed;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.admin-delete-confirm-label input[type="checkbox"] {
+  accent-color: #f28b82;
+}
+
 /* Warning Button */
 .admin-btn-warning {
   background: rgba(251, 188, 4, 0.15);
