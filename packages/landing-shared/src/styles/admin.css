@@ -250,6 +250,39 @@
   border-bottom: 1px solid rgba(138, 180, 248, 0.08);
 }
 
+.admin-th-sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s;
+}
+
+.admin-th-sortable:hover {
+  color: #e8eaed;
+}
+
+.admin-th-sortable svg {
+  vertical-align: -2px;
+  margin-left: 0.25rem;
+  opacity: 0.4;
+  transition: opacity 0.15s;
+}
+
+.admin-th-sortable:hover svg {
+  opacity: 0.7;
+}
+
+.admin-th-sorted {
+  color: #8ab4f8;
+}
+
+.admin-th-sorted svg {
+  opacity: 1;
+}
+
+.admin-th-sorted:hover {
+  color: #8ab4f8;
+}
+
 .admin-table td {
   padding: 0.75rem 1rem;
   color: #e8eaed;

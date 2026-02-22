@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Pencil } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, Pencil } from 'lucide-react'
 import { LicenseDetailModal } from '../components/LicenseDetailModal'
 import { AdminToast } from '../components/AdminToast'
 
@@ -35,6 +35,8 @@ export function AdminLicensesPage() {
   const [plan, setPlan] = useState('')
   const [product, setProduct] = useState('')
   const [page, setPage] = useState(1)
+  const [sort, setSort] = useState<'created_at' | 'email'>('created_at')
+  const [order, setOrder] = useState<'asc' | 'desc'>('desc')
   const [detailLicense, setDetailLicense] = useState<License | null>(null)
   const [toast, setToast] = useState<Toast | null>(null)
 
@@ -45,6 +47,8 @@ export function AdminLicensesPage() {
     if (status) params.set('status', status)
     if (plan) params.set('plan', plan)
     if (product) params.set('product', product)
+    params.set('sort', sort)
+    params.set('order', order)
     params.set('page', page.toString())
 
     const res = await fetch(`/api/admin/licenses?${params}`, { credentials: 'same-origin' })
@@ -52,11 +56,26 @@ export function AdminLicensesPage() {
       setData(await res.json())
     }
     setLoading(false)
-  }, [search, status, plan, product, page])
+  }, [search, status, plan, product, sort, order, page])
 
   useEffect(() => {
     fetchLicenses()
   }, [fetchLicenses])
+
+  const handleSort = (column: 'created_at' | 'email') => {
+    if (sort === column) {
+      setOrder(order === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSort(column)
+      setOrder(column === 'email' ? 'asc' : 'desc')
+    }
+    setPage(1)
+  }
+
+  function SortIcon({ column }: { column: 'created_at' | 'email' }) {
+    if (sort !== column) return <ArrowUpDown size={14} />
+    return order === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />
+  }
 
   const handleDetailAction = (message?: string) => {
     setToast({ message: message ?? 'Action completed successfully', type: 'success' })
@@ -111,12 +130,16 @@ export function AdminLicensesPage() {
             <table className="admin-table">
               <thead>
                 <tr>
-                  <th>Email</th>
+                  <th className={`admin-th-sortable${sort === 'email' ? ' admin-th-sorted' : ''}`} onClick={() => handleSort('email')}>
+                    Email <SortIcon column="email" />
+                  </th>
                   <th>Product</th>
                   <th>Plan</th>
                   <th>Access</th>
                   <th>Subscription</th>
-                  <th>Signed Up</th>
+                  <th className={`admin-th-sortable${sort === 'created_at' ? ' admin-th-sorted' : ''}`} onClick={() => handleSort('created_at')}>
+                    Signed Up <SortIcon column="created_at" />
+                  </th>
                   <th>Discount</th>
                   <th>Actions</th>
                 </tr>

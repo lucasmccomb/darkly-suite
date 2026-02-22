@@ -4,8 +4,14 @@ import { requireAdmin } from './_shared/auth.ts'
 
 type CFContext = EventContext<Env, string, unknown>
 
+// Whitelist of sortable columns (prevents SQL injection via column names)
+const SORT_COLUMNS: Record<string, string> = {
+  created_at: 'l.created_at',
+  email: 'l.email',
+}
+
 /**
- * GET /api/admin/licenses?search=&status=&plan=&product=&page=1&limit=50
+ * GET /api/admin/licenses?search=&status=&plan=&product=&sort=created_at&order=desc&page=1&limit=50
  * Returns paginated licenses for the admin dashboard.
  */
 export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
@@ -17,9 +23,14 @@ export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
   const status = url.searchParams.get('status') ?? ''
   const plan = url.searchParams.get('plan') ?? ''
   const product = url.searchParams.get('product') ?? ''
+  const sortParam = url.searchParams.get('sort') ?? 'created_at'
+  const orderParam = url.searchParams.get('order') ?? 'desc'
   const page = Math.max(1, parseInt(url.searchParams.get('page') ?? '1', 10))
   const limit = Math.min(100, Math.max(1, parseInt(url.searchParams.get('limit') ?? '50', 10)))
   const offset = (page - 1) * limit
+
+  const sortColumn = SORT_COLUMNS[sortParam] ?? 'l.created_at'
+  const sortOrder = orderParam === 'asc' ? 'ASC' : 'DESC'
 
   const conditions: string[] = []
   const bindings: string[] = []
@@ -60,7 +71,7 @@ export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
      FROM licenses l
      LEFT JOIN discount_codes d ON l.discount_code_id = d.id
      ${where}
-     ORDER BY l.created_at DESC
+     ORDER BY ${sortColumn} ${sortOrder}
      LIMIT ? OFFSET ?`,
   )
     .bind(...bindings, limit, offset)
