@@ -160,20 +160,8 @@ chrome.runtime.onInstalled.addListener(async (details) => {
       const result = await chrome.storage.sync.get(config.tokenKey);
       const token = result[config.tokenKey] ?? '';
 
-      // Get Chrome Identity email (may be empty if user isn't signed into Chrome)
-      let email = '';
-      try {
-        const info = await chrome.identity.getProfileUserInfo({
-          accountStatus: chrome.identity.AccountStatus.ANY,
-        });
-        email = info.email || '';
-      } catch {
-        // identity.email permission missing or API unavailable — proceed without email
-      }
-
       const params = new URLSearchParams();
       if (token) params.set('token', token);
-      if (email) params.set('email', email);
       params.set('product', 'suite');
       const qs = params.toString();
       chrome.tabs.create({ url: `${config.siteBase}/subscribe?${qs}` });

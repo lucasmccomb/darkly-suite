@@ -1,6 +1,7 @@
 import type { PricingTier, ComparisonFeature } from '@darkly/landing-shared'
 
 export const CHECKOUT_API_URL = '/api/checkout'
+export const AUTH_API_URL = '/api/auth/start'
 
 /**
  * Chrome Web Store listing URLs.

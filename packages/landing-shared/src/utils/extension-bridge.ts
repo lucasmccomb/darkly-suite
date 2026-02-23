@@ -11,8 +11,8 @@
 // Web pages listed in an extension's externally_connectable.matches can call
 // chrome.runtime.sendMessage(extensionId, ...) — this covers only that API.
 declare global {
-  namespace chrome {
-    namespace runtime {
+  // eslint-disable-next-line @typescript-eslint/no-namespace -- namespace is required for global type augmentation
+  namespace chrome { namespace runtime {
       const lastError: { message?: string } | undefined
       function sendMessage(
         extensionId: string,

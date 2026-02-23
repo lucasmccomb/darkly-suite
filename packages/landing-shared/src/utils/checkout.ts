@@ -9,21 +9,42 @@ const SESSION_TOKEN_KEY = 'darkly_checkout_token'
 
 /**
  * Build a full checkout URL for redirecting the user to Stripe.
+ *
+ * Used by home page pricing sections where email is not pre-captured.
  */
 export function buildCheckoutUrl(
   baseUrl: string,
   product: string,
   plan: string,
   token: string,
-  email?: string,
 ): string {
   const params = new URLSearchParams({
     token,
     plan: plan.toLowerCase(),
     product,
   })
-  if (email) params.set('email', email)
   return `${baseUrl}?${params}`
+}
+
+/**
+ * Build an OAuth checkout URL that routes through Google sign-in
+ * before reaching Stripe. This guarantees the correct email is captured.
+ *
+ * Used by the subscribe page (extension install redirect).
+ */
+export function buildOAuthCheckoutUrl(
+  authBaseUrl: string,
+  product: string,
+  plan: string,
+  token: string,
+): string {
+  const params = new URLSearchParams({
+    type: 'checkout',
+    token,
+    plan: plan.toLowerCase(),
+    product,
+  })
+  return `${authBaseUrl}?${params}`
 }
 
 /**

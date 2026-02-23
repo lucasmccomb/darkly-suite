@@ -289,20 +289,8 @@ export function createBackgroundWorker(config: ProductConfig): void {
         const result = await chrome.storage.sync.get(config.tokenKey);
         const token = result[config.tokenKey] ?? '';
 
-        // Get Chrome Identity email (may be empty if user isn't signed into Chrome)
-        let email = '';
-        try {
-          const info = await chrome.identity.getProfileUserInfo({
-            accountStatus: chrome.identity.AccountStatus.ANY,
-          });
-          email = info.email || '';
-        } catch {
-          // identity.email permission missing or API unavailable — proceed without email
-        }
-
         const params = new URLSearchParams();
         if (token) params.set('token', token);
-        if (email) params.set('email', email);
         const qs = params.toString();
         const subscribeUrl = `${config.siteBase}/subscribe${qs ? `?${qs}` : ''}`;
         chrome.tabs.create({ url: subscribeUrl });

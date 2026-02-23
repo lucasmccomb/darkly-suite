@@ -2,7 +2,7 @@ import { useSearchParams } from 'react-router-dom'
 import { useCallback } from 'react'
 import { Check } from 'lucide-react'
 import type { PricingTier } from './Pricing.tsx'
-import { buildCheckoutUrl, getOrCreateToken } from '../utils/checkout.ts'
+import { buildOAuthCheckoutUrl, getOrCreateToken } from '../utils/checkout.ts'
 import { useExtensionToken } from '../hooks/useExtensionToken.ts'
 
 interface SubscribeContentProps {
@@ -10,7 +10,7 @@ interface SubscribeContentProps {
   productName: string
   tiers: PricingTier[]
   features?: string[]
-  checkoutBaseUrl: string
+  authBaseUrl: string
   setupPath?: string
 }
 
@@ -19,20 +19,19 @@ export function SubscribeContent({
   productName,
   tiers,
   features,
-  checkoutBaseUrl,
+  authBaseUrl,
   setupPath = '/setup',
 }: SubscribeContentProps) {
   const [searchParams] = useSearchParams()
   const urlToken = searchParams.get('token')
-  const email = searchParams.get('email') || undefined
   const extensionToken = useExtensionToken(product)
   const token = getOrCreateToken(urlToken, extensionToken)
 
   const handleSubscribe = useCallback(
     (plan: string) => {
-      window.location.href = buildCheckoutUrl(checkoutBaseUrl, product, plan, token, email)
+      window.location.href = buildOAuthCheckoutUrl(authBaseUrl, product, plan, token)
     },
-    [checkoutBaseUrl, product, token, email],
+    [authBaseUrl, product, token],
   )
 
   return (

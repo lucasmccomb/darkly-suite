@@ -3,7 +3,7 @@
   "name": "Darkly for Google Docs\u2122",
   "description": "Dark mode for Google Docs with OS theme sync, sunset scheduling, and color presets. Settings right inside Docs.",
   "version": "1.0.0",
-  "permissions": ["storage", "alarms", "offscreen", "identity", "identity.email"],
+  "permissions": ["storage", "alarms", "offscreen"],
   "host_permissions": ["https://docs.google.com/*", "https://darklysuite.com/*", "https://api.sunrise-sunset.org/*"],
   "background": {
     "service_worker": "background.js"
