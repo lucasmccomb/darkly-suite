@@ -13,6 +13,7 @@ import type { PriceInfo } from '../payment/client';
 
 interface SettingsPanelProps {
   isPro?: boolean;
+  plan?: string;
   prices?: PriceInfo;
   onUpgrade?: (plan?: 'monthly' | 'yearly' | 'lifetime') => void;
   onManageSubscription?: () => void;
@@ -21,7 +22,7 @@ interface SettingsPanelProps {
   renderProductSection?: React.ReactNode;
 }
 
-export function SettingsPanel({ isPro = false, prices, onUpgrade, onManageSubscription, onClose, renderProductSection }: SettingsPanelProps) {
+export function SettingsPanel({ isPro = false, plan, prices, onUpgrade, onManageSubscription, onClose, renderProductSection }: SettingsPanelProps) {
   const p = usePrefix();
   const config = useDarklyConfig();
   const [prefs, setPrefs] = useState<BaseUserPreferences>(DEFAULT_PREFERENCES);
@@ -107,19 +108,21 @@ export function SettingsPanel({ isPro = false, prices, onUpgrade, onManageSubscr
         )}
       </div>
 
+      {plan === 'lifetime' && (
+        <div className={`${p}-lifetime-badge`}>Lifetime Membership</div>
+      )}
+
+      {onManageSubscription && (
+        <button
+          type="button"
+          className={`${p}-action-btn ${p}-action-btn--secondary ${p}-action-btn--full ${p}-manage-sub-btn`}
+          onClick={onManageSubscription}
+        >
+          Manage Subscription
+        </button>
+      )}
+
       <div className={`${p}-settings-footer`}>
-        {onManageSubscription && (
-          <>
-            <a
-              href="#"
-              onClick={(e) => { e.preventDefault(); onManageSubscription(); }}
-              className={`${p}-settings-footer-link`}
-            >
-              Manage Subscription
-            </a>
-            {' · '}
-          </>
-        )}
         Need help?{' '}
         <a
           href="https://darklysuite.com/support"

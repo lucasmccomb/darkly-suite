@@ -1124,6 +1124,35 @@
   margin: 4px 0 0;
 }
 
+/* ===== Lifetime Badge ===== */
+
+.darkly-lifetime-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: #d4941c;
+  background: linear-gradient(135deg, rgba(245, 200, 66, 0.12), rgba(212, 148, 28, 0.08));
+  border: 1px solid rgba(212, 148, 28, 0.3);
+}
+
+[data-darkly-theme="dark"] .darkly-lifetime-badge {
+  color: #f5c842;
+  background: linear-gradient(135deg, rgba(245, 200, 66, 0.1), rgba(212, 148, 28, 0.06));
+  border-color: rgba(245, 200, 66, 0.25);
+}
+
+/* ===== Manage Subscription Button ===== */
+
+.darkly-manage-sub-btn {
+  margin: 0;
+}
+
 /* ===== Settings Footer ===== */
 
 .darkly-settings-footer {

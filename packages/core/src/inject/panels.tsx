@@ -19,6 +19,7 @@ export function createSettingsModal(
   config: ProductConfig,
   options: {
     isPro: boolean;
+    plan?: string;
     prices?: PriceInfo;
     onUpgrade: (plan?: 'monthly' | 'yearly' | 'lifetime') => void;
     onManageSubscription?: () => void;
@@ -55,6 +56,7 @@ export function createSettingsModal(
       <DarklyProvider config={config}>
         <SettingsPanel
           isPro={options.isPro}
+          plan={options.plan}
           prices={options.prices}
           onUpgrade={options.onUpgrade}
           onManageSubscription={options.onManageSubscription}

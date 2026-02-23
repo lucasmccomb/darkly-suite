@@ -30,6 +30,7 @@ export interface PaymentClient {
   getToken(): Promise<string>;
   initPayment(): Promise<void>;
   isPro(): Promise<boolean>;
+  getPlan(): Promise<string | null>;
   getPrices(): Promise<PriceInfo | null>;
   onPaymentStatusChange(callback: (paid: boolean) => void): void;
   openPaymentPage(plan?: 'monthly' | 'yearly' | 'lifetime'): Promise<void>;
@@ -92,6 +93,12 @@ export function createPaymentClient(config: ProductConfig): PaymentClient {
     }
   }
 
+  async function getPlan(): Promise<string | null> {
+    const result = await chrome.storage.local.get(proCacheKey);
+    const cache = result[proCacheKey] as ProCache | undefined;
+    return cache?.plan ?? null;
+  }
+
   async function getPrices(): Promise<PriceInfo | null> {
     // Read prices directly from storage — they're valid regardless of paid status
     const result = await chrome.storage.local.get(proCacheKey);
@@ -133,6 +140,7 @@ export function createPaymentClient(config: ProductConfig): PaymentClient {
     getToken,
     initPayment,
     isPro,
+    getPlan,
     getPrices,
     onPaymentStatusChange,
     openPaymentPage,
