@@ -1,14 +1,17 @@
-name = "darkly-suite"
+name = "browse-darkly-landing"
 compatibility_date = "2024-09-23"
 pages_build_output_dir = "dist"
 
 [vars]
-SITE_URL = "https://darklysuite.com"
+SITE_URL = "https://browsedarkly.com"
 SITE_URL_GMAIL = "https://gmaildarkly.com"
 SITE_URL_SHEETS = "https://sheetsdarkly.com"
 SITE_URL_DOCS = "https://docsdarkly.com"
-SITE_URL_BROWSE = "https://browsedarkly.com"
+SITE_URL_SUITE = "https://darklysuite.com"
 # Stripe price IDs (sandbox — swap for live IDs when launching)
+STRIPE_PRICE_BROWSE_MONTHLY = "price_PLACEHOLDER_BROWSE_MONTHLY"
+STRIPE_PRICE_BROWSE_YEARLY = "price_PLACEHOLDER_BROWSE_YEARLY"
+STRIPE_PRICE_BROWSE_LIFETIME = "price_PLACEHOLDER_BROWSE_LIFETIME"
 STRIPE_PRICE_GMAIL_MONTHLY = "price_1T2ZhWJY6QkfGXSJEACPhWhv"
 STRIPE_PRICE_GMAIL_YEARLY = "price_1T2ZjQJY6QkfGXSJJ9rFh6Fc"
 STRIPE_PRICE_GMAIL_LIFETIME = "price_1T2ZkVJY6QkfGXSJkdPt1CAu"
@@ -21,18 +24,12 @@ STRIPE_PRICE_DOCS_LIFETIME = "price_1T3I1GJY6QkfGXSJlMlOp63S"
 STRIPE_PRICE_SUITE_MONTHLY = "price_1T3I1dJY6QkfGXSJdzKQC3O8"
 STRIPE_PRICE_SUITE_YEARLY = "price_1T3I1eJY6QkfGXSJd7YKUcXV"
 STRIPE_PRICE_SUITE_LIFETIME = "price_1T3I1IJY6QkfGXSJIUW0zs82"
-# Browse Darkly prices (sandbox)
-STRIPE_PRICE_BROWSE_MONTHLY = "price_1T3o28JY6QkfGXSJyDum57Py"
-STRIPE_PRICE_BROWSE_YEARLY = "price_1T3o28JY6QkfGXSJOasfbPCr"
-STRIPE_PRICE_BROWSE_LIFETIME = "price_1T3o29JY6QkfGXSJH4UewpKW"
-# Resend API key for admin email notifications (set in Cloudflare dashboard for production)
-# RESEND_API_KEY = ""
-# Stripe product IDs (sandbox — used for coupon applies_to restriction)
+# Stripe product IDs (sandbox)
+STRIPE_PRODUCT_BROWSE = "prod_PLACEHOLDER_BROWSE"
 STRIPE_PRODUCT_GMAIL = "prod_U0atcDlecMJ3xS"
 STRIPE_PRODUCT_SHEETS = "prod_U0b73lYnFW1ZRW"
 STRIPE_PRODUCT_DOCS = "prod_U0bNUH4OAwazJj"
 STRIPE_PRODUCT_SUITE = "prod_U0bNcnlzOCpMmS"
-STRIPE_PRODUCT_BROWSE = "prod_U1rl0WpNZePaMf"
 
 [[d1_databases]]
 binding = "DB"

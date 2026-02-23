@@ -23,7 +23,7 @@ export interface ComparisonFeature {
 type AppId = 'gmail' | 'sheets' | 'docs'
 
 interface PricingProps {
-  product: 'gmail' | 'sheets' | 'docs' | 'suite'
+  product: 'gmail' | 'sheets' | 'docs' | 'suite' | 'browse'
   selectedApp?: AppId | null
   onAppChange?: (app: AppId | null) => void
   features?: string[]

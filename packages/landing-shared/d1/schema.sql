@@ -1,5 +1,5 @@
 -- Darkly Suite — Unified D1 Schema
--- Supports: gmail, sheets, docs, suite products
+-- Supports: gmail, sheets, docs, suite, browse products
 
 -- Migration (run once on production D1):
 -- UPDATE licenses SET status = 'inactive' WHERE status IN ('cancelled', 'expired', 'past_due');

@@ -37,7 +37,7 @@ async function handleCheckout(context: CFContext): Promise<Response> {
 
   if (!isValidProduct(product)) {
     return new Response(
-      JSON.stringify({ error: 'Invalid product (must be gmail, sheets, docs, or suite)' }),
+      JSON.stringify({ error: 'Invalid product (must be gmail, sheets, docs, suite, or browse)' }),
       { status: 400, headers: { ...headers, 'Content-Type': 'application/json' } },
     );
   }
@@ -51,6 +51,7 @@ async function handleCheckout(context: CFContext): Promise<Response> {
     gmail: context.env.SITE_URL_GMAIL,
     sheets: context.env.SITE_URL_SHEETS,
     docs: context.env.SITE_URL_DOCS,
+    browse: context.env.SITE_URL_BROWSE,
   };
   const siteUrl = productSiteUrls[product] ?? context.env.SITE_URL;
 
