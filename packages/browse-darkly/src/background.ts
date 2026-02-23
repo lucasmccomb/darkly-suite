@@ -14,15 +14,20 @@ payment.initPayment();
 
 // Open side panel when toolbar icon is clicked (if user prefers side panel)
 // Default: popup opens. Side panel opened via "Open Settings" button in popup.
-chrome.sidePanel?.setOptions({
-  enabled: true,
-});
+chrome.sidePanel?.setOptions({ enabled: true });
+chrome.sidePanel?.setPanelBehavior({ openPanelOnActionClick: true });
 
 // Handle messages from content scripts, popup, and side panel
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === 'bd:openSidePanel') {
-    if (sender.tab?.windowId) {
-      chrome.sidePanel.open({ windowId: sender.tab.windowId });
+    const windowId = sender.tab?.windowId;
+    if (windowId) {
+      chrome.sidePanel.open({ windowId });
+    } else {
+      // Message from popup (not a tab) — get the current window
+      chrome.windows.getLastFocused().then((win) => {
+        if (win.id) chrome.sidePanel.open({ windowId: win.id });
+      });
     }
     sendResponse({ ok: true });
   }

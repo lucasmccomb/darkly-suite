@@ -57,6 +57,8 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         { from: 'static', to: '.' },
+        // Shared brand icons from @darkly/core
+        { from: path.resolve(__dirname, '../core/static/icons'), to: 'icons' },
         // Gmail-specific override CSS from @darkly/site-gmail
         // with darkly- → gd- prefix transformation
         {

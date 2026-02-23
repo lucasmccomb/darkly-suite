@@ -63,7 +63,7 @@ const styles = {
   },
   tabActive: {
     color: '#8ab4f8',
-    borderBottomColor: '#8ab4f8',
+    borderBottom: '2px solid #8ab4f8',
   },
   tabHover: {
     color: '#e0e0e0',

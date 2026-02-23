@@ -58,6 +58,8 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         { from: 'static', to: '.' },
+        // Shared brand icons from @darkly/core
+        { from: path.resolve(__dirname, '../core/static/icons'), to: 'icons' },
         // Shared core CSS files (themes, settings-panel)
         // with darkly- → bd- prefix transformation
         {
