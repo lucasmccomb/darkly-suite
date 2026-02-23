@@ -130,6 +130,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
       isPro: proStatus,
       prices: prices ?? undefined,
       onUpgrade: (plan) => payment.openPaymentPage(plan),
+      onManageSubscription: proStatus ? () => payment.openManageSubscription() : undefined,
       renderProductSection: productSection,
     });
 
@@ -178,6 +179,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
               }
             : () => settingsModal.show(), // Gmail: "All Settings" opens modal directly
           onUpgrade: (plan?: Plan) => payment.openPaymentPage(plan),
+          onManageSubscription: proStatus ? () => payment.openManageSubscription() : undefined,
         };
 
         toolbarButton = await sitePlugin.injectToolbarButton(toolbarOpts);

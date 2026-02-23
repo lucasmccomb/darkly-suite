@@ -11,9 +11,10 @@ Before starting, verify these are live:
 
 - [ ] **darklysuite.com** — Payment API deployed on Cloudflare Pages with D1 + Stripe bindings
 - [ ] **darklysuite.com/api/status/00000000-0000-4000-8000-000000000000?product=gmail** — Returns `{"paid":false}` (not a 500 or DNS error). Token must be a valid UUID v4.
-- [ ] **gmaildarkly.com** — Landing page live with working `/privacy` page
+- [ ] **gmaildarkly.com** — Landing page live with working `/privacy` and `/subscribe` pages
 - [ ] **Stripe test mode** — Products and prices configured for gmail (monthly/yearly/lifetime)
 - [ ] **Production zip** — Built from latest main: `pnpm --filter gmail-darkly build`, then zip `dist/`
+- [ ] **CWS reviewer promo code** — Verify the promo code (e.g., CWSREVIEW2026) is active in Stripe
 
 ---
 
@@ -22,36 +23,40 @@ Before starting, verify these are live:
 **Setup**: Use a Chrome profile signed into the fresh Google account. No previous Darkly extension installed.
 
 1. [ ] Load the extension as unpacked from the production `dist/` directory
-2. [ ] **Verify**: Browser opens `gmaildarkly.com/setup?product=gmail` in a new tab
-3. [ ] **Verify**: The setup page loads correctly (not a DNS error)
+2. [ ] **Verify**: Browser opens `gmaildarkly.com/subscribe?product=gmail` in a new tab
+3. [ ] **Verify**: The subscribe page loads correctly (not a DNS error)
 4. [ ] Navigate to `mail.google.com`
 5. [ ] **Verify**: Gmail loads normally (no crashes, no console errors)
 6. [ ] **Verify**: The Darkly toolbar button appears in Gmail's toolbar area
 7. [ ] Click the Darkly toolbar button
 8. [ ] **Verify**: Dark mode does NOT activate (free user, paywall blocks it)
-9. [ ] **Verify**: A settings panel or upgrade prompt appears
+9. [ ] **Verify**: The settings panel opens showing a subscription prompt / paywall with plan options
 10. [ ] Check the browser console (Right-click > Inspect > Console tab)
 11. [ ] **Verify**: No errors (warnings about Pro status check are OK if the API is unreachable)
 
-**Expected behavior for free users**: The toolbar button and settings panel should be visible, but dark mode functionality should be gated behind payment. The settings panel should show an "Upgrade" option.
+**Expected behavior for free users**: The toolbar button and settings panel should be visible, but dark mode functionality should be gated behind payment. The settings panel should show pricing and a subscribe button.
 
 ---
 
-## Test 2: Upgrade Flow (Stripe Checkout)
+## Test 2: Upgrade Flow (Stripe Checkout via OAuth)
 
 **Setup**: Continue from Test 1 (extension installed, free user on Gmail).
 
-1. [ ] In the settings panel, click "Upgrade" (or equivalent payment button)
-2. [ ] **Verify**: A new tab opens to `darklysuite.com/api/checkout?token=...&plan=yearly&product=gmail`
-3. [ ] **Verify**: You're redirected to Stripe Checkout (stripe.com hosted page)
-4. [ ] **Verify**: The checkout page shows the correct product ("Darkly for Gmail") and price
-5. [ ] Complete payment using Stripe test card: `4242 4242 4242 4242`, any future expiry, any CVC, any zip
-6. [ ] **Verify**: After payment, you're redirected to a success/thank-you page
-7. [ ] Return to the Gmail tab
-8. [ ] **Verify**: Within 30 minutes (cache TTL), or after closing and reopening Gmail, dark mode becomes available
-   - To speed this up: clear the extension's local storage for the `gd_pro_cache` key, then refresh Gmail
+1. [ ] In the settings panel, click a plan card or "Subscribe" button
+2. [ ] **Verify**: A new tab opens to `darklysuite.com/api/auth/start?type=checkout&token=...&plan=...&product=gmail`
+3. [ ] **Verify**: You're redirected through Google OAuth to confirm your email
+4. [ ] **Verify**: After OAuth, you're redirected to Stripe Checkout (stripe.com hosted page)
+5. [ ] **Verify**: The checkout page shows the correct product ("Darkly for Gmail") and price
+6. [ ] **Verify**: Your Google email is prefilled in the Stripe checkout form
+7. [ ] Apply promo code if testing with a CWS reviewer code
+8. [ ] Complete payment using Stripe test card: `4242 4242 4242 4242`, any future expiry, any CVC, any zip
+9. [ ] **Verify**: After payment, you're redirected to a success page
+10. [ ] Return to the Gmail tab
+11. [ ] **Verify**: Within a few minutes (background checkout polling checks every 5-30 seconds), the paywall dismisses and dark mode becomes available automatically
+    - The extension uses background polling: Phase 1 (0–2 min) every 5s, Phase 2 (2–5 min) every 10s, Phase 3 (5–60 min) every 30s via alarms
+    - Alternatively: close and reopen Gmail tab to trigger an immediate pro status check
 
-**Note**: The payment flow is: Extension → darklysuite.com/api/checkout → Stripe hosted checkout → Stripe webhook → D1 license record → Extension checks /api/status and gets `paid: true`.
+**Note**: The payment flow is: Extension → darklysuite.com/api/auth/start → Google OAuth → Stripe hosted checkout → Stripe webhook → D1 license record → Extension background polling detects `paid: true` → page reloads → dark mode activates.
 
 ---
 
@@ -125,7 +130,7 @@ Before starting, verify these are live:
 3. [ ] Return to Gmail tab and refresh the page
 4. [ ] **Verify**: Dark mode is still active (preferences survived extension reload)
 5. [ ] **Verify**: Pro status is still active (payment survived extension reload)
-6. [ ] **Verify**: The setup page does NOT open again (onInstalled should only fire for `reason: install`, not `update`)
+6. [ ] **Verify**: The subscribe page does NOT open again (onInstalled should only fire for `reason: install`, not `update`)
 
 ---
 
@@ -141,7 +146,7 @@ Before starting, verify these are live:
 6. [ ] **Labels/folders**: Navigate to Starred, Sent, Drafts — verify sidebar navigation is themed
 7. [ ] **Right-click menus**: Right-click on an email — verify context menus are readable
 8. [ ] **Popovers**: Hover over sender names, attachment previews — verify popovers are themed
-9. [ ] **Profile photo modal**: Click your profile photo (top right) — note if the modal/iframe has issues (known issue #137: inverted photo)
+9. [ ] **Profile photo modal**: Click your profile photo (top right) — note if the modal/iframe has issues
 
 ---
 
@@ -150,7 +155,21 @@ Before starting, verify these are live:
 1. [ ] **Multiple Gmail tabs**: Open Gmail in 2+ tabs — verify dark mode state is consistent across all tabs
 2. [ ] **Gmail loading spinner**: Refresh Gmail — verify no white flash while Gmail loads
 3. [ ] **Slow network**: Throttle network in DevTools (Slow 3G) — verify extension handles slow API response gracefully
-4. [ ] **API down**: Disconnect network, refresh Gmail — verify extension doesn't crash (should fall back gracefully, dark mode may not activate for free users)
+4. [ ] **API down**: Disconnect network, refresh Gmail — verify extension doesn't crash (dark mode remains active for paid users with cached pro status)
+5. [ ] **Tab focus revalidation**: Switch away from Gmail tab and back — verify pro status is revalidated without UI disruption
+
+---
+
+## Test 10: Extension Token Handoff (externally_connectable)
+
+**Setup**: Verify the extension properly communicates its token to the checkout page.
+
+1. [ ] Note the extension ID from `chrome://extensions`
+2. [ ] With the extension installed, navigate to `gmaildarkly.com/subscribe`
+3. [ ] Open the browser console on the subscribe page
+4. [ ] **Verify**: The page attempts to communicate with the extension via `chrome.runtime.sendMessage(extensionId, ...)`
+5. [ ] **Verify**: If the extension ID matches a published ID in `externally_connectable`, the token is received; otherwise, it gracefully falls back to a generated token
+6. [ ] **Note**: For unpublished extensions (local dev), the extension ID changes on each install, so token handoff will use the fallback — this is expected
 
 ---
 
@@ -160,9 +179,11 @@ If any of these fail, do NOT submit to Chrome Web Store:
 
 - [ ] Extension loads without crashing Gmail
 - [ ] Paywall blocks features for free users
-- [ ] Payment flow completes successfully (Stripe test mode)
+- [ ] Payment flow completes successfully (Stripe test mode or promo code)
 - [ ] Dark mode activates for paid users
 - [ ] Settings persist across sessions
 - [ ] No console errors that would concern a Google reviewer
 - [ ] `gmaildarkly.com/privacy` is accessible
 - [ ] `darklysuite.com/api/status` endpoint responds correctly
+- [ ] CWS listing description mentions subscription requirement
+- [ ] "Contains in-app purchases" is checked in CWS dashboard Distribution tab

@@ -21,6 +21,7 @@ export function createSettingsModal(
     isPro: boolean;
     prices?: PriceInfo;
     onUpgrade: (plan?: 'monthly' | 'yearly' | 'lifetime') => void;
+    onManageSubscription?: () => void;
     renderProductSection?: React.ReactNode;
   },
 ): PanelHandle {
@@ -56,6 +57,7 @@ export function createSettingsModal(
           isPro={options.isPro}
           prices={options.prices}
           onUpgrade={options.onUpgrade}
+          onManageSubscription={options.onManageSubscription}
           onClose={() => handle.hide()}
           renderProductSection={options.renderProductSection}
         />

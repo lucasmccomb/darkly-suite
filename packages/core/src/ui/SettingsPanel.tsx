@@ -15,12 +15,13 @@ interface SettingsPanelProps {
   isPro?: boolean;
   prices?: PriceInfo;
   onUpgrade?: (plan?: 'monthly' | 'yearly' | 'lifetime') => void;
+  onManageSubscription?: () => void;
   onClose?: () => void;
   /** Render prop for product-specific settings sections */
   renderProductSection?: React.ReactNode;
 }
 
-export function SettingsPanel({ isPro = false, prices, onUpgrade, onClose, renderProductSection }: SettingsPanelProps) {
+export function SettingsPanel({ isPro = false, prices, onUpgrade, onManageSubscription, onClose, renderProductSection }: SettingsPanelProps) {
   const p = usePrefix();
   const config = useDarklyConfig();
   const [prefs, setPrefs] = useState<BaseUserPreferences>(DEFAULT_PREFERENCES);
@@ -107,6 +108,18 @@ export function SettingsPanel({ isPro = false, prices, onUpgrade, onClose, rende
       </div>
 
       <div className={`${p}-settings-footer`}>
+        {onManageSubscription && (
+          <>
+            <a
+              href="#"
+              onClick={(e) => { e.preventDefault(); onManageSubscription(); }}
+              className={`${p}-settings-footer-link`}
+            >
+              Manage Subscription
+            </a>
+            {' · '}
+          </>
+        )}
         Need help?{' '}
         <a
           href="https://darklysuite.com/support"

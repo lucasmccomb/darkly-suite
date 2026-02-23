@@ -30,6 +30,7 @@ export interface ToolbarButtonOpts {
   prices?: import('./payment/client').PriceInfo;
   onAllSettings: () => void;
   onUpgrade: (plan?: 'monthly' | 'yearly' | 'lifetime') => void;
+  onManageSubscription?: () => void;
 }
 
 export interface SidebarIconOpts {

@@ -1,15 +1,3 @@
-# Chrome Web Store Listing — Darkly for Gmail
-
-## Extension Name
-
-Darkly for Gmail
-
-## Short Description (132 chars max)
-
-Dark mode for Gmail with scheduling, sunrise/sunset sync, and OS theme matching. Subscription required. Plans from $0.99/month.
-
-## Detailed Description
-
 Darkly for Gmail adds a beautiful dark mode to Gmail that goes beyond simple color inversion. A paid subscription is required to use dark mode features.
 
 FEATURES
@@ -39,19 +27,3 @@ Darkly for Gmail does not read your emails, collect personal data, or send analy
 SUPPORT
 
 Visit https://gmaildarkly.com for documentation and support, or email admin@darklysuite.com.
-
-## Category
-
-Productivity
-
-## Language
-
-English
-
-## Website
-
-https://gmaildarkly.com
-
-## Pricing
-
-Free to install (paid subscription required for all features — in-app purchase via Stripe)

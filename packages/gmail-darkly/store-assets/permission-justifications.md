@@ -7,15 +7,18 @@ Privacy Practices tab. These are copy-paste ready for the submission form.
 
 ### storage
 
-Stores user preferences (dark mode on/off, schedule times, theme settings) using
-chrome.storage.sync so settings persist across sessions and sync across the user's
-Chrome browsers. No personal data is stored.
+Stores user preferences (dark mode on/off, schedule times, theme settings) and an
+anonymous device token for subscription verification using chrome.storage.sync so
+settings persist across sessions and sync across the user's Chrome browsers. No
+personal data is stored.
 
 ### alarms
 
 Runs periodic checks for schedule-based and sunrise/sunset dark mode. An alarm fires
 every minute to determine whether dark mode should be active based on the user's
-configured schedule or local sunrise/sunset times.
+configured schedule or local sunrise/sunset times. Also used for background polling
+after Stripe checkout to detect when payment completes (polls every 30 seconds for
+up to 60 minutes after checkout).
 
 ### offscreen
 
@@ -39,9 +42,14 @@ into Gmail pages. Content scripts match this pattern to apply themes and render 
 
 ### https://darklysuite.com/*
 
-Communicates with the Darkly payment API to check license status. An anonymous device
-token (randomly generated UUID) is sent to verify whether the user has a paid license.
-No personal information is transmitted.
+Communicates with the Darkly payment API to check subscription status and initiate
+checkout. An anonymous device token (randomly generated UUID) is sent to verify whether
+the user has a paid subscription. No personal information is transmitted.
+
+Also used for `externally_connectable` messaging: the darklysuite.com checkout page
+can request the extension's device token so that Stripe licenses are linked to the
+correct extension instance. This communication is restricted to darklysuite.com by
+the manifest's `externally_connectable.matches` field.
 
 ### https://api.sunrise-sunset.org/*
 
