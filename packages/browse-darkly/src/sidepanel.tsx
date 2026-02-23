@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { PresetGallery } from './components/PresetGallery';
 import { DomainSettings } from './components/DomainSettings';
@@ -18,6 +18,15 @@ const tabs: Tab[] = [
   { id: 'schedule', label: 'Schedule' },
   { id: 'account', label: 'Account' },
 ];
+
+function domainFromUrl(url: string | undefined): string {
+  if (!url) return '';
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return '';
+  }
+}
 
 const styles = {
   container: {
@@ -80,26 +89,34 @@ function SidePanel() {
   const [currentDomain, setCurrentDomain] = useState<string>('');
   const [hoveredTab, setHoveredTab] = useState<TabId | null>(null);
 
-  useEffect(() => {
+  const updateDomain = useCallback(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const tab = tabs[0];
-      if (tab?.url) {
-        try {
-          const url = new URL(tab.url);
-          setCurrentDomain(url.hostname);
-        } catch {
-          setCurrentDomain('');
-        }
-      }
+      setCurrentDomain(domainFromUrl(tabs[0]?.url));
     });
   }, []);
+
+  useEffect(() => {
+    updateDomain();
+
+    const onActivated = () => updateDomain();
+    const onUpdated = (_tabId: number, info: chrome.tabs.TabChangeInfo) => {
+      if (info.url) updateDomain();
+    };
+
+    chrome.tabs.onActivated.addListener(onActivated);
+    chrome.tabs.onUpdated.addListener(onUpdated);
+    return () => {
+      chrome.tabs.onActivated.removeListener(onActivated);
+      chrome.tabs.onUpdated.removeListener(onUpdated);
+    };
+  }, [updateDomain]);
 
   const renderContent = () => {
     switch (activeTab) {
       case 'presets':
         return <PresetGallery currentDomain={currentDomain} />;
       case 'domain':
-        return <DomainSettings currentDomain={currentDomain} />;
+        return <DomainSettings key={currentDomain} currentDomain={currentDomain} />;
       case 'schedule':
         return <ScheduleSettings />;
       case 'account':
