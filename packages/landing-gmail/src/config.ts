@@ -59,6 +59,10 @@ export const GMAIL_FAQ = [
     question: 'Can I customize the colors?',
     answer: "Darkly's dark theme was carefully designed for readability and eye comfort. While custom color options aren't available yet, the theme is optimized to look great in all lighting conditions.",
   },
+  {
+    question: 'I reinstalled the extension and now I see the paywall. How do I restore my purchase?',
+    answer: 'When you uninstall and reinstall a Chrome extension, Chrome clears its local data — including the token that links the extension to your license. To restore your purchase, click the "Already purchased? Restore" link on the paywall screen, then sign in with the Google account you used to purchase. Your license will be re-linked automatically.',
+  },
 ]
 
 export const individualTiers = (): PricingTier[] => [
