@@ -29,14 +29,19 @@ export function buildCheckoutUrl(
 /**
  * Get a checkout token, preferring:
  * 1. An explicit token (e.g. from URL params, passed by the extension)
- * 2. A previously generated token stored in sessionStorage
- * 3. A freshly generated UUID
+ * 2. A token retrieved from an installed extension via externally_connectable
+ * 3. A previously generated token stored in sessionStorage
+ * 4. A freshly generated UUID
  *
  * sessionStorage ensures the same token is reused within a tab session
  * (e.g. user clicks Monthly → cancels on Stripe → clicks Yearly).
  */
-export function getOrCreateToken(urlToken?: string | null): string {
+export function getOrCreateToken(
+  urlToken?: string | null,
+  extensionToken?: string | null,
+): string {
   if (urlToken) return urlToken
+  if (extensionToken) return extensionToken
 
   const existing = sessionStorage.getItem(SESSION_TOKEN_KEY)
   if (existing) return existing

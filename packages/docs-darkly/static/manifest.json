@@ -26,6 +26,9 @@
       "matches": ["https://docs.google.com/*"]
     }
   ],
+  "externally_connectable": {
+    "matches": ["https://darklysuite.com/*"]
+  },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   },

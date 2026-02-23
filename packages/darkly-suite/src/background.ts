@@ -123,6 +123,20 @@ chrome.runtime.onMessage.addListener(
   },
 );
 
+// --- External message listener (landing page token requests) ---
+chrome.runtime.onMessageExternal.addListener((message, _sender, sendResponse) => {
+  if (message.type === 'getToken') {
+    chrome.storage.sync.get(config.tokenKey).then((result) => {
+      sendResponse({
+        token: result[config.tokenKey] || null,
+        productId: config.productId,
+      });
+    });
+    return true;
+  }
+  return false;
+});
+
 // --- Single alarm listener ---
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === checkoutPoller.alarmName) {

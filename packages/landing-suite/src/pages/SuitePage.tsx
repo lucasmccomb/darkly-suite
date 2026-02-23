@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { Nav, Hero, Features, Pricing, FAQ, Footer, buildCheckoutUrl, getOrCreateToken } from '@darkly/landing-shared'
+import { Nav, Hero, Features, Pricing, FAQ, Footer, buildCheckoutUrl, getOrCreateToken, useExtensionToken } from '@darkly/landing-shared'
 import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URLS, CHECKOUT_API_URL, individualTiers, bundleTiers } from '../config.ts'
 
 const suiteFeatures = [
@@ -14,10 +14,12 @@ const suiteFeatures = [
 ]
 
 export function SuitePage() {
+  const extensionToken = useExtensionToken('suite')
+
   const handleCheckout = useCallback((product: string, plan: string) => {
-    const token = getOrCreateToken()
+    const token = getOrCreateToken(null, extensionToken)
     window.location.href = buildCheckoutUrl(CHECKOUT_API_URL, product, plan, token)
-  }, [])
+  }, [extensionToken])
 
   return (
     <>

@@ -3,6 +3,7 @@ import { useCallback } from 'react'
 import { Check } from 'lucide-react'
 import type { PricingTier } from './Pricing.tsx'
 import { buildCheckoutUrl, getOrCreateToken } from '../utils/checkout.ts'
+import { useExtensionToken } from '../hooks/useExtensionToken.ts'
 
 interface SubscribeContentProps {
   product: string
@@ -24,7 +25,8 @@ export function SubscribeContent({
   const [searchParams] = useSearchParams()
   const urlToken = searchParams.get('token')
   const email = searchParams.get('email') || undefined
-  const token = getOrCreateToken(urlToken)
+  const extensionToken = useExtensionToken(product)
+  const token = getOrCreateToken(urlToken, extensionToken)
 
   const handleSubscribe = useCallback(
     (plan: string) => {
