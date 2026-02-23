@@ -78,3 +78,17 @@ export type { ViewportProcessorOptions } from './viewport-processor';
 // Override decision pipeline
 export { executeOverridePipeline } from './override-pipeline';
 export type { OverrideStrategy, OverrideResult } from './override-pipeline';
+
+// Site-style analysis engine
+export { analyzeDarkModeSupport } from './analysis/dark-mode-detection';
+export type { DarkModeAnalysis } from './analysis/dark-mode-detection';
+export { detectNativeDarkState } from './analysis/native-dark-detection';
+export type { NativeDarkState } from './analysis/native-dark-detection';
+export { classifyComplexity } from './analysis/complexity-classifier';
+export type { ComplexityLevel, ComplexityAnalysis } from './analysis/complexity-classifier';
+
+// Security — CSS sanitization and bundle verification
+export { sanitizeCSS } from './security/css-sanitizer';
+export type { SanitizationResult } from './security/css-sanitizer';
+export { verifyBundleSignature } from './security/signature-verifier';
+export type { SignedBundle } from './security/signature-verifier';
