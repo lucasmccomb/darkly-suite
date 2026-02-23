@@ -64,6 +64,7 @@ function swapSidebarIcon(prefix: string): void {
 
 interface SidebarPanelOptions {
   isPro?: boolean;
+  plan?: string;
   prices?: import('@darkly/core').PriceInfo;
   onUpgrade?: (plan?: 'monthly' | 'yearly' | 'lifetime') => void;
   onManageSubscription?: () => void;
@@ -84,6 +85,7 @@ export async function mountSettingsPanel(
   config: ProductConfig,
   SettingsPanel: React.FC<{
     isPro?: boolean;
+    plan?: string;
     prices?: import('@darkly/core').PriceInfo;
     onUpgrade?: (plan?: 'monthly' | 'yearly' | 'lifetime') => void;
     onManageSubscription?: () => void;
@@ -110,6 +112,7 @@ export async function mountSettingsPanel(
     <DarklyProvider config={config}>
       <SettingsPanel
         isPro={options.isPro}
+        plan={options.plan}
         prices={options.prices}
         onUpgrade={options.onUpgrade}
         onManageSubscription={options.onManageSubscription}

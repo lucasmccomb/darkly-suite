@@ -27,6 +27,7 @@ export interface ProductConfig {
 
 export interface ToolbarButtonOpts {
   isPro: boolean;
+  plan?: string;
   prices?: import('./payment/client').PriceInfo;
   onAllSettings: () => void;
   onUpgrade: (plan?: 'monthly' | 'yearly' | 'lifetime') => void;

@@ -101,6 +101,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
 
     const proStatus = await payment.refreshProStatus();
     const prices = await payment.getPrices();
+    const plan = await payment.getPlan();
 
     if (proStatus) {
       const currentPrefs = await prefs.load();
@@ -126,11 +127,13 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
     }
 
     // Create the settings modal (centered overlay with backdrop)
+    const isLifetime = plan === 'lifetime';
     const settingsModal = createSettingsModal(config, {
       isPro: proStatus,
+      plan: plan ?? undefined,
       prices: prices ?? undefined,
-      onUpgrade: (plan) => payment.openPaymentPage(plan),
-      onManageSubscription: proStatus ? () => payment.openManageSubscription() : undefined,
+      onUpgrade: (p) => payment.openPaymentPage(p),
+      onManageSubscription: proStatus && !isLifetime ? () => payment.openManageSubscription() : undefined,
       renderProductSection: productSection,
     });
 
@@ -164,6 +167,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
         // Editor path: toolbar button, DOM observer, sidebar icon
         const toolbarOpts = {
           isPro: proStatus,
+          plan: plan ?? undefined,
           prices: prices ?? undefined,
           onAllSettings: miniPanel
             ? () => {
@@ -178,8 +182,8 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
                 }
               }
             : () => settingsModal.show(), // Gmail: "All Settings" opens modal directly
-          onUpgrade: (plan?: Plan) => payment.openPaymentPage(plan),
-          onManageSubscription: proStatus ? () => payment.openManageSubscription() : undefined,
+          onUpgrade: (p?: Plan) => payment.openPaymentPage(p),
+          onManageSubscription: proStatus && !isLifetime ? () => payment.openManageSubscription() : undefined,
         };
 
         toolbarButton = await sitePlugin.injectToolbarButton(toolbarOpts);
