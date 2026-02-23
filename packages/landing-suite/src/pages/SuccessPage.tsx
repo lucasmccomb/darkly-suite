@@ -1,11 +1,13 @@
 import { useSearchParams } from 'react-router-dom'
-import { Nav, Footer, Wordmark, SetupGuide } from '@darkly/landing-shared'
+import { Nav, Footer, Wordmark, SetupGuide, useCheckoutComplete } from '@darkly/landing-shared'
 import { Check } from 'lucide-react'
 import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URLS } from '../config.ts'
 
 export function SuccessPage() {
   const [searchParams] = useSearchParams()
   const product = searchParams.get('product')
+
+  useCheckoutComplete(product)
 
   return (
     <>

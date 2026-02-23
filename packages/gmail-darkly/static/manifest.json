@@ -18,6 +18,11 @@
       ],
       "js": ["content.js"],
       "run_at": "document_end"
+    },
+    {
+      "matches": ["https://gmaildarkly.com/*", "https://darklysuite.com/*"],
+      "js": ["landing-bridge.js"],
+      "run_at": "document_end"
     }
   ],
   "web_accessible_resources": [
@@ -26,9 +31,6 @@
       "matches": ["https://mail.google.com/*"]
     }
   ],
-  "externally_connectable": {
-    "matches": ["https://darklysuite.com/*"]
-  },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   },

@@ -1,74 +1,60 @@
 /**
- * Extension bridge — detects installed Darkly extensions via
- * chrome.runtime.sendMessage (externally_connectable).
+ * Extension bridge — detects installed Darkly extensions via a content
+ * script bridge (landing-bridge.ts) that runs on landing page domains.
  *
- * The extension's background worker responds with { token, productId }
- * so the landing page can use the real extension token for checkout
- * instead of generating a throwaway UUID.
+ * The content script requests the token from the extension's background
+ * worker and dispatches it to the page via a CustomEvent. This approach
+ * works for both published (CWS) and unpacked extensions, unlike
+ * externally_connectable which requires knowing the extension ID.
+ *
+ * Communication:
+ *   Token:    content script → page via 'darkly-extension-token' event
+ *   Request:  page → content script via 'darkly-token-request' event
+ *   Checkout: page → content script via 'darkly-checkout-complete' event
  */
 
-// Minimal Chrome runtime types for externally_connectable messaging.
-// Web pages listed in an extension's externally_connectable.matches can call
-// chrome.runtime.sendMessage(extensionId, ...) — this covers only that API.
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace -- namespace is required for global type augmentation
-  namespace chrome { namespace runtime {
-      const lastError: { message?: string } | undefined
-      function sendMessage(
-        extensionId: string,
-        message: unknown,
-        callback: (response: unknown) => void,
-      ): void
-    }
-  }
-}
-
-/** Chrome Web Store extension IDs. Fill in as extensions are published. */
-const EXTENSION_IDS: Record<string, string> = {
-  gmail: 'PLACEHOLDER_GMAIL_ID',
-  sheets: 'PLACEHOLDER_SHEETS_ID',
-  docs: 'PLACEHOLDER_DOCS_ID',
-  suite: 'PLACEHOLDER_SUITE_ID',
-}
-
-interface TokenResponse {
-  token: string | null
+interface TokenDetail {
+  token: string
   productId: string
 }
 
 /**
- * Try to get the extension's token for a given product via
- * externally_connectable messaging. Returns null if no extension
- * is installed or the message fails.
+ * Try to get the extension's token via the content script bridge.
+ * Returns null if no extension is installed or doesn't respond within 2s.
+ *
+ * Handles both timing scenarios:
+ * - Content script loaded first: responds to our 'darkly-token-request'
+ * - Page loaded first: catches the content script's initial dispatch
  */
-export async function getExtensionToken(product: string): Promise<string | null> {
-  if (typeof chrome === 'undefined' || !chrome.runtime?.sendMessage) {
-    return null
-  }
+export function getExtensionToken(_product: string): Promise<string | null> {
+  return new Promise((resolve) => {
+    const timeout = setTimeout(() => {
+      window.removeEventListener('darkly-extension-token', handler)
+      resolve(null)
+    }, 2000)
 
-  // Try the product-specific extension first, then the suite extension
-  const idsToTry = [
-    EXTENSION_IDS[product],
-    ...(product !== 'suite' ? [EXTENSION_IDS.suite] : []),
-  ].filter(Boolean)
-
-  for (const id of idsToTry) {
-    try {
-      const response = await new Promise<TokenResponse>((resolve, reject) => {
-        chrome.runtime.sendMessage(id, { type: 'getToken' }, (resp) => {
-          if (chrome.runtime.lastError) {
-            reject(new Error(chrome.runtime.lastError.message))
-          } else {
-            resolve(resp as TokenResponse)
-          }
-        })
-      })
-      if (response?.token) return response.token
-    } catch {
-      // Extension not installed or not responding — try next
-      continue
+    function handler(event: Event) {
+      const detail = (event as CustomEvent<TokenDetail>).detail
+      if (detail?.token) {
+        clearTimeout(timeout)
+        window.removeEventListener('darkly-extension-token', handler)
+        resolve(detail.token)
+      }
     }
-  }
 
-  return null
+    window.addEventListener('darkly-extension-token', handler)
+
+    // Ask the content script to re-send its token (handles case where
+    // content script dispatched before our listener was ready)
+    window.dispatchEvent(new CustomEvent('darkly-token-request'))
+  })
+}
+
+/**
+ * Notify the extension that checkout completed, triggering the checkout
+ * poller to detect the new license. The content script bridge forwards
+ * this to the background worker via chrome.runtime.sendMessage.
+ */
+export function notifyCheckoutComplete(_product: string): void {
+  window.dispatchEvent(new CustomEvent('darkly-checkout-complete'))
 }

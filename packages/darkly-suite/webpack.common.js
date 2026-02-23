@@ -22,6 +22,7 @@ module.exports = {
     background: './src/background.ts',
     offscreen: './src/offscreen.ts',
     pageWorld: './src/pageWorld.ts',
+    'landing-bridge': path.resolve(__dirname, '../core/src/landing-bridge.ts'),
   },
   module: {
     rules: [

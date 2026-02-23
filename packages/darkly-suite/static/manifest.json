@@ -39,6 +39,11 @@
       "js": ["content-drive.js"],
       "css": ["styles/themes.css", "styles/drive-overrides.css", "styles/settings-panel.css"],
       "run_at": "document_end"
+    },
+    {
+      "matches": ["https://darklysuite.com/*"],
+      "js": ["landing-bridge.js"],
+      "run_at": "document_end"
     }
   ],
   "web_accessible_resources": [
@@ -51,9 +56,6 @@
       ]
     }
   ],
-  "externally_connectable": {
-    "matches": ["https://darklysuite.com/*"]
-  },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
