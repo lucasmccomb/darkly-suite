@@ -35,6 +35,10 @@ const defaultFaqs: FAQItem[] = [
     question: 'Does a Suite license include all future apps?',
     answer: 'Yes. As we add dark mode support for additional Google apps, Suite license holders get access automatically at no additional cost. Drive support was recently added this way.',
   },
+  {
+    question: 'I reinstalled the extension and now I see the paywall. How do I restore my purchase?',
+    answer: 'When you uninstall and reinstall a Chrome extension, Chrome clears its local data — including the token that links the extension to your license. To restore your purchase, click the "Already purchased? Restore" link on the paywall screen, then sign in with the Google account you used to purchase. Your license will be re-linked automatically.',
+  },
 ]
 
 export function FAQ({ items = defaultFaqs }: FAQProps) {

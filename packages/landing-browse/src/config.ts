@@ -64,6 +64,10 @@ export const BROWSE_FAQ = [
     question: 'What about sites that already have dark mode?',
     answer: "Browse Darkly's smart detection identifies sites that are already dark and automatically skips them. You'll never get double-darkened pages.",
   },
+  {
+    question: 'I reinstalled the extension and now I see the paywall. How do I restore my purchase?',
+    answer: 'When you uninstall and reinstall a Chrome extension, Chrome clears its local data — including the token that links the extension to your license. To restore your purchase, click the "Already purchased? Restore" link on the paywall screen, then sign in with the Google account you used to purchase. Your license will be re-linked automatically.',
+  },
 ]
 
 export const individualTiers = (): PricingTier[] => [

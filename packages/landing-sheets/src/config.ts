@@ -63,6 +63,10 @@ export const SHEETS_FAQ = [
     question: 'How do I toggle dark mode?',
     answer: 'You can toggle dark mode from the toolbar button in Google Sheets, or use the sidebar icon for quick access to the full settings panel.',
   },
+  {
+    question: 'I reinstalled the extension and now I see the paywall. How do I restore my purchase?',
+    answer: 'When you uninstall and reinstall a Chrome extension, Chrome clears its local data — including the token that links the extension to your license. To restore your purchase, click the "Already purchased? Restore" link on the paywall screen, then sign in with the Google account you used to purchase. Your license will be re-linked automatically.',
+  },
 ]
 
 export const individualTiers = (): PricingTier[] => [
