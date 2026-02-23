@@ -12,6 +12,7 @@ type CFContext = EventContext<Env, string, unknown>
  *   - admin    (default) — admin panel login
  *   - user     — account portal login
  *   - checkout — pre-checkout email capture, requires token/plan/product params
+ *   - restore  — restore purchase after reinstall, requires token/product params
  */
 export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
   const { GOOGLE_CLIENT_ID } = context.env
@@ -43,6 +44,18 @@ export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
     }
 
     state = `checkout:${token}:${plan}:${product}:${randomHex}`
+  } else if (type === 'restore') {
+    const token = url.searchParams.get('token')
+    const product = url.searchParams.get('product') ?? 'gmail'
+
+    if (!token || !isValidToken(token)) {
+      return new Response('Missing or invalid token', { status: 400 })
+    }
+    if (!isValidProduct(product)) {
+      return new Response('Invalid product', { status: 400 })
+    }
+
+    state = `restore:${token}:${product}:${randomHex}`
   } else {
     const flowType = type === 'user' ? 'user' : 'admin'
     state = `${flowType}:${randomHex}`

@@ -43,7 +43,7 @@ export const gmailPlugin: SitePlugin = {
       // Mount sidebar settings panel
       _openSettings = await mountSettingsPanel(
         sdk,
-        { isPro: opts.isPro, plan: opts.plan, prices: opts.prices, onUpgrade: opts.onUpgrade, onManageSubscription: opts.onManageSubscription },
+        { isPro: opts.isPro, plan: opts.plan, prices: opts.prices, onUpgrade: opts.onUpgrade, onRestorePurchase: opts.onRestorePurchase, onManageSubscription: opts.onManageSubscription },
         _config,
         GmailSettingsPanel,
       );

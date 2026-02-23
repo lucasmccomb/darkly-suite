@@ -21,11 +21,12 @@ const SUITE_PLANS: typeof INDIVIDUAL_PLANS = [
 
 interface PaywallProps {
   onSubscribe: (plan: Plan) => void;
+  onRestorePurchase?: () => void;
   onClose?: () => void;
   prices?: PriceInfo;
 }
 
-export function Paywall({ onSubscribe, onClose, prices }: PaywallProps) {
+export function Paywall({ onSubscribe, onRestorePurchase, onClose, prices }: PaywallProps) {
   const p = usePrefix();
   const uid = useId();
   const config = useDarklyConfig();
@@ -80,6 +81,15 @@ export function Paywall({ onSubscribe, onClose, prices }: PaywallProps) {
         >
           Learn more
         </a>
+        {onRestorePurchase && (
+          <a
+            href="#"
+            onClick={(e) => { e.preventDefault(); onRestorePurchase(); }}
+            className={`${p}-paywall-learn-more`}
+          >
+            Already purchased? Restore
+          </a>
+        )}
         <div className={`${p}-paywall-footer`}>
           <div className={`${p}-paywall-icon`}>
             <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="32" height="32">

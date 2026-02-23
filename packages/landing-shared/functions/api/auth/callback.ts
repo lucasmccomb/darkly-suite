@@ -8,10 +8,12 @@ type CFContext = EventContext<Env, string, unknown>
 /**
  * GET /api/auth/callback
  * Google redirects here after user authenticates.
- * Parses the state prefix to determine admin vs user flow:
- *   - admin:{hex} → existing admin session flow (ADMIN_EMAIL check)
- *   - user:{hex}  → account portal session flow (any Google account)
- *   - {hex}       → legacy admin flow (backward compat)
+ * Parses the state prefix to determine flow type:
+ *   - admin:{hex}   → existing admin session flow (ADMIN_EMAIL check)
+ *   - user:{hex}    → account portal session flow (any Google account)
+ *   - checkout:...  → pre-checkout email capture
+ *   - restore:...   → restore purchase after extension reinstall
+ *   - {hex}         → legacy admin flow (backward compat)
  */
 export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
   const url = new URL(context.request.url)
@@ -46,6 +48,10 @@ export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
       return handleCheckoutFlow(url.origin, state, claims.email)
     }
 
+    if (flowType === 'restore') {
+      return handleRestoreFlow(context.env, url.origin, DB, state, claims.email)
+    }
+
     if (flowType === 'user') {
       return handleUserFlow(context.env, url.origin, DB, claims.email)
     }
@@ -54,13 +60,14 @@ export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     console.error(`OAuth callback error: ${message}`)
-    const errorRedirect = flowType === 'checkout' ? '/' : flowType === 'user' ? '/account' : '/admin'
+    const errorRedirect = flowType === 'checkout' || flowType === 'restore' ? '/' : flowType === 'user' ? '/account' : '/admin'
     return redirectWithError(url.origin, 'Authentication failed', errorRedirect)
   }
 }
 
-function parseFlowType(state: string): 'admin' | 'user' | 'checkout' {
+function parseFlowType(state: string): 'admin' | 'user' | 'checkout' | 'restore' {
   if (state.startsWith('checkout:')) return 'checkout'
+  if (state.startsWith('restore:')) return 'restore'
   if (state.startsWith('user:')) return 'user'
   return 'admin' // 'admin:' prefix or legacy unprefixed state
 }
@@ -85,6 +92,63 @@ function handleCheckoutFlow(
   const responseHeaders = new Headers()
   responseHeaders.set('Location', checkoutUrl.toString())
   // Clear the OAuth state cookie
+  responseHeaders.append(
+    'Set-Cookie',
+    `darkly_oauth_state=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0`,
+  )
+
+  return new Response(null, { status: 302, headers: responseHeaders })
+}
+
+async function handleRestoreFlow(
+  env: Env,
+  origin: string,
+  db: D1Database,
+  state: string,
+  email: string,
+): Promise<Response> {
+  // State format: restore:{token}:{product}:{csrf_hex}
+  const parts = state.split(':')
+  const newToken = parts[1]
+  const product = parts[2]
+
+  // Look up active license by email + product (or suite)
+  const license = await db
+    .prepare(
+      `SELECT id, token FROM licenses
+       WHERE email = ? AND product IN (?, 'suite') AND status = 'active'
+       ORDER BY CASE WHEN product = ? THEN 0 ELSE 1 END
+       LIMIT 1`,
+    )
+    .bind(email, product, product)
+    .first<{ id: number; token: string }>()
+
+  if (!license) {
+    return redirectWithError(
+      origin,
+      'No active subscription found for this email. Please sign in with the email you used to purchase.',
+      '/',
+    )
+  }
+
+  // Update the license token to the new extension token
+  await db
+    .prepare('UPDATE licenses SET token = ? WHERE id = ?')
+    .bind(newToken, license.id)
+    .run()
+
+  // Redirect to success page — the extension's checkout poller will
+  // pick up the license on its next poll of /api/status/:newToken
+  const productSiteUrls: Partial<Record<string, string>> = {
+    gmail: env.SITE_URL_GMAIL,
+    sheets: env.SITE_URL_SHEETS,
+    docs: env.SITE_URL_DOCS,
+    browse: env.SITE_URL_BROWSE,
+  }
+  const siteUrl = productSiteUrls[product] ?? env.SITE_URL
+
+  const responseHeaders = new Headers()
+  responseHeaders.set('Location', `${siteUrl}/success?restored=true&product=${product}`)
   responseHeaders.append(
     'Set-Cookie',
     `darkly_oauth_state=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0`,
