@@ -22,6 +22,7 @@ export function createSettingsModal(
     plan?: string;
     prices?: PriceInfo;
     onUpgrade: (plan?: 'monthly' | 'yearly' | 'lifetime') => void;
+    onRestorePurchase?: () => void;
     onManageSubscription?: () => void;
     renderProductSection?: React.ReactNode;
   },
@@ -59,6 +60,7 @@ export function createSettingsModal(
           plan={options.plan}
           prices={options.prices}
           onUpgrade={options.onUpgrade}
+          onRestorePurchase={options.onRestorePurchase}
           onManageSubscription={options.onManageSubscription}
           onClose={() => handle.hide()}
           renderProductSection={options.renderProductSection}

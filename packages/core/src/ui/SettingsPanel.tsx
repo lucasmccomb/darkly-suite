@@ -16,13 +16,14 @@ interface SettingsPanelProps {
   plan?: string;
   prices?: PriceInfo;
   onUpgrade?: (plan?: 'monthly' | 'yearly' | 'lifetime') => void;
+  onRestorePurchase?: () => void;
   onManageSubscription?: () => void;
   onClose?: () => void;
   /** Render prop for product-specific settings sections */
   renderProductSection?: React.ReactNode;
 }
 
-export function SettingsPanel({ isPro = false, plan, prices, onUpgrade, onManageSubscription, onClose, renderProductSection }: SettingsPanelProps) {
+export function SettingsPanel({ isPro = false, plan, prices, onUpgrade, onRestorePurchase, onManageSubscription, onClose, renderProductSection }: SettingsPanelProps) {
   const p = usePrefix();
   const config = useDarklyConfig();
   const [prefs, setPrefs] = useState<BaseUserPreferences>(DEFAULT_PREFERENCES);
@@ -61,7 +62,7 @@ export function SettingsPanel({ isPro = false, plan, prices, onUpgrade, onManage
 
   // Show paywall if not paid
   if (!isPro && onUpgrade) {
-    return <Paywall onSubscribe={onUpgrade} onClose={onClose} prices={prices} />;
+    return <Paywall onSubscribe={onUpgrade} onRestorePurchase={onRestorePurchase} onClose={onClose} prices={prices} />;
   }
 
   return (

@@ -133,6 +133,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
       plan: plan ?? undefined,
       prices: prices ?? undefined,
       onUpgrade: (p) => payment.openPaymentPage(p),
+      onRestorePurchase: () => payment.openRestorePurchase(),
       onManageSubscription: proStatus && !isLifetime ? () => payment.openManageSubscription() : undefined,
       renderProductSection: productSection,
     });
@@ -183,6 +184,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
               }
             : () => settingsModal.show(), // Gmail: "All Settings" opens modal directly
           onUpgrade: (p?: Plan) => payment.openPaymentPage(p),
+          onRestorePurchase: () => payment.openRestorePurchase(),
           onManageSubscription: proStatus && !isLifetime ? () => payment.openManageSubscription() : undefined,
         };
 

@@ -22,11 +22,12 @@ interface GmailSettingsPanelProps {
   plan?: string;
   prices?: PriceInfo;
   onUpgrade?: (plan?: 'monthly' | 'yearly' | 'lifetime') => void;
+  onRestorePurchase?: () => void;
   onManageSubscription?: () => void;
   onClose: () => void;
 }
 
-export function GmailSettingsPanel({ isPro = false, plan, prices, onUpgrade, onManageSubscription, onClose }: GmailSettingsPanelProps) {
+export function GmailSettingsPanel({ isPro = false, plan, prices, onUpgrade, onRestorePurchase, onManageSubscription, onClose }: GmailSettingsPanelProps) {
   const p = usePrefix();
   const config = useDarklyConfig();
   const [prefs, setPrefs] = useState<BaseUserPreferences>(DEFAULT_PREFERENCES);
@@ -65,7 +66,7 @@ export function GmailSettingsPanel({ isPro = false, plan, prices, onUpgrade, onM
   }
 
   if (!isPro && onUpgrade) {
-    return <Paywall onSubscribe={onUpgrade} onClose={onClose} prices={prices} />;
+    return <Paywall onSubscribe={onUpgrade} onRestorePurchase={onRestorePurchase} onClose={onClose} prices={prices} />;
   }
 
   return (

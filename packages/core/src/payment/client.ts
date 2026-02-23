@@ -34,6 +34,7 @@ export interface PaymentClient {
   getPrices(): Promise<PriceInfo | null>;
   onPaymentStatusChange(callback: (paid: boolean) => void): void;
   openPaymentPage(plan?: 'monthly' | 'yearly' | 'lifetime'): Promise<void>;
+  openRestorePurchase(): Promise<void>;
   openManageSubscription(): Promise<void>;
   refreshProStatus(): Promise<boolean>;
 }
@@ -125,6 +126,14 @@ export function createPaymentClient(config: ProductConfig): PaymentClient {
     chrome.runtime.sendMessage({ type: 'checkoutStarted' });
   }
 
+  async function openRestorePurchase(): Promise<void> {
+    const token = await getToken();
+    const params = new URLSearchParams({ type: 'restore', token, product: config.productId });
+    const url = `${apiBase}/auth/start?${params}`;
+    chrome.runtime.sendMessage({ type: 'openTab', url });
+    chrome.runtime.sendMessage({ type: 'checkoutStarted' });
+  }
+
   async function openManageSubscription(): Promise<void> {
     const token = await getToken();
     const url = `${apiBase}/portal?token=${token}&product=${config.productId}`;
@@ -144,6 +153,7 @@ export function createPaymentClient(config: ProductConfig): PaymentClient {
     getPrices,
     onPaymentStatusChange,
     openPaymentPage,
+    openRestorePurchase,
     openManageSubscription,
     refreshProStatus,
   };
