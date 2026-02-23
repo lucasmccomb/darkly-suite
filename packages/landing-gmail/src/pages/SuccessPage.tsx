@@ -1,8 +1,10 @@
 import { Check, Mail, Download, ArrowRight } from 'lucide-react'
-import { Nav, Footer, Wordmark } from '@darkly/landing-shared'
+import { Nav, Footer, Wordmark, useCheckoutComplete } from '@darkly/landing-shared'
 import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME } from '../config.ts'
 
 export function SuccessPage() {
+  useCheckoutComplete('gmail')
+
   return (
     <>
       <Nav brandLabel="for Gmail" links={NAV_LINKS} cta={NAV_CTA} />

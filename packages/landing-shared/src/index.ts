@@ -21,10 +21,11 @@ export { LogoDesignPage } from './pages/LogoDesignPage.tsx'
 // Utilities
 export { ScrollToHash } from './ScrollToHash.tsx'
 export { buildCheckoutUrl, buildOAuthCheckoutUrl, getOrCreateToken } from './utils/checkout.ts'
-export { getExtensionToken } from './utils/extension-bridge.ts'
+export { getExtensionToken, notifyCheckoutComplete } from './utils/extension-bridge.ts'
 
 // Hooks
 export { useExtensionToken } from './hooks/useExtensionToken.ts'
+export { useCheckoutComplete } from './hooks/useCheckoutComplete.ts'
 
 // Admin
 export { AdminAuthProvider, useAdminAuth } from './admin/AdminAuthContext.tsx'

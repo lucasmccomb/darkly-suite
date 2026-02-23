@@ -18,6 +18,7 @@ function isDarkBySunTimes(sunrise: Date, sunset: Date): boolean {
  */
 export interface SiteWorkerHandlers {
   readonly config: ProductConfig;
+  getToken(): Promise<string>;
   getScheduleStatus(): Promise<{ shouldBeDark: boolean }>;
   getSunTimes(lat: number, lng: number): Promise<SunTimes | null>;
   getProStatus(): Promise<{ paid: boolean }>;
@@ -188,6 +189,7 @@ export function createSiteWorker(config: ProductConfig): SiteWorkerHandlers {
 
   return {
     config,
+    getToken: () => payment.getToken(),
     getScheduleStatus,
     getSunTimes: getSunTimesHandler,
     getProStatus,
@@ -263,21 +265,22 @@ export function createBackgroundWorker(config: ProductConfig): void {
       return false;
     }
 
-    return false;
-  });
-
-  // Allow landing pages (listed in externally_connectable) to request the
-  // extension's token so checkout creates licenses with the correct token.
-  chrome.runtime.onMessageExternal.addListener((message, _sender, sendResponse) => {
+    // Landing bridge content script requests — the content script on
+    // landing pages uses these to hand off the extension's token for
+    // checkout and to notify the extension when payment completes.
     if (message.type === 'getToken') {
-      chrome.storage.sync.get(config.tokenKey).then((result) => {
-        sendResponse({
-          token: result[config.tokenKey] || null,
-          productId: config.productId,
-        });
+      worker.getToken().then((token) => {
+        sendResponse({ token, productId: config.productId });
       });
       return true;
     }
+
+    if (message.type === 'checkoutComplete') {
+      checkoutPoller.start();
+      sendResponse({ ok: true });
+      return true;
+    }
+
     return false;
   });
 
@@ -285,15 +288,20 @@ export function createBackgroundWorker(config: ProductConfig): void {
     console.log(`[${config.productName}] Extension installed:`, details.reason);
     if (details.reason === 'install') {
       if (typeof __DEV_MODE__ === 'undefined' || !__DEV_MODE__) {
-        // Get token (already initialized by createSiteWorker → initPayment)
-        const result = await chrome.storage.sync.get(config.tokenKey);
-        const token = result[config.tokenKey] ?? '';
+        // Use worker.getToken() instead of raw storage read to avoid race
+        // condition with initPayment() (which is fire-and-forget async).
+        const token = await worker.getToken();
 
         const params = new URLSearchParams();
         if (token) params.set('token', token);
         const qs = params.toString();
         const subscribeUrl = `${config.siteBase}/subscribe${qs ? `?${qs}` : ''}`;
         chrome.tabs.create({ url: subscribeUrl });
+
+        // Start checkout poller immediately — the user is being directed to the
+        // subscribe page, so payment may complete soon. Without this, the poller
+        // only starts when subscribing from the in-app paywall (checkoutStarted).
+        checkoutPoller.start();
       }
       await worker.setupAlarm();
     }

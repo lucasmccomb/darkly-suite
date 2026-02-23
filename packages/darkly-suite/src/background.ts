@@ -114,6 +114,22 @@ chrome.runtime.onMessage.addListener(
       return false;
     }
 
+    // Landing bridge content script requests — the content script on
+    // landing pages uses these to hand off the extension's token for
+    // checkout and to notify the extension when payment completes.
+    if (message.type === 'getToken') {
+      sharedWorker.getToken().then((token) => {
+        sendResponse({ token, productId: config.productId });
+      });
+      return true;
+    }
+
+    if (message.type === 'checkoutComplete') {
+      checkoutPoller.start();
+      sendResponse({ ok: true });
+      return true;
+    }
+
     if (message.type === 'getProductConfig') {
       sendResponse(config);
       return true;
@@ -122,20 +138,6 @@ chrome.runtime.onMessage.addListener(
     return false;
   },
 );
-
-// --- External message listener (landing page token requests) ---
-chrome.runtime.onMessageExternal.addListener((message, _sender, sendResponse) => {
-  if (message.type === 'getToken') {
-    chrome.storage.sync.get(config.tokenKey).then((result) => {
-      sendResponse({
-        token: result[config.tokenKey] || null,
-        productId: config.productId,
-      });
-    });
-    return true;
-  }
-  return false;
-});
 
 // --- Single alarm listener ---
 chrome.alarms.onAlarm.addListener(async (alarm) => {
@@ -156,15 +158,20 @@ chrome.runtime.onInstalled.addListener(async (details) => {
   if (details.reason === 'install') {
     console.log('[Darkly Suite] Extension installed');
     if (typeof __DEV_MODE__ === 'undefined' || !__DEV_MODE__) {
-      // Get token (already initialized by createSiteWorker → initPayment)
-      const result = await chrome.storage.sync.get(config.tokenKey);
-      const token = result[config.tokenKey] ?? '';
+      // Use sharedWorker.getToken() instead of raw storage read to avoid race
+      // condition with initPayment() (which is fire-and-forget async).
+      const token = await sharedWorker.getToken();
 
       const params = new URLSearchParams();
       if (token) params.set('token', token);
       params.set('product', 'suite');
       const qs = params.toString();
       chrome.tabs.create({ url: `${config.siteBase}/subscribe?${qs}` });
+
+      // Start checkout poller immediately — the user is being directed to the
+      // subscribe page, so payment may complete soon. Without this, the poller
+      // only starts when subscribing from the in-app paywall (checkoutStarted).
+      checkoutPoller.start();
     }
     for (const worker of workers.values()) {
       await worker.setupAlarm();

@@ -1,8 +1,10 @@
 import { Check, FileText, Download, ArrowRight } from 'lucide-react'
-import { Nav, Footer, Wordmark } from '@darkly/landing-shared'
+import { Nav, Footer, Wordmark, useCheckoutComplete } from '@darkly/landing-shared'
 import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME } from '../config.ts'
 
 export function SuccessPage() {
+  useCheckoutComplete('docs')
+
   return (
     <>
       <Nav brandLabel="for Docs" links={NAV_LINKS} cta={NAV_CTA} />
