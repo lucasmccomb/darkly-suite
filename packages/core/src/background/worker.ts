@@ -266,6 +266,21 @@ export function createBackgroundWorker(config: ProductConfig): void {
     return false;
   });
 
+  // Allow landing pages (listed in externally_connectable) to request the
+  // extension's token so checkout creates licenses with the correct token.
+  chrome.runtime.onMessageExternal.addListener((message, _sender, sendResponse) => {
+    if (message.type === 'getToken') {
+      chrome.storage.sync.get(config.tokenKey).then((result) => {
+        sendResponse({
+          token: result[config.tokenKey] || null,
+          productId: config.productId,
+        });
+      });
+      return true;
+    }
+    return false;
+  });
+
   chrome.runtime.onInstalled.addListener(async (details) => {
     console.log(`[${config.productName}] Extension installed:`, details.reason);
     if (details.reason === 'install') {

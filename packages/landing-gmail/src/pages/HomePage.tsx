@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { Mail } from 'lucide-react'
-import { Nav, Hero, Features, Pricing, FAQ, Footer, buildCheckoutUrl, getOrCreateToken } from '@darkly/landing-shared'
+import { Nav, Hero, Features, Pricing, FAQ, Footer, buildCheckoutUrl, getOrCreateToken, useExtensionToken } from '@darkly/landing-shared'
 import type { ScreenshotImage } from '@darkly/landing-shared'
 import {
   NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URL, CHECKOUT_API_URL,
@@ -17,10 +17,12 @@ const featureScreenshots: ScreenshotImage[] = [
 ]
 
 export function HomePage() {
+  const extensionToken = useExtensionToken('gmail')
+
   const handleCheckout = useCallback((product: string, plan: string) => {
-    const token = getOrCreateToken()
+    const token = getOrCreateToken(null, extensionToken)
     window.location.href = buildCheckoutUrl(CHECKOUT_API_URL, product, plan, token)
-  }, [])
+  }, [extensionToken])
 
   return (
     <>

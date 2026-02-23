@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Nav, Hero, Features, Pricing, ProductCard, FAQ, Footer, SuiteIcon, buildCheckoutUrl, getOrCreateToken } from '@darkly/landing-shared'
+import { Nav, Hero, Features, Pricing, ProductCard, FAQ, Footer, SuiteIcon, buildCheckoutUrl, getOrCreateToken, useExtensionToken } from '@darkly/landing-shared'
 import type { ScreenshotImage } from '@darkly/landing-shared'
 import { Mail, Table2, FileText } from 'lucide-react'
 import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URLS, CHECKOUT_API_URL, individualTiers, bundleTiers, COMPARISON_FEATURES } from '../config.ts'
@@ -23,10 +23,12 @@ export function HomePage() {
     document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })
   }, [])
 
+  const extensionToken = useExtensionToken(selectedApp ?? 'suite')
+
   const handleCheckout = useCallback((product: string, plan: string) => {
-    const token = getOrCreateToken()
+    const token = getOrCreateToken(null, extensionToken)
     window.location.href = buildCheckoutUrl(CHECKOUT_API_URL, product, plan, token)
-  }, [])
+  }, [extensionToken])
 
   return (
     <>
