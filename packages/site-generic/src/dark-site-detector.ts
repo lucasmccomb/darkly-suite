@@ -1,12 +1,17 @@
+import { isKnownDarkSite } from './dark-sites';
+
 /**
  * Detects whether the current page already has a dark theme applied.
- * Uses multiple signals: color-scheme meta tag, CSS class patterns,
- * and sampling background colors of key elements.
+ * Uses multiple signals: known dark sites list, color-scheme meta tag,
+ * CSS class patterns, and sampling background colors of key elements.
  *
  * This is used to avoid double-darkening sites that already have
  * native dark mode enabled (e.g., GitHub in dark mode, Discord, etc.).
  */
 export function isDarkSite(): boolean {
+  // 0. Check static list of known dark sites
+  if (isKnownDarkSite(window.location.hostname)) return true;
+
   // 1. Check color-scheme meta tag
   const meta = document.querySelector('meta[name="color-scheme"]');
   if (meta) {
