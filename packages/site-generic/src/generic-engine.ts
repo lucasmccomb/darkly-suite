@@ -10,6 +10,7 @@
  */
 
 import type { PresetName } from '@darkly/core';
+import { attemptCssVarFastPath } from './css-var-fast-path';
 
 export interface GenericDarkModeOptions {
   /** Theme preset name (reserved for future preset support) */
@@ -105,5 +106,42 @@ export class GenericDarkMode {
     this.overrideElement = style;
     // Remove filter AFTER override is injected (atomic swap)
     this.disableFilter();
+  }
+
+  /**
+   * Attempt the smart dark mode pipeline:
+   * 1. Enable filter (instant)
+   * 2. Try CSS variable fast path
+   * 3. If fast path works, swap filter for var overrides
+   * 4. If not, filter stays as fallback
+   * Returns true if fast path was used.
+   */
+  async attemptSmartDarkMode(): Promise<boolean> {
+    // Step 1: Instant filter
+    this.enable();
+
+    // Step 2: Wait for DOM to be ready
+    await new Promise<void>((resolve) => {
+      if (
+        document.readyState === 'complete' ||
+        document.readyState === 'interactive'
+      ) {
+        resolve();
+      } else {
+        document.addEventListener('DOMContentLoaded', () => resolve(), {
+          once: true,
+        });
+      }
+    });
+
+    // Step 3: Try CSS variable fast path
+    const overrideCSS = attemptCssVarFastPath();
+
+    if (overrideCSS) {
+      this.replaceWithOverrides(overrideCSS);
+      return true;
+    }
+
+    return false;
   }
 }

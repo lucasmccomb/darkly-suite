@@ -48,3 +48,20 @@ export type { CacheEntry } from './css-cache';
 
 // adoptedStyleSheets injection layer
 export { StylesheetInjector } from './stylesheet-injector';
+
+// Shadow DOM support
+export {
+  setRootCustomProperties,
+  ShadowStyleInjector,
+  getShadowRoot,
+  hasClosedShadowRootAccess,
+  ShadowRootDiscovery,
+  LAYER_ORDER,
+  wrapInLayer,
+  buildLayeredCSS,
+} from './shadow-dom';
+export type { ShadowRootCallback } from './shadow-dom';
+
+// SPA support — stylesheet mutation interception
+export { StylesheetProxy } from './spa-support';
+export type { StylesheetChangeCallback } from './spa-support';
