@@ -89,6 +89,9 @@ if (GOOGLE_WORKSPACE_DOMAINS.has(domain)) {
       if (engine.isEnabled()) {
         engine.disable();
         engine.enable(msg.preset);
+      } else {
+        document.documentElement.setAttribute('data-darkly-active', 'bd');
+        engine.enable(msg.preset);
       }
       sendResponse({ ok: true });
     }
