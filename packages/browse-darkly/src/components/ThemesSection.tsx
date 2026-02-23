@@ -32,16 +32,10 @@ const styles = {
     flexDirection: 'column' as const,
     gap: 10,
   },
-  heading: {
-    fontSize: 14,
-    fontWeight: 600 as const,
-    color: '#e0e0e0',
-    margin: '0 0 4px',
-  },
   subtext: {
     fontSize: 12,
     color: '#888',
-    margin: '0 0 8px',
+    margin: '0 0 4px',
   },
   grid: {
     display: 'grid',
@@ -94,11 +88,11 @@ const styles = {
   },
 };
 
-interface PresetGalleryProps {
+interface ThemesSectionProps {
   currentDomain: string;
 }
 
-export function PresetGallery({ currentDomain }: PresetGalleryProps) {
+export function ThemesSection({ currentDomain }: ThemesSectionProps) {
   const [selected, setSelected] = useState<PresetName>('default');
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
@@ -114,7 +108,6 @@ export function PresetGallery({ currentDomain }: PresetGalleryProps) {
   const handleSelect = (presetName: PresetName) => {
     setSelected(presetName);
 
-    // Save to global preferences
     chrome.storage.local.get([STORAGE_KEY], (result) => {
       const prefs = result[STORAGE_KEY] || {};
       chrome.storage.local.set({
@@ -122,7 +115,6 @@ export function PresetGallery({ currentDomain }: PresetGalleryProps) {
       });
     });
 
-    // Update per-domain override if one exists
     chrome.storage.local.get([DOMAIN_KEY], (result) => {
       const overrides: Record<string, DomainOverride> = result[DOMAIN_KEY] || {};
       if (overrides[currentDomain]) {
@@ -131,7 +123,6 @@ export function PresetGallery({ currentDomain }: PresetGalleryProps) {
       }
     });
 
-    // Send message to active tab to apply preset
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const tab = tabs[0];
       if (tab?.id) {
@@ -142,7 +133,6 @@ export function PresetGallery({ currentDomain }: PresetGalleryProps) {
 
   return (
     <div style={styles.container}>
-      <h3 style={styles.heading}>Theme Presets</h3>
       <p style={styles.subtext}>Choose a color theme for dark mode.</p>
       <div style={styles.grid}>
         {allPresets.map((preset, idx) => {

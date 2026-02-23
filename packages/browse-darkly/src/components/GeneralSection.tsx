@@ -10,12 +10,18 @@ interface Preferences {
   sunriseSunset: SunriseSunsetConfig;
 }
 
+interface GeneralSectionProps {
+  currentDomain: string;
+  darkEnabled: boolean;
+  onDarkEnabledChange: (enabled: boolean) => void;
+}
+
 const modeOptions: { value: ThemeMode; label: string; description: string }[] = [
-  { value: 'dark', label: 'Manual (Always Dark)', description: 'Dark mode is always on' },
-  { value: 'light', label: 'Manual (Always Light)', description: 'Dark mode is always off' },
-  { value: 'system', label: 'System Theme', description: 'Follow your OS dark/light setting' },
+  { value: 'dark', label: 'Always Dark', description: 'Dark mode is always on' },
+  { value: 'light', label: 'Always Light', description: 'Dark mode is always off' },
+  { value: 'system', label: 'System Theme', description: 'Follow your OS setting' },
   { value: 'schedule', label: 'Schedule', description: 'Dark mode between specific hours' },
-  { value: 'sunrise-sunset', label: 'Sunrise / Sunset', description: 'Dark mode based on your location' },
+  { value: 'sunrise-sunset', label: 'Sunrise / Sunset', description: 'Based on your location' },
 ];
 
 const hours = Array.from({ length: 24 }, (_, i) => i);
@@ -33,27 +39,62 @@ const styles = {
     flexDirection: 'column' as const,
     gap: 12,
   },
-  heading: {
-    fontSize: 14,
-    fontWeight: 600 as const,
-    color: '#e0e0e0',
-    margin: '0 0 4px',
+  toggleRow: {
+    display: 'flex',
+    justifyContent: 'space-between' as const,
+    alignItems: 'center' as const,
+    padding: '4px 0',
   },
-  subtext: {
+  toggleLabel: {
+    fontSize: 14,
+    fontWeight: 500 as const,
+    color: '#e0e0e0',
+  },
+  toggle: {
+    position: 'relative' as const,
+    width: 40,
+    height: 22,
+    borderRadius: 11,
+    cursor: 'pointer',
+    transition: 'background 0.2s',
+    borderWidth: 0,
+    borderStyle: 'none' as const,
+    borderColor: 'transparent',
+    padding: 0,
+    flexShrink: 0,
+  },
+  toggleKnob: {
+    position: 'absolute' as const,
+    top: 2,
+    width: 18,
+    height: 18,
+    borderRadius: '50%',
+    background: '#fff',
+    transition: 'left 0.2s',
+  },
+  divider: {
+    borderTopWidth: 1,
+    borderTopStyle: 'solid' as const,
+    borderTopColor: '#44446a',
+    margin: '4px 0',
+  },
+  sectionLabel: {
     fontSize: 12,
     color: '#888',
-    margin: '0 0 4px',
+    fontWeight: 500 as const,
+    textTransform: 'uppercase' as const,
+    letterSpacing: 0.5,
   },
   modeList: {
     display: 'flex',
     flexDirection: 'column' as const,
-    gap: 6,
+    gap: 4,
   },
   modeOption: {
     display: 'flex',
     alignItems: 'center' as const,
     gap: 10,
-    padding: '8px 10px',
+    padding: '6px 8px',
     borderRadius: 6,
     cursor: 'pointer',
     transition: 'background 0.15s',
@@ -69,8 +110,8 @@ const styles = {
     background: '#1e1e3a',
   },
   radio: {
-    width: 16,
-    height: 16,
+    width: 14,
+    height: 14,
     borderRadius: '50%',
     borderWidth: 2,
     borderStyle: 'solid' as const,
@@ -84,8 +125,8 @@ const styles = {
     borderColor: '#8ab4f8',
   },
   radioDot: {
-    width: 8,
-    height: 8,
+    width: 6,
+    height: 6,
     borderRadius: '50%',
     background: '#8ab4f8',
   },
@@ -98,13 +139,15 @@ const styles = {
     fontSize: 11,
     color: '#888',
   },
-  section: {
+  inlineSection: {
     background: '#1e1e3a',
     borderRadius: 8,
     padding: 12,
-    border: '1px solid #44446a',
+    borderWidth: 1,
+    borderStyle: 'solid' as const,
+    borderColor: '#44446a',
   },
-  sectionLabel: {
+  inlineLabel: {
     fontSize: 13,
     color: '#e0e0e0',
     fontWeight: 500 as const,
@@ -123,7 +166,9 @@ const styles = {
   select: {
     background: '#16213e',
     color: '#e0e0e0',
-    border: '1px solid #44446a',
+    borderWidth: 1,
+    borderStyle: 'solid' as const,
+    borderColor: '#44446a',
     borderRadius: 6,
     padding: '4px 8px',
     fontSize: 13,
@@ -132,7 +177,9 @@ const styles = {
   },
   button: {
     background: '#16213e',
-    border: '1px solid #44446a',
+    borderWidth: 1,
+    borderStyle: 'solid' as const,
+    borderColor: '#44446a',
     borderRadius: 6,
     padding: '8px 12px',
     color: '#e0e0e0',
@@ -141,6 +188,7 @@ const styles = {
     transition: 'background 0.15s',
     width: '100%',
     textAlign: 'center' as const,
+    fontFamily: 'inherit',
   },
   locationInfo: {
     fontSize: 11,
@@ -154,7 +202,7 @@ const styles = {
   },
 };
 
-export function ScheduleSettings() {
+export function GeneralSection({ currentDomain: _currentDomain, darkEnabled, onDarkEnabledChange }: GeneralSectionProps) {
   const [mode, setMode] = useState<ThemeMode>(DEFAULT_PREFERENCES.mode);
   const [schedule, setSchedule] = useState<ScheduleConfig>(DEFAULT_PREFERENCES.schedule);
   const [sunriseSunset, setSunriseSunset] = useState<SunriseSunsetConfig>(DEFAULT_PREFERENCES.sunriseSunset);
@@ -176,6 +224,18 @@ export function ScheduleSettings() {
     chrome.storage.local.get([STORAGE_KEY], (result) => {
       const prefs = result[STORAGE_KEY] || {};
       chrome.storage.local.set({ [STORAGE_KEY]: { ...prefs, ...update } });
+    });
+  };
+
+  const handleToggle = () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const tab = tabs[0];
+      if (tab?.id) {
+        chrome.tabs.sendMessage(tab.id, { type: 'bd:toggle' }, (response) => {
+          if (chrome.runtime.lastError) return;
+          if (response) onDarkEnabledChange(response.enabled);
+        });
+      }
     });
   };
 
@@ -212,9 +272,30 @@ export function ScheduleSettings() {
 
   return (
     <div style={styles.container}>
-      <h3 style={styles.heading}>Auto Dark Mode</h3>
-      <p style={styles.subtext}>Control when dark mode activates.</p>
+      {/* Dark mode toggle */}
+      <div style={styles.toggleRow}>
+        <span style={styles.toggleLabel}>Dark mode</span>
+        <button
+          style={{
+            ...styles.toggle,
+            background: darkEnabled ? '#8ab4f8' : '#44446a',
+          }}
+          onClick={handleToggle}
+          aria-label="Toggle dark mode"
+        >
+          <div
+            style={{
+              ...styles.toggleKnob,
+              left: darkEnabled ? 20 : 2,
+            }}
+          />
+        </button>
+      </div>
 
+      <div style={styles.divider} />
+
+      {/* Mode selector */}
+      <div style={styles.sectionLabel}>Mode</div>
       <div style={styles.modeList}>
         {modeOptions.map((opt) => {
           const isSelected = mode === opt.value;
@@ -248,9 +329,10 @@ export function ScheduleSettings() {
         })}
       </div>
 
+      {/* Schedule settings */}
       {mode === 'schedule' && (
-        <div style={styles.section}>
-          <div style={styles.sectionLabel}>Schedule</div>
+        <div style={styles.inlineSection}>
+          <div style={styles.inlineLabel}>Schedule</div>
           <div style={styles.timeRow}>
             <span style={styles.timeLabel}>Dark mode starts</span>
             <select
@@ -278,9 +360,10 @@ export function ScheduleSettings() {
         </div>
       )}
 
+      {/* Sunrise/Sunset settings */}
       {mode === 'sunrise-sunset' && (
-        <div style={styles.section}>
-          <div style={styles.sectionLabel}>Location</div>
+        <div style={styles.inlineSection}>
+          <div style={styles.inlineLabel}>Location</div>
           {sunriseSunset.lat !== null && sunriseSunset.lng !== null ? (
             <>
               <div style={styles.successText}>

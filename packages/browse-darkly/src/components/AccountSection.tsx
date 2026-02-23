@@ -11,12 +11,6 @@ const styles = {
     flexDirection: 'column' as const,
     gap: 12,
   },
-  heading: {
-    fontSize: 14,
-    fontWeight: 600 as const,
-    color: '#e0e0e0',
-    margin: '0 0 4px',
-  },
   proBadge: {
     display: 'inline-flex',
     alignItems: 'center' as const,
@@ -31,7 +25,9 @@ const styles = {
   },
   statusCard: {
     background: '#1e1e3a',
-    border: '1px solid #44446a',
+    borderWidth: 1,
+    borderStyle: 'solid' as const,
+    borderColor: '#44446a',
     borderRadius: 8,
     padding: 14,
   },
@@ -47,7 +43,9 @@ const styles = {
   },
   manageButton: {
     background: '#16213e',
-    border: '1px solid #44446a',
+    borderWidth: 1,
+    borderStyle: 'solid' as const,
+    borderColor: '#44446a',
     borderRadius: 6,
     padding: '10px 14px',
     color: '#e0e0e0',
@@ -57,10 +55,13 @@ const styles = {
     width: '100%',
     textAlign: 'center' as const,
     marginTop: 8,
+    fontFamily: 'inherit',
   },
   freeCard: {
     background: '#1e1e3a',
-    border: '1px solid #44446a',
+    borderWidth: 1,
+    borderStyle: 'solid' as const,
+    borderColor: '#44446a',
     borderRadius: 8,
     padding: 14,
   },
@@ -92,7 +93,9 @@ const styles = {
     marginTop: 4,
   },
   upgradeButton: {
-    border: 'none',
+    borderWidth: 0,
+    borderStyle: 'none' as const,
+    borderColor: 'transparent',
     borderRadius: 8,
     padding: '10px 14px',
     fontSize: 13,
@@ -101,6 +104,7 @@ const styles = {
     transition: 'opacity 0.15s',
     textAlign: 'center' as const,
     width: '100%',
+    fontFamily: 'inherit',
   },
   primaryUpgrade: {
     background: 'linear-gradient(135deg, #8ab4f8, #c4a7e7)',
@@ -109,7 +113,9 @@ const styles = {
   secondaryUpgrade: {
     background: '#2a2a4a',
     color: '#e0e0e0',
-    border: '1px solid #44446a',
+    borderWidth: 1,
+    borderStyle: 'solid' as const,
+    borderColor: '#44446a',
   },
   priceLabel: {
     fontSize: 11,
@@ -138,7 +144,7 @@ const proFeatures = [
   { text: 'Sunrise/sunset automation', included: false },
 ];
 
-export function AccountPanel() {
+export function AccountSection() {
   const [isPro, setIsPro] = useState<boolean | null>(null);
   const [prices, setPrices] = useState<PriceInfo | null>(null);
 
@@ -171,7 +177,6 @@ export function AccountPanel() {
   if (isPro) {
     return (
       <div style={styles.container}>
-        <h3 style={styles.heading}>Account</h3>
         <div style={styles.proBadge}>&#9733; Pro</div>
         <div style={styles.statusCard}>
           <div style={styles.statusLabel}>Status</div>
@@ -195,7 +200,6 @@ export function AccountPanel() {
 
   return (
     <div style={styles.container}>
-      <h3 style={styles.heading}>Account</h3>
       <div style={styles.freeCard}>
         <div style={{ ...styles.statusLabel, marginBottom: 8 }}>Free Plan</div>
         <ul style={styles.featureList}>
