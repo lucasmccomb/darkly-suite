@@ -11,6 +11,14 @@ const BLOCKLIST_KEY = 'bd_blocklist';
 const engine = new GenericDarkMode();
 const domain = window.location.hostname;
 
+/** Google Workspace domains handled by specialized Darkly extensions. */
+const GOOGLE_WORKSPACE_DOMAINS = new Set([
+  'mail.google.com', // Gmail
+  'docs.google.com', // Docs + Sheets + Slides + Forms
+  'sheets.google.com', // Sheets (redirect target)
+  'drive.google.com', // Drive
+]);
+
 interface DomainConfig {
   enabled: boolean;
   preset?: string;
@@ -21,8 +29,14 @@ interface Preferences {
   preset: string;
 }
 
-// Check if another Darkly extension already claimed this page
-if (document.documentElement.hasAttribute('data-darkly-active')) {
+// Defer to specialized Darkly extensions on Google Workspace sites
+if (GOOGLE_WORKSPACE_DOMAINS.has(domain)) {
+  console.log(
+    '[Browse Darkly] Deferring to specialized Darkly extension on',
+    domain
+  );
+} else if (document.documentElement.hasAttribute('data-darkly-active')) {
+  // Check if another Darkly extension already claimed this page
   console.log('[Browse Darkly] Skipping — another Darkly extension is active');
 } else {
   // Initialize based on stored preferences

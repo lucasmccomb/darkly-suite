@@ -5,3 +5,4 @@
 export { GenericDarkMode } from './generic-engine';
 export type { GenericDarkModeOptions } from './generic-engine';
 export { isDarkSite } from './dark-site-detector';
+export { DARK_SITES, isKnownDarkSite } from './dark-sites';

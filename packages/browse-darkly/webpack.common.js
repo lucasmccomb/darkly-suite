@@ -20,6 +20,7 @@ module.exports = {
     background: './src/background.ts',
     popup: './src/popup.tsx',
     sidepanel: './src/sidepanel.tsx',
+    'page-world': './src/page-world.ts',
   },
   module: {
     rules: [
