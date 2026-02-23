@@ -650,15 +650,14 @@ Not every site needs Playwright. Use a two-tier approach to dramatically reduce 
 
 At 2% conversion of 100K users at $30/yr = $60K/yr revenue, even the Playwright-heavy approach costs <5% of revenue. With tiered crawling, it's <2%.
 
-### Crowdsourced Quality (Replaces ML Classifier)
+### Quality Feedback
 
-Instead of an expensive ML quality gate, crowdsource quality data from users:
+Instead of an expensive ML quality gate, quality feedback comes through support communications:
 
-1. **"Report broken site" button** in popup/side panel — sends `{ domain, preset }` to API (opt-in only)
-2. **Auto-signal**: If user toggles dark mode off within 10 seconds of page load, flag as potentially broken (local-only unless opted in)
-3. **User ratings**: After 5 page views on a site, optional 1-5 star rating prompt (non-intrusive, dismissible)
-4. **Prioritized re-crawl**: Reported domains get bumped to the top of the next crawl cycle
-- **Zero compute cost, more accurate than ML, and creates a user feedback loop**
+1. **Bug reports via support channels** — users report broken sites through standard support (email, website form)
+2. **Prioritized re-crawl**: Reported domains get bumped to the top of the next crawl cycle
+3. **Internal QA**: Top 100 sites get manual quality review; automated WCAG AA contrast auditing for all sites
+4. **Future consideration**: In-extension "Report broken site" button may be added post-V1 once the fix pipeline is battle-tested
 
 ### Competitive Moat
 
@@ -943,12 +942,6 @@ packages/
       "world": "MAIN"
     }
   ],
-  "commands": {
-    "toggle-dark-mode": {
-      "suggested_key": { "default": "Alt+Shift+D" },
-      "description": "Toggle dark mode"
-    }
-  }
 }
 ```
 
@@ -957,7 +950,7 @@ packages/
 - **`identity` + `identity.email` → optional**: Requested only when user clicks "Sign in" or "Manage subscription." Reduces install-time permission prompt and CWS review scrutiny
 - **`scripting` added**: Needed for `chrome.scripting.insertCSS()` with `origin: 'USER'` (user-agent priority)
 - **Page-world content script**: Injects `pageWorld.js` in `MAIN` world to monkey-patch `attachShadow`, `matchMedia`, and `CSSStyleSheet` prototype (same pattern as existing Darkly Suite extensions)
-- **Keyboard shortcut**: `Alt+Shift+D` for global dark mode toggle (matches common dark mode extension convention)
+- **No keyboard shortcuts**: Removed from all Darkly extensions — not implemented for Browse Darkly
 
 ### UI Architecture: Popup + Side Panel Hybrid
 
@@ -974,7 +967,6 @@ packages/
 - System theme sync toggle
 - Import/export settings
 - Account/license management (uses optional `identity` permission)
-- "Report broken site" feedback button (opt-in, see Section 7)
 - "Powered by Darkly Suite" upsell for Google Workspace features
 
 **Side Panel Communication:**
@@ -1026,17 +1018,18 @@ chrome.storage.local (10MB max):
 
 ## 11. Pricing
 
-| Plan | Price | Features |
-|------|-------|----------|
-| **Free** | $0 | Dark mode on all sites, 2 presets (Default + Nord), basic toggle |
-| **Pro Monthly** | $4.99/mo | All presets, per-site memory, schedule/sunrise-sunset, side panel UI |
-| **Pro Yearly** | $29.99/yr (~$2.50/mo) | Same as monthly, 50% savings |
-| **Lifetime** | $79.99 | All Pro features, forever |
-| **Bundle** (future) | TBD | Browse Darkly Pro + Darkly Suite |
+| Plan | Price |
+|------|-------|
+| **Monthly** | $0.99/mo |
+| **Yearly** | $9.99/yr |
+| **Lifetime** | $29.99 |
+| **Bundle** (future) | TBD — Browse Darkly + Darkly Suite |
 
-Free tier drives 5-7x installation multiplier. Target 2-3% conversion.
+**No free tier.** All features available to all paying users. Matches pricing of standalone Darkly extensions (Gmail, Sheets, Docs).
 
-Projected at 100K free users, 2% conversion, $30/yr = **$60K/yr revenue**.
+**Competitive positioning**: Dark Reader charges a one-time $9.99 payment. Browse Darkly at $0.99/mo is cheaper for the first 10 months, and the $29.99 lifetime is justified by the premium experience (curated presets, side panel UI, pre-computed overrides, Google Workspace deep integration).
+
+**Infrastructure**: Shared Stripe account and D1 database with Darkly Suite. Browse Darkly is product #5 in the existing multi-product system. Checkout routes through `darklysuite.com/api/checkout` (same pattern as gmaildarkly.com and sheetsdarkly.com).
 
 ---
 
@@ -1112,7 +1105,7 @@ Agent-3: Darkly Suite bundle conflict detection + upsell integration
 
 | Agent | Work | Files Owned |
 |-------|------|-------------|
-| **Agent-0** | Payment integration | Stripe CLI: create Browse Darkly product + 3 prices. D1 migration for `browse` product. `wrangler.toml` Stripe price vars. `browse-darkly/src/paywall.ts` (Free/Pro gating) |
+| **Agent-0** | Payment integration | Stripe CLI: create Browse Darkly product + 3 prices ($0.99/mo, $9.99/yr, $29.99 lifetime). D1 migration for `browse` product. `wrangler.toml` Stripe price vars. Shared infrastructure with Darkly Suite (product #5). No free tier — no gating needed. |
 | **Agent-1** | Crawl pipeline (NEW REPO: `darkly-crawler`) | Crawlee + Playwright project. HTTP-only Tier A crawler. Playwright Tier B crawler. CSS extraction + classification. Site analysis engine. R2 publishing. GitHub Actions workflow |
 | **Agent-2** | Landing page | `packages/landing-browse/` (fork `landing-suite`, strip Google Workspace content, redesign hero, Browse Darkly pricing, browsedarkly.com Cloudflare Pages setup) |
 | **Agent-3** | Override DB integration | `browse-darkly/src/override-db/` (bundled override loader, CDN manifest fetcher, freshness checker, confidence scoring, dynamic fallback, IndexedDB cache layer) |
@@ -1186,12 +1179,12 @@ Chrome-only for all phases. However, design `site-generic` with no Chrome-specif
 - ~~Should we use WASM?~~ **No** — TypeScript + Web Worker is sufficient (Section 5)
 - ~~Do we need a side panel POC?~~ **No** — zero theoretical unknowns, build the real thing in Phase 2
 
-**Still Open:**
-- Should Browse Darkly share the same Stripe account / D1 database as Darkly Suite, or create separate infrastructure?
-- Should the free tier have a site limit (like Night Eye's 5-site free tier) or be truly unlimited?
-- Should the keyboard shortcut (`Alt+Shift+D`) conflict-check with Dark Reader's shortcut if both are installed?
-- What is the strategy for sites behind authentication (dashboards, admin panels) that the crawler cannot access?
-- Should Browse Darkly support user-submitted site fixes (community-contributed, like Dark Reader's open-source config)?
+**Also Resolved:**
+- ~~Should Browse Darkly share the same Stripe account / D1 database?~~ **Yes — shared.** Browse Darkly is product #5 in existing multi-product system. Checkout routes through `darklysuite.com/api/checkout`
+- ~~Should the free tier have a site limit?~~ **No free tier.** Same pricing as standalone extensions: $0.99/mo, $9.99/yr, $29.99 lifetime. All features for all paying users
+- ~~Keyboard shortcut conflict?~~ **No keyboard shortcuts.** Removed from all Darkly extensions
+- ~~Strategy for authenticated sites?~~ **Dynamic engine handles automatically.** Top 50 sites get manual test accounts + Playwright login recipes for pre-computed overrides
+- ~~Community-contributed site fixes?~~ **Curated-only.** Bug reports through support communications. No in-extension reporting button for V1
 
 ---
 
@@ -1199,8 +1192,8 @@ Chrome-only for all phases. However, design `site-generic` with no Chrome-specif
 
 | Feature | Dark Reader | Night Eye | Browse Darkly (Planned) |
 |---------|:-----------:|:---------:|:-----------------------:|
-| Basic dark mode for all sites | Yes (free) | Yes (5 sites free) | Yes (free) |
-| Unlimited sites | Yes | Paid only | Yes (free) |
+| Basic dark mode for all sites | Yes (free) | Yes (5 sites free) | Yes (paid, from $0.99/mo) |
+| Unlimited sites | Yes | Paid only | Yes (all plans) |
 | Color presets (Nord, Solarized, etc.) | No — sliders only | No | Yes — 10+ curated presets |
 | Per-site theme memory | On/off only | Basic customization | Full preset per domain |
 | Schedule / auto dark mode | Yes (time-based) | No | Yes (time + sunrise/sunset) |
@@ -1213,8 +1206,8 @@ Chrome-only for all phases. However, design `site-generic` with no Chrome-specif
 | Privacy / zero telemetry | Contradictory claims | Unknown | Zero telemetry, local-only storage |
 | Open source | Yes | No | No (but auditable permissions) |
 | Cross-browser | Chrome, Firefox, Edge, Safari | Chrome, Firefox, Edge, Safari, Opera | Chrome initially |
-| Annual price | Free / $9.99 corporate | $9/year | Free tier + $29.99/year |
-| Lifetime option | No | $40 | $79.99 |
+| Annual price | Free / $9.99 corporate | $9/year | $0.99/mo or $9.99/year |
+| Lifetime option | No | $40 | $29.99 |
 
 ---
 
