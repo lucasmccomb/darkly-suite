@@ -11,6 +11,7 @@ export function getProductStripeId(env: Env, product: ProductId): string {
     sheets: env.STRIPE_PRODUCT_SHEETS,
     docs: env.STRIPE_PRODUCT_DOCS,
     suite: env.STRIPE_PRODUCT_SUITE,
+    browse: env.STRIPE_PRODUCT_BROWSE,
   };
 
   const id = productMap[product];
@@ -39,6 +40,9 @@ export function getPriceId(env: Env, product: ProductId, plan: Plan): string {
     'suite:monthly': env.STRIPE_PRICE_SUITE_MONTHLY,
     'suite:yearly': env.STRIPE_PRICE_SUITE_YEARLY,
     'suite:lifetime': env.STRIPE_PRICE_SUITE_LIFETIME,
+    'browse:monthly': env.STRIPE_PRICE_BROWSE_MONTHLY,
+    'browse:yearly': env.STRIPE_PRICE_BROWSE_YEARLY,
+    'browse:lifetime': env.STRIPE_PRICE_BROWSE_LIFETIME,
   };
 
   const key = `${product}:${plan}`;
@@ -69,6 +73,9 @@ export function getProductPlanFromPriceId(env: Env, priceId: string): { product:
     [env.STRIPE_PRICE_SUITE_MONTHLY, 'suite', 'monthly'],
     [env.STRIPE_PRICE_SUITE_YEARLY, 'suite', 'yearly'],
     [env.STRIPE_PRICE_SUITE_LIFETIME, 'suite', 'lifetime'],
+    [env.STRIPE_PRICE_BROWSE_MONTHLY, 'browse', 'monthly'],
+    [env.STRIPE_PRICE_BROWSE_YEARLY, 'browse', 'yearly'],
+    [env.STRIPE_PRICE_BROWSE_LIFETIME, 'browse', 'lifetime'],
   ];
 
   for (const [id, product, plan] of entries) {

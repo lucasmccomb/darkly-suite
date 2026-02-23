@@ -1,7 +1,7 @@
-export type ProductId = 'gmail' | 'sheets' | 'docs' | 'suite';
+export type ProductId = 'gmail' | 'sheets' | 'docs' | 'suite' | 'browse';
 
 export function isValidProduct(product: string): product is ProductId {
-  return ['gmail', 'sheets', 'docs', 'suite'].includes(product);
+  return ['gmail', 'sheets', 'docs', 'suite', 'browse'].includes(product);
 }
 
 export interface Env {
@@ -23,11 +23,16 @@ export interface Env {
   STRIPE_PRICE_SUITE_MONTHLY: string;
   STRIPE_PRICE_SUITE_YEARLY: string;
   STRIPE_PRICE_SUITE_LIFETIME: string;
+  // Browse Darkly prices
+  STRIPE_PRICE_BROWSE_MONTHLY: string;
+  STRIPE_PRICE_BROWSE_YEARLY: string;
+  STRIPE_PRICE_BROWSE_LIFETIME: string;
   // Stripe product IDs (for coupon applies_to restriction)
   STRIPE_PRODUCT_GMAIL: string;
   STRIPE_PRODUCT_SHEETS: string;
   STRIPE_PRODUCT_DOCS: string;
   STRIPE_PRODUCT_SUITE: string;
+  STRIPE_PRODUCT_BROWSE: string;
   // OAuth
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;
@@ -37,6 +42,7 @@ export interface Env {
   SITE_URL_GMAIL?: string;
   SITE_URL_SHEETS?: string;
   SITE_URL_DOCS?: string;
+  SITE_URL_BROWSE?: string;
   // Resend API key for admin email notifications
   RESEND_API_KEY?: string;
   // CORS — comma-separated list of allowed Chrome extension IDs (stable CWS IDs)
