@@ -50,7 +50,9 @@ const styles = {
   },
   card: {
     background: '#1e1e3a',
-    border: '2px solid #44446a',
+    borderWidth: 2,
+    borderStyle: 'solid' as const,
+    borderColor: '#44446a',
     borderRadius: 8,
     padding: 10,
     cursor: 'pointer',
@@ -86,7 +88,9 @@ const styles = {
     width: 20,
     height: 20,
     borderRadius: 4,
-    border: '1px solid rgba(255,255,255,0.1)',
+    borderWidth: 1,
+    borderStyle: 'solid' as const,
+    borderColor: 'rgba(255,255,255,0.1)',
   },
 };
 

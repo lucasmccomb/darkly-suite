@@ -85,7 +85,9 @@ const styles = {
   },
   button: {
     background: 'transparent',
-    border: '1px solid #44446a',
+    borderWidth: 1,
+    borderStyle: 'solid' as const,
+    borderColor: '#44446a',
     borderRadius: 6,
     padding: '8px 12px',
     color: '#e0e0e0',

@@ -48,8 +48,11 @@ function Popup() {
     });
   };
 
-  const handleOpenSettings = () => {
-    chrome.runtime.sendMessage({ type: 'bd:openSidePanel' });
+  const handleOpenSettings = async () => {
+    const win = await chrome.windows.getLastFocused();
+    if (win.id) {
+      await chrome.sidePanel.open({ windowId: win.id });
+    }
     window.close();
   };
 
