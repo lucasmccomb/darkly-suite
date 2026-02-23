@@ -92,3 +92,20 @@ export { sanitizeCSS } from './security/css-sanitizer';
 export type { SanitizationResult } from './security/css-sanitizer';
 export { verifyBundleSignature } from './security/signature-verifier';
 export type { SignedBundle } from './security/signature-verifier';
+
+// Breakage pattern handlers for CSS filter inversion
+export {
+  BREAKAGE_HANDLERS,
+  generateBreakageCSS,
+  generateBreakageCSSForHandlers,
+} from './breakage-handlers';
+export type { BreakageHandler } from './breakage-handlers';
+
+// Privacy-safe domain reporting
+export {
+  hashDomain,
+  reportDomain,
+  getReports,
+  clearReports,
+} from './privacy';
+export type { DomainReport } from './privacy';
