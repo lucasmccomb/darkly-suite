@@ -18,3 +18,33 @@ export type {
   SiteFix,
 } from './fix-parser';
 export { applyFixDirectives } from './fix-applier';
+
+// Color transformation engine
+export {
+  parseColor,
+  rgbToHsl,
+  hslToRgb,
+  formatRgb,
+  transformColor,
+} from './color-transform';
+export type { RGB, HSL, ColorContext } from './color-transform';
+
+// CSS custom property fast path
+export {
+  scanRootColorVars,
+  generateVarOverrideCSS,
+  attemptCssVarFastPath,
+} from './css-var-fast-path';
+export type { CssVarOverride } from './css-var-fast-path';
+
+// IndexedDB persistent cache
+export {
+  hashString,
+  getCachedCSS,
+  setCachedCSS,
+  clearExpiredCache,
+} from './css-cache';
+export type { CacheEntry } from './css-cache';
+
+// adoptedStyleSheets injection layer
+export { StylesheetInjector } from './stylesheet-injector';
