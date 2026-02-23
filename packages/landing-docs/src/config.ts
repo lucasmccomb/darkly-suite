@@ -7,6 +7,7 @@ import type { PricingTier } from '@darkly/landing-shared'
 export const STORE_URL = 'https://chromewebstore.google.com/detail/darkly-for-google-docs/PLACEHOLDER_DOCS_ID'
 
 export const CHECKOUT_API_URL = 'https://darklysuite.com/api/checkout'
+export const AUTH_API_URL = 'https://darklysuite.com/api/auth/start'
 
 export const SITE_NAME = 'Darkly for Docs'
 

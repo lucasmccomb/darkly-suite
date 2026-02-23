@@ -20,7 +20,7 @@ export { LogoDesignPage } from './pages/LogoDesignPage.tsx'
 
 // Utilities
 export { ScrollToHash } from './ScrollToHash.tsx'
-export { buildCheckoutUrl, getOrCreateToken } from './utils/checkout.ts'
+export { buildCheckoutUrl, buildOAuthCheckoutUrl, getOrCreateToken } from './utils/checkout.ts'
 export { getExtensionToken } from './utils/extension-bridge.ts'
 
 // Hooks

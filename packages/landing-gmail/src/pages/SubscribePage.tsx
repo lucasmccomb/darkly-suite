@@ -1,5 +1,5 @@
 import { Nav, Footer, SubscribeContent } from '@darkly/landing-shared'
-import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, CHECKOUT_API_URL, GMAIL_FEATURES, individualTiers } from '../config.ts'
+import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, AUTH_API_URL, GMAIL_FEATURES, individualTiers } from '../config.ts'
 
 export function SubscribePage() {
   return (
@@ -10,7 +10,7 @@ export function SubscribePage() {
         productName="Darkly for Gmail"
         tiers={individualTiers()}
         features={GMAIL_FEATURES}
-        checkoutBaseUrl={CHECKOUT_API_URL}
+        authBaseUrl={AUTH_API_URL}
       />
       <Footer
         brandLabel="for Gmail"
