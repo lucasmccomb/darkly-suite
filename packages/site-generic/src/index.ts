@@ -59,9 +59,22 @@ export {
   LAYER_ORDER,
   wrapInLayer,
   buildLayeredCSS,
+  ShadowPerfOptimizer,
 } from './shadow-dom';
-export type { ShadowRootCallback } from './shadow-dom';
+export type { ShadowRootCallback, ShadowPerfOptions } from './shadow-dom';
 
 // SPA support — stylesheet mutation interception
 export { StylesheetProxy } from './spa-support';
 export type { StylesheetChangeCallback } from './spa-support';
+
+// CSS processing pipeline
+export { processPageStylesheets, generateFullOverrideCSS } from './worker';
+export type { ProcessedStylesheet } from './worker';
+
+// Viewport-aware incremental processing
+export { ViewportProcessor } from './viewport-processor';
+export type { ViewportProcessorOptions } from './viewport-processor';
+
+// Override decision pipeline
+export { executeOverridePipeline } from './override-pipeline';
+export type { OverrideStrategy, OverrideResult } from './override-pipeline';

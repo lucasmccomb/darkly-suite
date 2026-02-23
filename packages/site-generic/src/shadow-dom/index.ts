@@ -10,3 +10,6 @@ export { ShadowRootDiscovery } from './shadow-discovery';
 export type { ShadowRootCallback } from './shadow-discovery';
 
 export { LAYER_ORDER, wrapInLayer, buildLayeredCSS } from './css-layers';
+
+export { ShadowPerfOptimizer } from './performance';
+export type { ShadowPerfOptions } from './performance';
