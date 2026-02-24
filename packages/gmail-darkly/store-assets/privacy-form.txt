@@ -26,7 +26,9 @@ Required by the InboxSDK library to register content scripts that integrate the 
 HOST PERMISSION JUSTIFICATION:
 mail.google.com: Injecting dark mode CSS and the settings panel UI into Gmail pages. Content scripts match this pattern to apply themes and render controls.
 
-darklysuite.com: Communicates with the Darkly payment API to check subscription status and initiate checkout. An anonymous device token (randomly generated UUID) is sent to verify whether the user has a paid subscription. No personal information is transmitted. Also used for externally_connectable messaging to pass the extension's token to the checkout page.
+darklysuite.com: Communicates with the Darkly payment API to check subscription status and initiate checkout. An anonymous device token (randomly generated UUID) is sent to verify whether the user has a paid subscription. No personal information is transmitted. A lightweight content script (landing-bridge.js) also runs on darklysuite.com to pass the extension's anonymous device token to the checkout page via a CustomEvent, ensuring Stripe licenses are linked to the correct extension instance.
+
+gmaildarkly.com + darklysuite.com (landing-bridge.js content script): A small content script bridges communication between the landing/checkout pages and the extension's background worker. It passes the extension's anonymous device token to the page for checkout linking and forwards a checkout-complete signal back to the extension. No page content is read or transmitted.
 
 api.sunrise-sunset.org: Fetches sunrise and sunset times for the user's approximate location when they opt into sunrise/sunset scheduling. Only latitude and longitude coordinates are sent. This is a public, free API with no authentication required.
 
