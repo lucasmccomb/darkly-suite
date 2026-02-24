@@ -370,7 +370,7 @@ describe('webhook — discount usage tracking', () => {
 });
 
 describe('webhook — customer.subscription.updated', () => {
-  it('maps "active" Stripe status to "active" license status', async () => {
+  it('maps "active" Stripe status to "active" license with "active" stripe_status', async () => {
     const env = createMockEnv();
     const eventBody = makeWebhookEvent('customer.subscription.updated', {
       id: 'sub_123',
@@ -380,10 +380,10 @@ describe('webhook — customer.subscription.updated', () => {
 
     expect(response.status).toBe(200);
     const db = env.DB as unknown as MockD1Database;
-    expect(db._statement.bind).toHaveBeenCalledWith('active', 'sub_123');
+    expect(db._statement.bind).toHaveBeenCalledWith('active', 'active', 'sub_123');
   });
 
-  it('maps "canceled" Stripe status to "inactive" license status', async () => {
+  it('maps "canceled" Stripe status to "inactive" license', async () => {
     const env = createMockEnv();
     const eventBody = makeWebhookEvent('customer.subscription.updated', {
       id: 'sub_456',
@@ -392,10 +392,10 @@ describe('webhook — customer.subscription.updated', () => {
     await callWebhook(eventBody, env);
 
     const db = env.DB as unknown as MockD1Database;
-    expect(db._statement.bind).toHaveBeenCalledWith('inactive', 'sub_456');
+    expect(db._statement.bind).toHaveBeenCalledWith('inactive', 'active', 'sub_456');
   });
 
-  it('maps "past_due" Stripe status to "inactive"', async () => {
+  it('maps "past_due" Stripe status to "active" license with "past_due" stripe_status', async () => {
     const env = createMockEnv();
     const eventBody = makeWebhookEvent('customer.subscription.updated', {
       id: 'sub_pd',
@@ -404,7 +404,7 @@ describe('webhook — customer.subscription.updated', () => {
     await callWebhook(eventBody, env);
 
     const db = env.DB as unknown as MockD1Database;
-    expect(db._statement.bind).toHaveBeenCalledWith('inactive', 'sub_pd');
+    expect(db._statement.bind).toHaveBeenCalledWith('active', 'past_due', 'sub_pd');
   });
 
   it('maps "incomplete_expired" to "inactive"', async () => {
@@ -416,7 +416,7 @@ describe('webhook — customer.subscription.updated', () => {
     await callWebhook(eventBody, env);
 
     const db = env.DB as unknown as MockD1Database;
-    expect(db._statement.bind).toHaveBeenCalledWith('inactive', 'sub_ie');
+    expect(db._statement.bind).toHaveBeenCalledWith('inactive', 'active', 'sub_ie');
   });
 
   it('maps "trialing" to "active"', async () => {
@@ -428,7 +428,7 @@ describe('webhook — customer.subscription.updated', () => {
     await callWebhook(eventBody, env);
 
     const db = env.DB as unknown as MockD1Database;
-    expect(db._statement.bind).toHaveBeenCalledWith('active', 'sub_trial');
+    expect(db._statement.bind).toHaveBeenCalledWith('active', 'active', 'sub_trial');
   });
 
   it('defaults unknown Stripe status to "inactive"', async () => {
@@ -440,7 +440,20 @@ describe('webhook — customer.subscription.updated', () => {
     await callWebhook(eventBody, env);
 
     const db = env.DB as unknown as MockD1Database;
-    expect(db._statement.bind).toHaveBeenCalledWith('inactive', 'sub_unknown');
+    expect(db._statement.bind).toHaveBeenCalledWith('inactive', 'active', 'sub_unknown');
+  });
+
+  it('sets stripe_status to "cancel_at_period_end" when subscription is active but canceling', async () => {
+    const env = createMockEnv();
+    const eventBody = makeWebhookEvent('customer.subscription.updated', {
+      id: 'sub_canceling',
+      status: 'active',
+      cancel_at_period_end: true,
+    });
+    await callWebhook(eventBody, env);
+
+    const db = env.DB as unknown as MockD1Database;
+    expect(db._statement.bind).toHaveBeenCalledWith('active', 'cancel_at_period_end', 'sub_canceling');
   });
 
   it('sends notification when status changes to a problematic state', async () => {
@@ -632,7 +645,7 @@ describe('webhook — customer.subscription.deleted', () => {
 });
 
 describe('webhook — invoice.payment_failed', () => {
-  it('sets license status to "inactive" and sends admin + user notifications', async () => {
+  it('sets stripe_status to "past_due" (keeps license active) and sends notifications', async () => {
     // sendAdminEmail + sendUserEmail
     mockResendSuccess();
     mockResendSuccess();
@@ -649,9 +662,10 @@ describe('webhook — invoice.payment_failed', () => {
 
     expect(response.status).toBe(200);
 
-    // First call: UPDATE status
+    // First call: UPDATE stripe_status (license stays active for grace period)
     const updateSql = db.prepare.mock.calls[0][0] as string;
-    expect(updateSql).toContain("status = 'inactive'");
+    expect(updateSql).toContain("stripe_status = 'past_due'");
+    expect(updateSql).not.toContain("status = 'inactive'");
 
     // Second call: SELECT license for notification
     const selectSql = db.prepare.mock.calls[1][0] as string;

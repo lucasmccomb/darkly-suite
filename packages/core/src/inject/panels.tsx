@@ -20,6 +20,7 @@ export function createSettingsModal(
   options: {
     isPro: boolean;
     plan?: string;
+    subscriptionStatus?: string;
     prices?: PriceInfo;
     onUpgrade: (plan?: 'monthly' | 'yearly' | 'lifetime') => void;
     onRestorePurchase?: () => void;
@@ -58,6 +59,7 @@ export function createSettingsModal(
         <SettingsPanel
           isPro={options.isPro}
           plan={options.plan}
+          subscriptionStatus={options.subscriptionStatus}
           prices={options.prices}
           onUpgrade={options.onUpgrade}
           onRestorePurchase={options.onRestorePurchase}

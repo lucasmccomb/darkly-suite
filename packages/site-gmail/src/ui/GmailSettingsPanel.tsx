@@ -20,6 +20,7 @@ import {
 interface GmailSettingsPanelProps {
   isPro?: boolean;
   plan?: string;
+  subscriptionStatus?: string;
   prices?: PriceInfo;
   onUpgrade?: (plan?: 'monthly' | 'yearly' | 'lifetime') => void;
   onRestorePurchase?: () => void;
@@ -27,7 +28,7 @@ interface GmailSettingsPanelProps {
   onClose: () => void;
 }
 
-export function GmailSettingsPanel({ isPro = false, plan, prices, onUpgrade, onRestorePurchase, onManageSubscription, onClose }: GmailSettingsPanelProps) {
+export function GmailSettingsPanel({ isPro = false, plan, subscriptionStatus, prices, onUpgrade, onRestorePurchase, onManageSubscription, onClose }: GmailSettingsPanelProps) {
   const p = usePrefix();
   const config = useDarklyConfig();
   const [prefs, setPrefs] = useState<BaseUserPreferences>(DEFAULT_PREFERENCES);
@@ -114,6 +115,18 @@ export function GmailSettingsPanel({ isPro = false, plan, prices, onUpgrade, onR
 
       {plan === 'lifetime' && (
         <div className={`${p}-lifetime-badge`}>Lifetime Membership</div>
+      )}
+
+      {subscriptionStatus === 'cancel_at_period_end' && (
+        <div className={`${p}-sub-warning ${p}-sub-warning--cancel`}>
+          Your subscription is set to cancel. Click below to renew.
+        </div>
+      )}
+
+      {subscriptionStatus === 'past_due' && (
+        <div className={`${p}-sub-warning ${p}-sub-warning--past-due`}>
+          Your payment method needs updating. Click below to update.
+        </div>
       )}
 
       {onManageSubscription && (
