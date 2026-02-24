@@ -86,6 +86,35 @@ function formatAmount(cents: unknown): string {
   return `$${(cents / 100).toFixed(2)}`;
 }
 
+const FEEDBACK_LABELS: Record<string, string> = {
+  customer_service: 'Customer service',
+  low_quality: 'Low quality',
+  missing_features: 'Missing features',
+  other: 'Other',
+  switched_service: 'Found an alternative',
+  too_complex: 'Too complex',
+  too_expensive: 'Too expensive',
+  unused: 'No longer needed',
+};
+
+function formatCancellationDetails(subscription: Record<string, unknown>): string {
+  const details = subscription.cancellation_details as
+    | { feedback?: string | null; comment?: string | null; reason?: string | null }
+    | undefined;
+
+  if (!details) return '';
+
+  const parts: string[] = [];
+  if (details.feedback) {
+    parts.push(`Reason: ${FEEDBACK_LABELS[details.feedback] ?? details.feedback}`);
+  }
+  if (details.comment) {
+    parts.push(`Comment: ${details.comment}`);
+  }
+
+  return parts.length > 0 ? '\n' + parts.join('\n') : '';
+}
+
 // -- Event Handlers ---------------------------------------------------------
 
 async function handleCheckoutCompleted(env: Env, event: StripeEvent): Promise<void> {
@@ -214,10 +243,12 @@ async function handleSubscriptionUpdated(env: Env, event: StripeEvent): Promise<
     const product = license?.product ?? 'unknown';
     const plan = license?.plan ?? 'unknown';
 
+    const cancellationInfo = formatCancellationDetails(subscription);
+
     await sendAdminEmail(
       env,
       `Subscription ${status}: ${capitalize(product)} ${capitalize(plan)} — ${email}`,
-      `Product: ${capitalize(product)}\nPlan: ${capitalize(plan)}\nEmail: ${email}\nStripe status: ${previousStatus} → ${status}\nSubscription: ${subscriptionId}`,
+      `Product: ${capitalize(product)}\nPlan: ${capitalize(plan)}\nEmail: ${email}\nStripe status: ${previousStatus} → ${status}\nSubscription: ${subscriptionId}${cancellationInfo}`,
     );
   }
 }
@@ -274,10 +305,12 @@ async function handleSubscriptionDeleted(env: Env, event: StripeEvent): Promise<
   const displayProduct = product ?? 'unknown';
   const displayPlan = plan ?? 'unknown';
 
+  const cancellationInfo = formatCancellationDetails(subscription);
+
   await sendAdminEmail(
     env,
     `Subscription cancelled: ${capitalize(displayProduct)} ${capitalize(displayPlan)} — ${displayEmail}`,
-    `Product: ${capitalize(displayProduct)}\nPlan: ${capitalize(displayPlan)}\nEmail: ${displayEmail}\nSubscription: ${subscriptionId}`,
+    `Product: ${capitalize(displayProduct)}\nPlan: ${capitalize(displayPlan)}\nEmail: ${displayEmail}\nSubscription: ${subscriptionId}${cancellationInfo}`,
   );
 }
 

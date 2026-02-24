@@ -473,6 +473,46 @@ describe('webhook — customer.subscription.updated', () => {
     expect(emailUrl).toBe('https://api.resend.com/emails');
   });
 
+  it('includes cancellation reason and comment in notification email', async () => {
+    const env = createMockEnv();
+    const db = env.DB as unknown as MockD1Database;
+    db._statement.first.mockResolvedValueOnce({ email: 'cancel@example.com', product: 'gmail', plan: 'monthly' });
+
+    // sendAdminEmail
+    mockResendSuccess();
+
+    const eventBody = JSON.stringify({
+      id: `evt_${Date.now()}`,
+      type: 'customer.subscription.updated',
+      data: {
+        object: {
+          id: 'sub_cancel_reason',
+          status: 'canceled',
+          cancellation_details: {
+            feedback: 'too_expensive',
+            comment: 'I love the extension but cannot afford it right now',
+            reason: 'cancellation_requested',
+          },
+        },
+        previous_attributes: { status: 'active' },
+      },
+    });
+
+    const { header } = await generateWebhookSignature(eventBody, env.STRIPE_WEBHOOK_SECRET);
+    const request = new Request('https://darklysuite.com/api/webhook', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'stripe-signature': header },
+      body: eventBody,
+    });
+    const context = createMockContext({ request, env });
+    await onRequestPost(context);
+
+    const [, emailOpts] = fetchMock.mock.calls[0];
+    const emailBody = JSON.parse(emailOpts?.body as string);
+    expect(emailBody.text).toContain('Too expensive');
+    expect(emailBody.text).toContain('I love the extension but cannot afford it right now');
+  });
+
   it('does not send notification when status remains active', async () => {
     const env = createMockEnv();
 
@@ -525,6 +565,31 @@ describe('webhook — customer.subscription.deleted', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const [emailUrl] = fetchMock.mock.calls[0];
     expect(emailUrl).toBe('https://api.resend.com/emails');
+  });
+
+  it('includes cancellation reason in deleted subscription notification', async () => {
+    const env = createMockEnv();
+    const db = env.DB as unknown as MockD1Database;
+    db._statement.first.mockResolvedValueOnce({ email: 'gone@example.com', product: 'sheets', plan: 'yearly' });
+
+    // sendAdminEmail
+    mockResendSuccess();
+
+    const eventBody = makeWebhookEvent('customer.subscription.deleted', {
+      id: 'sub_deleted_reason',
+      cancellation_details: {
+        feedback: 'switched_service',
+        comment: null,
+        reason: 'cancellation_requested',
+      },
+    });
+    const response = await callWebhook(eventBody, env);
+
+    expect(response.status).toBe(200);
+    const [, emailOpts] = fetchMock.mock.calls[0];
+    const emailBody = JSON.parse(emailOpts?.body as string);
+    expect(emailBody.text).toContain('Found an alternative');
+    expect(emailBody.text).not.toContain('Comment:');
   });
 
   it('falls back to Stripe data when license is deleted from D1', async () => {
