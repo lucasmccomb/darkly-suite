@@ -42,6 +42,7 @@ export interface License {
   status: 'active' | 'cancelled' | 'expired' | 'past_due';
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
+  stripe_status: string;
   discount_code_id: number | null;
   created_at: string;
   expires_at: string | null;

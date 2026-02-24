@@ -1147,6 +1147,41 @@
   border-color: rgba(245, 200, 66, 0.25);
 }
 
+/* ===== Subscription Warning Banner ===== */
+
+.darkly-sub-warning {
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.darkly-sub-warning--cancel {
+  background: #fef3cd;
+  color: #856404;
+  border: 1px solid #f9d679;
+}
+
+[data-darkly-theme="dark"] .darkly-sub-warning--cancel {
+  background: #3a3520;
+  color: #f9d679;
+  border-color: #665c2e;
+}
+
+.darkly-sub-warning--past-due {
+  background: #fde8e8;
+  color: #991b1b;
+  border: 1px solid #f5a3a3;
+}
+
+[data-darkly-theme="dark"] .darkly-sub-warning--past-due {
+  background: #3a2020;
+  color: #fca5a5;
+  border-color: #7f1d1d;
+}
+
 /* ===== Manage Subscription Button ===== */
 
 .darkly-manage-sub-btn {

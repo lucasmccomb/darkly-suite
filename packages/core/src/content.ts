@@ -102,6 +102,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
     const proStatus = await payment.refreshProStatus();
     const prices = await payment.getPrices();
     const plan = await payment.getPlan();
+    const subscriptionStatus = await payment.getSubscriptionStatus();
 
     if (proStatus) {
       const currentPrefs = await prefs.load();
@@ -131,6 +132,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
     const settingsModal = createSettingsModal(config, {
       isPro: proStatus,
       plan: plan ?? undefined,
+      subscriptionStatus: subscriptionStatus ?? undefined,
       prices: prices ?? undefined,
       onUpgrade: (p) => payment.openPaymentPage(p),
       onRestorePurchase: () => payment.openRestorePurchase(),
@@ -169,6 +171,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
         const toolbarOpts = {
           isPro: proStatus,
           plan: plan ?? undefined,
+          subscriptionStatus: subscriptionStatus ?? undefined,
           prices: prices ?? undefined,
           onAllSettings: miniPanel
             ? () => {

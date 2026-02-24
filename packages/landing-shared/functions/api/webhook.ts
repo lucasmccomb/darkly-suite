@@ -138,14 +138,15 @@ async function handleCheckoutCompleted(env: Env, event: StripeEvent): Promise<vo
   const expiresAt = plan === 'lifetime' ? '2099-12-31T23:59:59Z' : null;
 
   await env.DB.prepare(
-    `INSERT INTO licenses (token, product, email, plan, status, stripe_customer_id, stripe_subscription_id, expires_at)
-     VALUES (?, ?, ?, ?, 'active', ?, ?, ?)
+    `INSERT INTO licenses (token, product, email, plan, status, stripe_customer_id, stripe_subscription_id, stripe_status, expires_at)
+     VALUES (?, ?, ?, ?, 'active', ?, ?, 'active', ?)
      ON CONFLICT(token, product) DO UPDATE SET
        email = excluded.email,
        plan = excluded.plan,
        status = 'active',
        stripe_customer_id = excluded.stripe_customer_id,
        stripe_subscription_id = excluded.stripe_subscription_id,
+       stripe_status = 'active',
        expires_at = excluded.expires_at`,
   )
     .bind(token, product, email, plan, customerId, subscriptionId, expiresAt)
@@ -216,19 +217,32 @@ async function handleSubscriptionUpdated(env: Env, event: StripeEvent): Promise<
   const subscription = event.data.object as Record<string, unknown>;
   const subscriptionId = subscription.id as string;
   const status = subscription.status as string;
+  const cancelAtPeriodEnd = subscription.cancel_at_period_end as boolean | undefined;
   const previousAttributes = (event.data as Record<string, unknown>).previous_attributes as
     | Record<string, unknown>
     | undefined;
   const previousStatus = previousAttributes?.status as string | undefined;
 
-  // Binary access gate: only 'active' and 'trialing' grant access
-  const activeStatuses = new Set(['active', 'trialing']);
+  // Access gate: active, trialing, and past_due all keep access (grace period).
+  // past_due means Stripe is retrying payment — user keeps access but sees a warning.
+  const activeStatuses = new Set(['active', 'trialing', 'past_due']);
   const licenseStatus = activeStatuses.has(status) ? 'active' : 'inactive';
 
+  // Determine stripe_status for UI warnings:
+  // - cancel_at_period_end → user canceled, subscription ending at period end
+  // - past_due → payment failed, Stripe is retrying
+  // - active (default) → subscription healthy
+  let stripeStatus = 'active';
+  if (cancelAtPeriodEnd && status === 'active') {
+    stripeStatus = 'cancel_at_period_end';
+  } else if (status === 'past_due') {
+    stripeStatus = 'past_due';
+  }
+
   await env.DB.prepare(
-    `UPDATE licenses SET status = ? WHERE stripe_subscription_id = ?`,
+    `UPDATE licenses SET status = ?, stripe_status = ? WHERE stripe_subscription_id = ?`,
   )
-    .bind(licenseStatus, subscriptionId)
+    .bind(licenseStatus, stripeStatus, subscriptionId)
     .run();
 
   // Notify admin on status changes to non-active states
@@ -265,7 +279,7 @@ async function handleSubscriptionDeleted(env: Env, event: StripeEvent): Promise<
     .first<{ email: string | null; product: string; plan: string }>();
 
   await env.DB.prepare(
-    `UPDATE licenses SET status = 'inactive' WHERE stripe_subscription_id = ?`,
+    `UPDATE licenses SET status = 'inactive', stripe_status = 'active' WHERE stripe_subscription_id = ?`,
   )
     .bind(subscriptionId)
     .run();
@@ -320,8 +334,11 @@ async function handlePaymentFailed(env: Env, event: StripeEvent): Promise<void> 
 
   if (!subscriptionId) return;
 
+  // Keep license active during Stripe's payment retry window — user sees a
+  // warning banner instead of losing access immediately. Final revocation
+  // happens via customer.subscription.deleted when all retries are exhausted.
   await env.DB.prepare(
-    `UPDATE licenses SET status = 'inactive' WHERE stripe_subscription_id = ?`,
+    `UPDATE licenses SET stripe_status = 'past_due' WHERE stripe_subscription_id = ?`,
   )
     .bind(subscriptionId)
     .run();
