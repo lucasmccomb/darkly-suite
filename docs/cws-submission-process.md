@@ -75,18 +75,46 @@ stripe post /v1/promotion_codes \
 
 ---
 
-## Step 3: Build Production Zip
+## Step 3: Review Unreleased Changes
+
+Before building, check what has changed since the last CWS submission:
+
+```bash
+./scripts/release-check.sh {extension}
+```
+
+This compares HEAD against the latest `{extension}-v*` git tag and lists all commits that touch the extension's code or its shared dependencies (`core`, `site-*`). Review the list to confirm everything is ready to ship.
+
+If the script reports "No release tag found", see [Post-Submission Tagging](#post-submission-tagging) to establish the baseline.
+
+---
+
+## Step 4: Bump Version
+
+Bump the version in `manifest.json` before building:
+
+```bash
+./scripts/release-bump.sh {extension} patch   # 1.0.1 → 1.0.2
+./scripts/release-bump.sh {extension} minor   # 1.0.1 → 1.1.0
+./scripts/release-bump.sh {extension} major   # 1.0.1 → 2.0.0
+```
+
+Commit the version bump before building.
+
+---
+
+## Step 5: Build Production Zip
 
 ```bash
 pnpm --filter {extension} build
-cd packages/{extension}/dist && zip -r ../gmail-darkly.zip .
+cd packages/{extension}/dist && zip -r ../{extension}.zip .
 ```
 
 Verify the zip contains: `manifest.json`, JS bundles, CSS, icons.
 
 ---
 
-## Step 4: Upload to Chrome Web Store
+## Step 6: Upload to Chrome Web Store
 
 1. Go to https://chrome.google.com/webstore/devconsole
 2. Click **New Item**
@@ -94,7 +122,7 @@ Verify the zip contains: `manifest.json`, JS bundles, CSS, icons.
 
 ---
 
-## Step 5: Store Listing Tab
+## Step 7: Store Listing Tab
 
 | Field | Value |
 |-------|-------|
@@ -112,7 +140,7 @@ Verify the zip contains: `manifest.json`, JS bundles, CSS, icons.
 
 ---
 
-## Step 6: Privacy Tab
+## Step 8: Privacy Tab
 
 | Field | Source |
 |-------|--------|
@@ -127,7 +155,7 @@ Verify the zip contains: `manifest.json`, JS bundles, CSS, icons.
 
 ---
 
-## Step 7: Distribution Tab
+## Step 9: Distribution Tab
 
 | Field | Value |
 |-------|-------|
@@ -137,7 +165,7 @@ Verify the zip contains: `manifest.json`, JS bundles, CSS, icons.
 
 ---
 
-## Step 8: Test Instructions
+## Step 10: Test Instructions
 
 Paste content from `test-instructions.txt` into the **Test instructions** page under Access.
 
@@ -145,12 +173,29 @@ Test instructions can be edited after submission without resubmitting — the re
 
 ---
 
-## Step 9: Submit
+## Step 11: Submit
 
 1. Click **Save draft**
 2. Click **Submit for review**
 3. **Uncheck** auto-publish — stage for manual publish so you can switch to live Stripe first
 4. Click **Submit For Review**
+
+---
+
+## Post-Submission Tagging
+
+After submitting, tag the commit so `release-check.sh` knows what was included:
+
+```bash
+# Read the version from the manifest
+VERSION=$(grep '"version"' packages/{extension}/static/manifest.json | sed 's/.*: *"\(.*\)".*/\1/')
+
+# Tag and push
+git tag {extension}-v${VERSION}
+git push origin {extension}-v${VERSION}
+```
+
+Future runs of `./scripts/release-check.sh {extension}` will compare against this tag, showing only commits that landed after the submission.
 
 ---
 
