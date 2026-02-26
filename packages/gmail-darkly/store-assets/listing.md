@@ -32,7 +32,7 @@ HOW IT WORKS
 
 After installing, a subscription page opens at gmaildarkly.com where you can choose a plan. Sign in with your Google account to verify your email, then complete checkout securely through Stripe. Once subscribed, navigate to Gmail to start using dark mode. You may need to refresh Gmail to see the Darkly button appear in Gmail's toolbar. Click the Darkly toggle in Gmail's toolbar to open the mini-panel to control the dark mode setting or open the "All Settings" panel using the button in the right rail in Gmail to configure more settings.
 
-Your preferences sync across devices using Chrome's built-in sync.
+Your preferences sync across your desktop Chrome browsers using Chrome's built-in sync.
 
 PRIVACY
 
