@@ -1,29 +1,33 @@
-Darkly for Google Sheets adds a carefully engineered dark mode designed specifically for spreadsheets — not a generic filter that breaks your data.
+Darkly for Google Sheets adds a carefully engineered dark mode designed specifically for spreadsheets - not a generic filter that breaks your data. A paid subscription is required to use dark mode features.
 
 FEATURES
 
-- Grid-aware dark mode — Darkens the toolbar, formula bar, menus, and sidebar while intelligently handling the spreadsheet grid
-- Preserve Grid Colors toggle — Keep your spreadsheet cells in their original colors while the surrounding UI goes dark, so conditional formatting, colored cells, and data bars remain accurate
-- Color picker swatch preservation — Cell background and text color swatches display their true colors even in dark mode, so you always pick the right shade
-- Chart re-inversion — Embedded charts and chart editor previews display in their original colors, keeping your visualizations readable
-- Automatic scheduling — Set dark mode to activate and deactivate at specific times each day
-- Sunrise/sunset sync — Automatically follow your local daylight hours so dark mode turns on at dusk and off at dawn
-- OS theme sync — Match your system's light/dark preference so Sheets follows your desktop setting
-- Settings panel inside Sheets — Access all settings from a toolbar button or sidebar icon without leaving your spreadsheet
-- Smooth transitions — No jarring white flashes when toggling between light and dark modes
-- Cross-device sync — Preferences sync across all your Chrome browsers via Chrome's built-in storage
+- Grid-aware dark mode - Darkens the toolbar, formula bar, menus, and sidebar while intelligently handling the spreadsheet grid
+- Preserve Grid Colors toggle - Keep your spreadsheet cells in their original colors while the surrounding UI goes dark, so conditional formatting, colored cells, and data bars remain accurate
+- Color picker swatch preservation - Cell background and text color swatches display their true colors even in dark mode, so you always pick the right shade
+- Chart re-inversion - Embedded charts and chart editor previews display in their original colors, keeping your visualizations readable
+- Automatic scheduling - Set dark mode to activate and deactivate at specific times each day
+- Sunrise/sunset sync - Automatically follow your local daylight hours so dark mode turns on at dusk and off at dawn
+- OS theme sync - Match your system's light/dark preference so Sheets follows your desktop setting
+- Settings panel inside Sheets - Access all settings from a toolbar button or sidebar icon without leaving your spreadsheet
+- Smooth transitions - No jarring white flashes when toggling between light and dark modes
+- Cross-device sync - Preferences sync across all your Chrome browsers via Chrome's built-in storage
+
+SUBSCRIPTION
+
+All features require a paid subscription. After installing, you can view subscription options and choose a plan that works for you. Plans start at $0.99/month, with yearly and lifetime options available. You'll sign in with your Google account to verify your email, then complete checkout securely through Stripe. You can manage or cancel your subscription at any time from within the extension's settings.
 
 HOW IT WORKS
 
-After installing, you'll see a dark mode toggle button in the Google Sheets toolbar. Click it to enable dark mode instantly. A sidebar icon also provides quick access.
+After installing, you'll see a dark mode toggle button in the Google Sheets toolbar. Click it to view the settings panel and subscribe. Once subscribed, dark mode activates instantly. Open the settings panel to configure scheduling, sunrise/sunset mode, or OS sync.
 
-Open the settings panel to configure scheduling, sunrise/sunset mode, or OS sync. Toggle "Preserve Grid Colors" to keep your spreadsheet data colors intact while the UI around it stays dark — particularly useful for spreadsheets with color-coded data, conditional formatting, or charts.
+Toggle "Preserve Grid Colors" to keep your spreadsheet data colors intact while the UI around it stays dark - particularly useful for spreadsheets with color-coded data, conditional formatting, or charts.
 
-Your preferences sync across devices using Chrome's built-in sync. No account required.
+Your preferences sync across devices using Chrome's built-in sync. No account required beyond your subscription.
 
 PRIVACY
 
-Darkly for Google Sheets does not read your spreadsheet data, collect personal information, or send analytics. Your preferences are stored locally using Chrome's storage API. See our full privacy policy at https://sheetsdarkly.com/privacy.
+Darkly for Google Sheets does not read your spreadsheet data, collect personal data, or send analytics. Your preferences are stored locally using Chrome's storage API. An anonymous device token is used to verify your subscription status - no personal information is transmitted. See our full privacy policy at https://sheetsdarkly.com/privacy.
 
 SUPPORT
 

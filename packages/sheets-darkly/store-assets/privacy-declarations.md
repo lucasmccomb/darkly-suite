@@ -6,7 +6,8 @@ These map to the Privacy Practices tab in the developer dashboard.
 ## Single Purpose Description
 
 Darkly for Google Sheets applies a dark mode theme to Google Sheets with automatic
-scheduling based on time of day, sunrise/sunset, or OS theme preference.
+scheduling based on time of day, sunrise/sunset, or OS theme preference. A paid subscription
+is required for all features.
 
 ## Privacy Policy URL
 
@@ -19,16 +20,10 @@ it is collected, the purpose, whether it is sold, and whether it is transmitted.
 
 ### Personally identifiable information
 
-- Collected: YES
-- Use purpose: Functionality — linking the Chrome profile email to the user's subscription
-  for automatic license recovery when the local device token is lost or the extension
-  is reinstalled
-- Sold to third parties: NO
-- Transmitted to entities outside the extension: YES — the Chrome profile email is sent
-  to darklysuite.com as a query parameter during license status checks, only as a fallback
-  when the local license token cannot be found
-- Note: Uses the `identity` permission (`chrome.identity.getProfileUserInfo`). No marketing,
-  no sharing with third parties. Email is used solely to look up an existing subscription.
+- Collected: NO
+- Note: The extension does not collect or transmit any personally identifiable information.
+  An anonymous device token (randomly generated UUID) is used for subscription verification.
+  No email addresses, names, or other PII are accessed by the extension.
 
 ### Health information
 
@@ -73,7 +68,7 @@ it is collected, the purpose, whether it is sold, and whether it is transmitted.
 
 - Collected: NO
 - Note: The extension injects CSS for dark mode theming but does not read or extract
-  any spreadsheet content.
+  any page content.
 
 ## Remote Code
 

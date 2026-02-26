@@ -175,7 +175,7 @@ If rejected, the email includes the reason. Fix and resubmit.
 | Product | Extension Package | Landing Site | siteBase |
 |---------|------------------|--------------|----------|
 | Gmail | `gmail-darkly` | gmaildarkly.com | `https://gmaildarkly.com` |
-| Sheets | `sheets-darkly` | darklysuite.com | `https://darklysuite.com` |
+| Sheets | `sheets-darkly` | sheetsdarkly.com | `https://sheetsdarkly.com` |
 | Docs | `docs-darkly` | darklysuite.com | `https://darklysuite.com` |
 | Suite | `darkly-suite` | darklysuite.com | `https://darklysuite.com` |
 

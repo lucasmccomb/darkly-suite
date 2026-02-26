@@ -7,22 +7,24 @@ Copy-paste ready for the CWS developer dashboard.
 SINGLE PURPOSE DESCRIPTION
 ---------------------------
 Darkly for Google Sheets applies a dark mode theme to Google Sheets with automatic
-scheduling based on time of day, sunrise/sunset, or OS theme preference.
+scheduling based on time of day, sunrise/sunset, or OS theme preference. A paid
+subscription is required for all features.
 
 
 PERMISSION JUSTIFICATIONS
 --------------------------
 
 storage:
-Stores user preferences (dark mode on/off, schedule times, preserve grid
-colors setting) using chrome.storage.sync so settings persist across sessions and sync
-across the user's Chrome browsers. Also uses chrome.storage.local for pro status cache
-and sunrise/sunset times cache. No personal data is stored.
+Stores user preferences (dark mode on/off, schedule times, preserve grid colors setting)
+and an anonymous device token for subscription verification using chrome.storage.sync so
+settings persist across sessions and sync across the user's Chrome browsers. No personal
+data is stored.
 
 alarms:
-Runs periodic checks (every minute) for schedule-based and sunrise/sunset dark mode.
-Determines whether dark mode should be active based on the user's configured schedule
-or local sunrise/sunset times.
+Runs periodic checks for schedule-based and sunrise/sunset dark mode. An alarm fires
+every minute to determine whether dark mode should be active based on the user's
+configured schedule or local sunrise/sunset times. Also used for background polling
+after checkout to detect when payment completes.
 
 offscreen:
 Creates an offscreen document to access the browser's Geolocation API, which is not
