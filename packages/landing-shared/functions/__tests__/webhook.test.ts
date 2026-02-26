@@ -380,7 +380,7 @@ describe('webhook — customer.subscription.updated', () => {
 
     expect(response.status).toBe(200);
     const db = env.DB as unknown as MockD1Database;
-    expect(db._statement.bind).toHaveBeenCalledWith('active', 'active', 'sub_123');
+    expect(db._statement.bind).toHaveBeenCalledWith('active', 'active', null, 'sub_123');
   });
 
   it('maps "canceled" Stripe status to "inactive" license', async () => {
@@ -392,7 +392,7 @@ describe('webhook — customer.subscription.updated', () => {
     await callWebhook(eventBody, env);
 
     const db = env.DB as unknown as MockD1Database;
-    expect(db._statement.bind).toHaveBeenCalledWith('inactive', 'active', 'sub_456');
+    expect(db._statement.bind).toHaveBeenCalledWith('inactive', 'active', null, 'sub_456');
   });
 
   it('maps "past_due" Stripe status to "active" license with "past_due" stripe_status', async () => {
@@ -404,7 +404,7 @@ describe('webhook — customer.subscription.updated', () => {
     await callWebhook(eventBody, env);
 
     const db = env.DB as unknown as MockD1Database;
-    expect(db._statement.bind).toHaveBeenCalledWith('active', 'past_due', 'sub_pd');
+    expect(db._statement.bind).toHaveBeenCalledWith('active', 'past_due', null, 'sub_pd');
   });
 
   it('maps "incomplete_expired" to "inactive"', async () => {
@@ -416,7 +416,7 @@ describe('webhook — customer.subscription.updated', () => {
     await callWebhook(eventBody, env);
 
     const db = env.DB as unknown as MockD1Database;
-    expect(db._statement.bind).toHaveBeenCalledWith('inactive', 'active', 'sub_ie');
+    expect(db._statement.bind).toHaveBeenCalledWith('inactive', 'active', null, 'sub_ie');
   });
 
   it('maps "trialing" to "active"', async () => {
@@ -428,7 +428,7 @@ describe('webhook — customer.subscription.updated', () => {
     await callWebhook(eventBody, env);
 
     const db = env.DB as unknown as MockD1Database;
-    expect(db._statement.bind).toHaveBeenCalledWith('active', 'active', 'sub_trial');
+    expect(db._statement.bind).toHaveBeenCalledWith('active', 'active', null, 'sub_trial');
   });
 
   it('defaults unknown Stripe status to "inactive"', async () => {
@@ -440,20 +440,44 @@ describe('webhook — customer.subscription.updated', () => {
     await callWebhook(eventBody, env);
 
     const db = env.DB as unknown as MockD1Database;
-    expect(db._statement.bind).toHaveBeenCalledWith('inactive', 'active', 'sub_unknown');
+    expect(db._statement.bind).toHaveBeenCalledWith('inactive', 'active', null, 'sub_unknown');
   });
 
-  it('sets stripe_status to "cancel_at_period_end" when subscription is active but canceling', async () => {
+  it('sets stripe_status to "cancel_at_period_end" and stores cancel_at date when subscription is canceling', async () => {
     const env = createMockEnv();
+    // current_period_end is a Unix timestamp (seconds): 2026-03-15T00:00:00Z
+    const periodEnd = Math.floor(new Date('2026-03-15T00:00:00Z').getTime() / 1000);
     const eventBody = makeWebhookEvent('customer.subscription.updated', {
       id: 'sub_canceling',
       status: 'active',
       cancel_at_period_end: true,
+      current_period_end: periodEnd,
     });
     await callWebhook(eventBody, env);
 
     const db = env.DB as unknown as MockD1Database;
-    expect(db._statement.bind).toHaveBeenCalledWith('active', 'cancel_at_period_end', 'sub_canceling');
+    const bindArgs = db._statement.bind.mock.calls[0];
+    expect(bindArgs[0]).toBe('active');
+    expect(bindArgs[1]).toBe('cancel_at_period_end');
+    expect(bindArgs[2]).toBe('2026-03-15T00:00:00.000Z');
+    expect(bindArgs[3]).toBe('sub_canceling');
+  });
+
+  it('clears cancel_at when subscription is renewed (cancel_at_period_end becomes false)', async () => {
+    const env = createMockEnv();
+    const eventBody = makeWebhookEvent('customer.subscription.updated', {
+      id: 'sub_renewed',
+      status: 'active',
+      cancel_at_period_end: false,
+    });
+    await callWebhook(eventBody, env);
+
+    const db = env.DB as unknown as MockD1Database;
+    const bindArgs = db._statement.bind.mock.calls[0];
+    expect(bindArgs[0]).toBe('active');
+    expect(bindArgs[1]).toBe('active');
+    expect(bindArgs[2]).toBeNull();
+    expect(bindArgs[3]).toBe('sub_renewed');
   });
 
   it('sends notification when status changes to a problematic state', async () => {

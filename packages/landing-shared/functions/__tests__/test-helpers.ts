@@ -184,6 +184,7 @@ export function createMockLicense(overrides: Partial<License> = {}): License {
     stripe_subscription_id: 'sub_test123',
     stripe_status: 'active',
     discount_code_id: null,
+    cancel_at: null,
     created_at: '2025-01-01T00:00:00Z',
     expires_at: null,
     ...overrides,

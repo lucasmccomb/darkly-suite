@@ -218,6 +218,7 @@ async function handleSubscriptionUpdated(env: Env, event: StripeEvent): Promise<
   const subscriptionId = subscription.id as string;
   const status = subscription.status as string;
   const cancelAtPeriodEnd = subscription.cancel_at_period_end as boolean | undefined;
+  const currentPeriodEnd = subscription.current_period_end as number | undefined;
   const previousAttributes = (event.data as Record<string, unknown>).previous_attributes as
     | Record<string, unknown>
     | undefined;
@@ -239,10 +240,15 @@ async function handleSubscriptionUpdated(env: Env, event: StripeEvent): Promise<
     stripeStatus = 'past_due';
   }
 
+  // Store the subscription end date when canceling, clear it when renewed
+  const cancelAt = cancelAtPeriodEnd && currentPeriodEnd
+    ? new Date(currentPeriodEnd * 1000).toISOString()
+    : null;
+
   await env.DB.prepare(
-    `UPDATE licenses SET status = ?, stripe_status = ? WHERE stripe_subscription_id = ?`,
+    `UPDATE licenses SET status = ?, stripe_status = ?, cancel_at = ? WHERE stripe_subscription_id = ?`,
   )
-    .bind(licenseStatus, stripeStatus, subscriptionId)
+    .bind(licenseStatus, stripeStatus, cancelAt, subscriptionId)
     .run();
 
   // Notify admin on status changes to non-active states

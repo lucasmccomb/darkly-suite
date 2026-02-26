@@ -61,6 +61,7 @@ export interface License {
   stripe_subscription_id: string | null;
   stripe_status: string;
   discount_code_id: number | null;
+  cancel_at: string | null;
   created_at: string;
   expires_at: string | null;
 }

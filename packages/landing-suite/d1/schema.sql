@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS licenses (
   stripe_customer_id TEXT,
   stripe_subscription_id TEXT,
   discount_code_id INTEGER REFERENCES discount_codes(id),
+  cancel_at TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   expires_at TEXT,
   UNIQUE(token, product)
