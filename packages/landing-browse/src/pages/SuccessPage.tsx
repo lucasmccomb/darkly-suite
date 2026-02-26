@@ -1,8 +1,12 @@
-import { Check, Globe, Download, ArrowRight } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
+import { Check, Globe, Download, ArrowRight, RefreshCw } from 'lucide-react'
 import { Nav, Footer, Wordmark } from '@darkly/landing-shared'
 import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URL } from '../config.ts'
 
 export function SuccessPage() {
+  const [searchParams] = useSearchParams()
+  const isRestored = searchParams.get('restored') === 'true'
+
   return (
     <>
       <Nav links={NAV_LINKS} cta={NAV_CTA} />
@@ -24,7 +28,9 @@ export function SuccessPage() {
             justifyContent: 'center',
             margin: '0 auto 24px',
           }}>
-            <Check size={36} color="var(--color-success)" strokeWidth={2.5} />
+            {isRestored
+              ? <RefreshCw size={36} color="var(--color-success)" strokeWidth={2.5} />
+              : <Check size={36} color="var(--color-success)" strokeWidth={2.5} />}
           </div>
 
           <h1 style={{
@@ -33,7 +39,7 @@ export function SuccessPage() {
             color: 'var(--color-text)',
             marginBottom: 12,
           }}>
-            Payment Successful
+            {isRestored ? 'Purchase Restored' : 'Payment Successful'}
           </h1>
 
           <p style={{
@@ -42,23 +48,36 @@ export function SuccessPage() {
             lineHeight: 1.6,
             marginBottom: 32,
           }}>
-            Welcome to <Wordmark />! You now have full access to
-            beautiful dark mode for every website.
+            {isRestored
+              ? <>Your <Wordmark /> license has been restored. Open any website to continue using dark mode.</>
+              : <>Welcome to <Wordmark />! You now have full access to beautiful dark mode for every website.</>}
           </p>
 
-          <a
-            href={STORE_URL}
-            className="btn btn-primary"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ marginBottom: 48, display: 'inline-flex' }}
-          >
-            <Globe size={18} strokeWidth={2} />
-            <span className="btn-label">Install Browse Darkly</span>
-          </a>
+          {isRestored ? (
+            <a
+              href="/"
+              className="btn btn-primary"
+              style={{ marginBottom: 48, display: 'inline-flex' }}
+            >
+              <ArrowRight size={18} strokeWidth={2} />
+              <span className="btn-label">Back to Home</span>
+            </a>
+          ) : (
+            <a
+              href={STORE_URL}
+              className="btn btn-primary"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ marginBottom: 48, display: 'inline-flex' }}
+            >
+              <Globe size={18} strokeWidth={2} />
+              <span className="btn-label">Install Browse Darkly</span>
+            </a>
+          )}
         </div>
       </section>
 
+      {!isRestored && (
       <section style={{ paddingBottom: 100 }}>
         <div className="container" style={{ maxWidth: 520, textAlign: 'center' }}>
           <div style={{
@@ -105,6 +124,7 @@ export function SuccessPage() {
           </div>
         </div>
       </section>
+      )}
 
       <Footer
         links={FOOTER_LINKS}
