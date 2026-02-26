@@ -103,6 +103,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
     const prices = await payment.getPrices();
     const plan = await payment.getPlan();
     const subscriptionStatus = await payment.getSubscriptionStatus();
+    const cancelAt = await payment.getCancelAt();
 
     if (proStatus) {
       const currentPrefs = await prefs.load();
@@ -133,6 +134,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
       isPro: proStatus,
       plan: plan ?? undefined,
       subscriptionStatus: subscriptionStatus ?? undefined,
+      cancelAt: cancelAt ?? undefined,
       prices: prices ?? undefined,
       onUpgrade: (p) => payment.openPaymentPage(p),
       onRestorePurchase: () => payment.openRestorePurchase(),
@@ -172,6 +174,7 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
           isPro: proStatus,
           plan: plan ?? undefined,
           subscriptionStatus: subscriptionStatus ?? undefined,
+          cancelAt: cancelAt ?? undefined,
           prices: prices ?? undefined,
           onAllSettings: miniPanel
             ? () => {

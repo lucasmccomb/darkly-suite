@@ -21,6 +21,7 @@ interface GmailSettingsPanelProps {
   isPro?: boolean;
   plan?: string;
   subscriptionStatus?: string;
+  cancelAt?: string;
   prices?: PriceInfo;
   onUpgrade?: (plan?: 'monthly' | 'yearly' | 'lifetime') => void;
   onRestorePurchase?: () => void;
@@ -28,7 +29,7 @@ interface GmailSettingsPanelProps {
   onClose: () => void;
 }
 
-export function GmailSettingsPanel({ isPro = false, plan, subscriptionStatus, prices, onUpgrade, onRestorePurchase, onManageSubscription, onClose }: GmailSettingsPanelProps) {
+export function GmailSettingsPanel({ isPro = false, plan, subscriptionStatus, cancelAt, prices, onUpgrade, onRestorePurchase, onManageSubscription, onClose }: GmailSettingsPanelProps) {
   const p = usePrefix();
   const config = useDarklyConfig();
   const [prefs, setPrefs] = useState<BaseUserPreferences>(DEFAULT_PREFERENCES);
@@ -119,7 +120,9 @@ export function GmailSettingsPanel({ isPro = false, plan, subscriptionStatus, pr
 
       {subscriptionStatus === 'cancel_at_period_end' && (
         <div className={`${p}-sub-warning ${p}-sub-warning--cancel`}>
-          Your subscription is set to cancel. Click below to renew.
+          {cancelAt
+            ? <>Your subscription ends on <strong>{new Date(cancelAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</strong>. Click below to renew.</>
+            : 'Your subscription is set to cancel. Click below to renew.'}
         </div>
       )}
 

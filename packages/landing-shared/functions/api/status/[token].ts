@@ -83,6 +83,7 @@ export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
         ...(prices && { prices }),
         // Include subscriptionStatus only when there's a warning to show
         ...(result.stripe_status && result.stripe_status !== 'active' && { subscriptionStatus: result.stripe_status }),
+        ...(result.stripe_status === 'cancel_at_period_end' && result.cancel_at && { cancelAt: result.cancel_at }),
       }),
       { status: 200, headers },
     );

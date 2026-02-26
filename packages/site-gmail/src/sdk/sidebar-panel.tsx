@@ -66,6 +66,7 @@ interface SidebarPanelOptions {
   isPro?: boolean;
   plan?: string;
   subscriptionStatus?: string;
+  cancelAt?: string;
   prices?: import('@darkly/core').PriceInfo;
   onUpgrade?: (plan?: 'monthly' | 'yearly' | 'lifetime') => void;
   onRestorePurchase?: () => void;
@@ -89,6 +90,7 @@ export async function mountSettingsPanel(
     isPro?: boolean;
     plan?: string;
     subscriptionStatus?: string;
+    cancelAt?: string;
     prices?: import('@darkly/core').PriceInfo;
     onUpgrade?: (plan?: 'monthly' | 'yearly' | 'lifetime') => void;
     onRestorePurchase?: () => void;
@@ -118,6 +120,7 @@ export async function mountSettingsPanel(
         isPro={options.isPro}
         plan={options.plan}
         subscriptionStatus={options.subscriptionStatus}
+        cancelAt={options.cancelAt}
         prices={options.prices}
         onUpgrade={options.onUpgrade}
         onRestorePurchase={options.onRestorePurchase}

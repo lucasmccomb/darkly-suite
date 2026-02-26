@@ -175,6 +175,56 @@ describe('status/[token] — GET', () => {
     expect(body.plan).toBe('lifetime');
   });
 
+  it('includes cancelAt when subscription is canceling', async () => {
+    const license = createMockLicense({
+      token: validToken,
+      product: 'gmail',
+      stripe_status: 'cancel_at_period_end',
+      cancel_at: '2026-03-15T00:00:00.000Z',
+    });
+
+    const context = createMockContext({
+      request: new Request(`https://darklysuite.com/api/status/${validToken}?product=gmail`, {
+        headers: { Origin: 'https://mail.google.com' },
+      }),
+      params: { token: validToken },
+    });
+
+    const db = context.env.DB as unknown as MockD1Database;
+    db._statement.first.mockResolvedValueOnce(license);
+
+    const response = await onRequestGet(context);
+    const body = await response.json() as { paid: boolean; subscriptionStatus: string; cancelAt: string };
+    expect(body.paid).toBe(true);
+    expect(body.subscriptionStatus).toBe('cancel_at_period_end');
+    expect(body.cancelAt).toBe('2026-03-15T00:00:00.000Z');
+  });
+
+  it('omits cancelAt when subscription is active', async () => {
+    const license = createMockLicense({
+      token: validToken,
+      product: 'gmail',
+      stripe_status: 'active',
+      cancel_at: null,
+    });
+
+    const context = createMockContext({
+      request: new Request(`https://darklysuite.com/api/status/${validToken}?product=gmail`, {
+        headers: { Origin: 'https://mail.google.com' },
+      }),
+      params: { token: validToken },
+    });
+
+    const db = context.env.DB as unknown as MockD1Database;
+    db._statement.first.mockResolvedValueOnce(license);
+
+    const response = await onRequestGet(context);
+    const body = await response.json() as { paid: boolean; cancelAt?: string; subscriptionStatus?: string };
+    expect(body.paid).toBe(true);
+    expect(body.cancelAt).toBeUndefined();
+    expect(body.subscriptionStatus).toBeUndefined();
+  });
+
   it('returns 500 on database error', async () => {
     const context = createMockContext({
       request: new Request(`https://darklysuite.com/api/status/${validToken}?product=gmail`, {
