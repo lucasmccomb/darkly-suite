@@ -1,8 +1,12 @@
-import { Check, FileText, Download, ArrowRight } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
+import { Check, FileText, Download, ArrowRight, RefreshCw } from 'lucide-react'
 import { Nav, Footer, Wordmark, useCheckoutComplete } from '@darkly/landing-shared'
 import { NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME } from '../config.ts'
 
 export function SuccessPage() {
+  const [searchParams] = useSearchParams()
+  const isRestored = searchParams.get('restored') === 'true'
+
   useCheckoutComplete('docs')
 
   return (
@@ -27,7 +31,9 @@ export function SuccessPage() {
             justifyContent: 'center',
             margin: '0 auto 24px',
           }}>
-            <Check size={36} color="var(--color-success)" strokeWidth={2.5} />
+            {isRestored
+              ? <RefreshCw size={36} color="var(--color-success)" strokeWidth={2.5} />
+              : <Check size={36} color="var(--color-success)" strokeWidth={2.5} />}
           </div>
 
           <h1 style={{
@@ -36,7 +42,7 @@ export function SuccessPage() {
             color: 'var(--color-text)',
             marginBottom: 12,
           }}>
-            Payment Successful
+            {isRestored ? 'Purchase Restored' : 'Payment Successful'}
           </h1>
 
           <p style={{
@@ -45,8 +51,9 @@ export function SuccessPage() {
             lineHeight: 1.6,
             marginBottom: 32,
           }}>
-            Welcome to <Wordmark /> for Docs! You now have full access to
-            intelligent dark mode for Google Docs.
+            {isRestored
+              ? <>Your <Wordmark /> for Docs license has been restored. Return to Google Docs to continue using dark mode.</>
+              : <>Welcome to <Wordmark /> for Docs! You now have full access to intelligent dark mode for Google Docs.</>}
           </p>
 
           {/* Return to Google Docs button */}
@@ -61,7 +68,8 @@ export function SuccessPage() {
         </div>
       </section>
 
-      {/* Continue Setup section */}
+      {/* Continue Setup section — hide for restore flow */}
+      {!isRestored && (
       <section style={{ paddingBottom: 100 }}>
         <div className="container" style={{ maxWidth: 520, textAlign: 'center' }}>
           <div style={{
@@ -103,6 +111,7 @@ export function SuccessPage() {
           </div>
         </div>
       </section>
+      )}
 
       <Footer
         brandLabel="for Docs"
