@@ -16,13 +16,13 @@ SUBSCRIPTION FEATURES
 
 All of the following features require an active subscription.
 
-- One-click dark mode — Toggle dark mode on and off from a button inside Gmail
-- Automatic scheduling — Set dark mode to activate and deactivate on a schedule
-- Sunrise/sunset sync — Automatically follow your local daylight hours
-- OS theme sync — Match your system's light/dark preference
-- Settings panel inside Gmail — No separate options page; everything is accessible from within Gmail
-- Smooth transitions — No jarring flashes when switching modes
-- Gmail-specific overrides — Carefully tuned for Gmail's interface including compose windows, popovers, and settings
+- One-click dark mode: Toggle dark mode on and off from a button inside Gmail
+- Automatic scheduling: Set dark mode to activate and deactivate on a schedule
+- Sunrise/sunset sync: Automatically follow your local daylight hours
+- OS theme sync: Match your system's light/dark preference
+- Settings panel inside Gmail: No separate options page; everything is accessible from within Gmail
+- Smooth transitions: No jarring flashes when switching modes
+- Gmail-specific overrides: Carefully tuned for Gmail's interface including compose windows, popovers, and settings
 
 SUBSCRIPTION
 
@@ -36,7 +36,7 @@ Your preferences sync across devices using Chrome's built-in sync. No account re
 
 PRIVACY
 
-Darkly for Gmail does not read your emails, collect personal data, or send analytics. Your preferences are stored locally using Chrome's storage API. An anonymous device token is used to verify your subscription status — no personal information is transmitted. See our full privacy policy at https://gmaildarkly.com/privacy.
+Darkly for Gmail does not read your emails, collect personal data, or send analytics. Your preferences are stored locally using Chrome's storage API. An anonymous device token is used to verify your subscription status. No personal information is transmitted. See our full privacy policy at https://gmaildarkly.com/privacy.
 
 SUPPORT
 
