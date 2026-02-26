@@ -4,6 +4,33 @@
 
 Unified pnpm workspace monorepo that builds **4 Chrome extensions** (Darkly for Gmail, Darkly for Sheets, Darkly for Docs, Darkly Suite bundle) from shared code, served by a **unified landing page and payment backend** at **darklysuite.com**.
 
+## CRITICAL: CWS Launch Status Table (Session Start)
+
+**At the start of every session**, check the "Chrome Web Store Launch Status" table in `README.md` and update it if anything has changed. This table is consumed by lem.work to display project status on the Darkly Suite project page.
+
+### What to check:
+
+1. **CWS submission status** - Has an extension been submitted, approved, or published since the last update?
+2. **Version numbers** - Have any manifest versions been bumped? Check `packages/{extension}/static/manifest.json`
+3. **Agent logs** - Did another agent submit or publish an extension?
+
+### How to update:
+
+The table lives at the top of `README.md` under "Chrome Web Store Launch Status". Each extension progresses left-to-right through stages:
+
+| Stage | Meaning |
+|-------|---------|
+| In Development | Code is being actively built |
+| CWS In-Review | Submitted to Chrome Web Store, awaiting Google's review |
+| CWS Approved | Google approved the extension but it hasn't been published yet |
+| Published | Live on the Chrome Web Store |
+
+Add `:white_check_mark:` to each completed stage. The rightmost checkmark shows current status. Update the Version column to match the manifest version.
+
+### If status changed:
+
+Commit the README update as part of the current branch or as a standalone commit on main. Do not leave an outdated table.
+
 ## Quick Start
 
 ```bash
