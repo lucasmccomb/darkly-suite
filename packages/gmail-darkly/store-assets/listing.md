@@ -16,7 +16,7 @@ SUBSCRIPTION FEATURES
 
 All of the following features require an active subscription.
 
-- One-click dark mode: Toggle dark mode on and off from a button inside Gmail
+- Dark mode controls: Click the Darkly icon in Gmail's toolbar to open a mini-panel with dark mode controls
 - Automatic scheduling: Set dark mode to activate and deactivate on a schedule
 - Sunrise/sunset sync: Automatically follow your local daylight hours
 - OS theme sync: Match your system's light/dark preference
