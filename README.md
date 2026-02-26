@@ -4,8 +4,23 @@
 
 **[darklysuite.com](https://darklysuite.com)** | **[gmaildarkly.com](https://gmaildarkly.com)**
 
+## Chrome Web Store Launch Status
+
+<!-- This table is consumed by lem.work to display project status. Keep it up to date. -->
+
+| Extension | In Development | CWS In-Review | CWS Approved | Published | Version |
+|-----------|:-:|:-:|:-:|:-:|---------|
+| Darkly for Gmail | :white_check_mark: | :white_check_mark: | | | 1.0.1 |
+| Darkly for Sheets | :white_check_mark: | | | | 1.0.0 |
+| Darkly for Docs | :white_check_mark: | | | | 1.0.0 |
+| Darkly Suite | :white_check_mark: | | | | 1.0.0 |
+| Browse Darkly | :white_check_mark: | | | | 1.0.0 |
+
+**Legend:** :white_check_mark: = stage completed. Rightmost checkmark indicates current status.
+
 ## Table of Contents
 
+- [Chrome Web Store Launch Status](#chrome-web-store-launch-status)
 - [What is Darkly Suite?](#what-is-darkly-suite)
 - [Extensions at a Glance](#extensions-at-a-glance)
 - [Repository Structure](#repository-structure)
