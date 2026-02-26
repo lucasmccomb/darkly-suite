@@ -1,12 +1,9 @@
-1. Install extension: a new tab opens to gmaildarkly.com/subscribe
-2. Select a plan on the subscribe page
-3. Sign in with Google, then complete Stripe checkout
-4. Enter promo code CWSREVIEW2026 for free access
-5. Use test card: 4242 4242 4242 4242, any future exp. date, any CVC
-6. After checkout, navigate to mail.google.com
-7. Darkly icon appears in Gmail's toolbar (d icon)
-8. Paywall dismisses automatically within 1-2 minutes as the extension detects the new license
-9. Click Darkly icon to toggle dark mode on/off
-10. Open settings panel to view all modes (Schedule, OS Sync, Sunrise/Sunset)
+1. Install extension: gmaildarkly.com/subscribe opens automatically
+2. Select a plan, sign in with Google, complete Stripe checkout
+3. Promo code: CWSREVIEW2026 (free access for review)
+4. Test card: 4242 4242 4242 4242, any future exp, any CVC
+5. After checkout, go to mail.google.com (refresh if needed)
+6. Click Darkly icon in toolbar to toggle dark mode
+7. Open settings to view Schedule, OS Sync, Sunrise/Sunset modes
 
-All dark mode features require a paid subscription. Promo code provides free access for review.
+All features require a paid subscription. Promo code provides free access.
