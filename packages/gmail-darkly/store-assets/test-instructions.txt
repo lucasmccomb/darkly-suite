@@ -1,9 +1,9 @@
 1. Install extension: gmaildarkly.com/subscribe opens automatically
 2. Select a plan, sign in with Google, complete Stripe checkout
-3. Promo code: CWSREVIEW2026 (free access for review)
-4. Test card: 4242 4242 4242 4242, any future exp, any CVC
-5. After checkout, go to mail.google.com (refresh if needed)
-6. Click Darkly icon in toolbar to toggle dark mode
-7. Open settings to view Schedule, OS Sync, Sunrise/Sunset modes
+3. Promo: CWSREVIEW2026 | Card: 4242 4242 4242 4242, any exp/CVC
+4. After checkout, go to mail.google.com (refresh if needed)
+5. Click Darkly icon in toolbar to open the mini-panel
+6. Use mini-panel controls to enable dark mode
+7. Open All Settings for Schedule, OS Sync, Sunrise/Sunset modes
 
-All features require a paid subscription. Promo code provides free access.
+All features require a subscription. Promo code gives free access.
