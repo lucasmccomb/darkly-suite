@@ -160,16 +160,41 @@ Before starting, verify these are live:
 
 ---
 
-## Test 10: Extension Token Handoff (externally_connectable)
+## Test 10: Extension Token Handoff (landing-bridge.js)
 
-**Setup**: Verify the extension properly communicates its token to the checkout page.
+**Setup**: Verify the extension properly communicates its token to the checkout page via the landing-bridge content script.
 
-1. [ ] Note the extension ID from `chrome://extensions`
-2. [ ] With the extension installed, navigate to `gmaildarkly.com/subscribe`
-3. [ ] Open the browser console on the subscribe page
-4. [ ] **Verify**: The page attempts to communicate with the extension via `chrome.runtime.sendMessage(extensionId, ...)`
-5. [ ] **Verify**: If the extension ID matches a published ID in `externally_connectable`, the token is received; otherwise, it gracefully falls back to a generated token
-6. [ ] **Note**: For unpublished extensions (local dev), the extension ID changes on each install, so token handoff will use the fallback — this is expected
+1. [ ] With the extension installed, navigate to `gmaildarkly.com/subscribe`
+2. [ ] Open the browser console on the subscribe page
+3. [ ] **Verify**: A `darkly-extension-token` CustomEvent is dispatched (add a listener: `window.addEventListener('darkly-extension-token', e => console.log('token:', e.detail))`)
+4. [ ] **Verify**: The event detail contains `{ token: "...", productId: "gmail" }`
+5. [ ] **Verify**: The subscribe page receives the token and uses it for the checkout flow (the "Subscribe" buttons include the token in the checkout URL)
+6. [ ] Navigate to `darklysuite.com`
+7. [ ] **Verify**: The landing-bridge content script also runs here (same CustomEvent mechanism)
+
+**How it works**: The manifest declares a `landing-bridge.js` content script on `gmaildarkly.com/*` and `darklysuite.com/*`. This content script requests the extension's anonymous device token from the background worker via `chrome.runtime.sendMessage` and broadcasts it to the page via CustomEvent. This works for both published and unpacked extensions without needing a known extension ID.
+
+---
+
+## Test 11: Restore Purchase Flow
+
+**Setup**: Simulate a user who reinstalled the extension and needs to recover their license.
+
+1. [ ] Start with a paid user (from Test 2)
+2. [ ] Remove the extension from `chrome://extensions`
+3. [ ] Re-install the extension (load unpacked from `dist/`)
+4. [ ] Navigate to `mail.google.com`
+5. [ ] **Verify**: Extension shows the paywall (new device token has no license)
+6. [ ] Click "Already purchased? Restore" link in the paywall
+7. [ ] **Verify**: A new tab opens to `darklysuite.com/api/auth/start?type=restore&token=...&product=gmail`
+8. [ ] **Verify**: Google OAuth flow asks you to confirm your email
+9. [ ] **Verify**: After OAuth, you're redirected to `gmaildarkly.com/success?restored=true`
+10. [ ] **Verify**: The success page shows "Purchase Restored" heading with a refresh icon (not "Payment Successful" with a checkmark)
+11. [ ] **Verify**: The setup/install section is hidden (since the extension is already installed)
+12. [ ] Return to the Gmail tab
+13. [ ] **Verify**: Within a few minutes, the paywall dismisses and dark mode becomes available (the restore flow updates the license's device token on the backend)
+
+**Note**: The restore flow uses the same OAuth mechanism as checkout but with `type=restore`. Instead of creating a new Stripe subscription, it looks up the existing license by email and updates the device token to match the new extension instance.
 
 ---
 
