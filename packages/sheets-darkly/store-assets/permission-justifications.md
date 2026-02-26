@@ -7,16 +7,18 @@ Privacy Practices tab. These are copy-paste ready for the submission form.
 
 ### storage
 
-Stores user preferences (dark mode on/off, schedule times, preserve grid
-colors setting) using chrome.storage.sync so settings persist across sessions and sync
-across the user's Chrome browsers. Also uses chrome.storage.local for pro status cache
-and sunrise/sunset times cache. No personal data is stored.
+Stores user preferences (dark mode on/off, schedule times, preserve grid colors setting)
+and an anonymous device token for subscription verification using chrome.storage.sync so
+settings persist across sessions and sync across the user's Chrome browsers. No personal
+data is stored.
 
 ### alarms
 
-Runs periodic checks (every minute) for schedule-based and sunrise/sunset dark mode.
-Determines whether dark mode should be active based on the user's configured schedule
-or local sunrise/sunset times.
+Runs periodic checks for schedule-based and sunrise/sunset dark mode. An alarm fires
+every minute to determine whether dark mode should be active based on the user's
+configured schedule or local sunrise/sunset times. Also used for background polling
+after Stripe checkout to detect when payment completes (polls every 30 seconds for
+up to 60 minutes after checkout).
 
 ### offscreen
 
