@@ -4,11 +4,13 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "baseUrl": ".",
+    "module": "ES2020",
+    "moduleResolution": "bundler",
     "types": ["node"],
     "paths": {
       "@darkly/screenshot-harness/*": ["src/*"]
     }
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "pages"]
+  "exclude": ["node_modules", "dist", "output", "pages"]
 }
