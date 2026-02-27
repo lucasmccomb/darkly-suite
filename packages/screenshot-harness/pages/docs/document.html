@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en" data-darkly-theme="light" data-darkly-active="true">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280">
+  <title>Q1 Marketing Strategy - Google Docs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+     * Reset & Base
+     * ============================================================ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 1280px;
+      height: 800px;
+      overflow: hidden;
+      font-family: 'Roboto', Arial, sans-serif;
+      background: #ffffff;
+      color: #202124;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ============================================================
+     * Layout - CSS Grid: stacked rows
+     * ============================================================ */
+    .app-layout {
+      display: grid;
+      grid-template-rows: 48px 30px 40px 24px 1fr;
+      grid-template-columns: 1fr 52px;
+      width: 1280px;
+      height: 800px;
+    }
+
+    /* Header rows span full width */
+    .docs-titlebar-container { grid-column: 1 / -1; }
+    .docs-menubar-container  { grid-column: 1 / -1; }
+    .docs-toolbar-container  { grid-column: 1 / -1; }
+    .ruler-container         { grid-column: 1 / -1; }
+
+    /* Main content: canvas area + companion strip */
+    #docs-editor-container    { grid-column: 1 / 2; overflow: hidden; }
+    .companion-strip          { grid-column: 2 / 3; grid-row: 5 / 6; }
+
+    /* ============================================================
+     * Title Bar (~48px)
+     * ============================================================ */
+    .docs-titlebar-container {
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      height: 48px;
+      border-bottom: 1px solid #e8eaed;
+      background: #ffffff;
+    }
+
+    .docs-icon {
+      width: 24px;
+      height: 32px;
+      background: #4285f4;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 8px;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .docs-icon::before {
+      content: '';
+      display: block;
+      width: 12px;
+      height: 2px;
+      background: #ffffff;
+      box-shadow: 0 4px 0 #ffffff, 0 8px 0 #ffffff, 0 12px 0 #ffffff;
+      border-radius: 1px;
+    }
+
+    .title-section {
+      display: flex;
+      flex-direction: column;
+      margin-right: auto;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .doc-title {
+      font-size: 18px;
+      font-weight: 400;
+      color: #202124;
+      line-height: 1.3;
+    }
+
+    .star-icon {
+      color: #5f6368;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .move-icon {
+      color: #5f6368;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .subtitle-text {
+      font-size: 12px;
+      color: #5f6368;
+      line-height: 1.2;
+      margin-top: 1px;
+    }
+
+    .title-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: 16px;
+    }
+
+    .docs-titlebar-buttons {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .history-icon, .comments-icon {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      cursor: pointer;
+      color: #5f6368;
+      font-size: 16px;
+    }
+
+    .history-icon:hover, .comments-icon:hover {
+      background: #e8eaed;
+    }
+
+    .share-button {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 20px;
+      height: 36px;
+      background: #1a73e8;
+      color: #ffffff;
+      border: none;
+      border-radius: 18px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: 'Roboto', sans-serif;
+      cursor: pointer;
+    }
+
+    .share-button .lock-icon {
+      font-size: 14px;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #8ab4f8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 500;
+      color: #202124;
+      cursor: pointer;
+    }
+
+    /* ============================================================
+     * Menu Bar (~30px)
+     * ============================================================ */
+    .docs-menubar-container {
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      height: 30px;
+      background: #ffffff;
+      border-bottom: 1px solid #e8eaed;
+    }
+
+    .menu-item {
+      padding: 4px 8px;
+      font-size: 14px;
+      color: #202124;
+      cursor: pointer;
+      border-radius: 4px;
+      white-space: nowrap;
+      line-height: 1.4;
+    }
+
+    .menu-item:hover {
+      background: #e8eaed;
+    }
+
+    /* ============================================================
+     * Toolbar (~40px)
+     * ============================================================ */
+    .docs-toolbar-container {
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      height: 40px;
+      background: #edf2fa;
+      border-bottom: 1px solid #dadce0;
+      gap: 2px;
+      overflow: hidden;
+    }
+
+    .toolbar-btn {
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #444746;
+      font-size: 16px;
+      background: transparent;
+      border: none;
+      font-family: 'Roboto', Arial, sans-serif;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .toolbar-btn:hover {
+      background: #d3d3d3;
+    }
+
+    .toolbar-btn.bold { font-weight: 700; font-size: 15px; }
+    .toolbar-btn.italic { font-style: italic; font-size: 15px; font-family: serif; }
+    .toolbar-btn.underline { text-decoration: underline; font-size: 14px; }
+
+    .toolbar-divider {
+      width: 1px;
+      height: 20px;
+      background: #c7c7c7;
+      margin: 0 4px;
+      flex-shrink: 0;
+    }
+
+    .toolbar-dropdown {
+      display: inline-flex;
+      align-items: center;
+      height: 28px;
+      padding: 0 4px 0 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #444746;
+      font-size: 13px;
+      background: transparent;
+      border: none;
+      font-family: 'Roboto', sans-serif;
+      white-space: nowrap;
+      flex-shrink: 0;
+      gap: 2px;
+    }
+
+    .toolbar-dropdown:hover {
+      background: #d3d3d3;
+    }
+
+    .toolbar-dropdown .arrow {
+      font-size: 10px;
+      color: #444746;
+    }
+
+    .styles-dropdown {
+      width: 120px;
+      overflow: hidden;
+    }
+
+    .font-dropdown {
+      width: 100px;
+      overflow: hidden;
+    }
+
+    .size-dropdown {
+      width: 40px;
+      justify-content: center;
+    }
+
+    .text-color-btn {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      flex-shrink: 0;
+    }
+
+    .text-color-btn:hover {
+      background: #d3d3d3;
+    }
+
+    .text-color-btn .letter {
+      font-size: 14px;
+      font-weight: 700;
+      color: #444746;
+      line-height: 1;
+    }
+
+    .text-color-btn .underline-bar {
+      width: 14px;
+      height: 3px;
+      border-radius: 1px;
+      margin-top: 1px;
+    }
+
+    .text-color-underline { background: #202124; }
+    .highlight-color-underline { background: #ffffff; border: 1px solid #c7c7c7; }
+
+    /* ============================================================
+     * Ruler (~24px)
+     * ============================================================ */
+    .ruler-container {
+      height: 24px;
+      background: #ffffff;
+      border-bottom: 1px solid #dadce0;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .ruler {
+      position: relative;
+      margin: 0 auto;
+      width: 816px;
+      height: 100%;
+    }
+
+    .ruler-track {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 12px;
+      background: #f1f3f4;
+      border-left: 1px solid #c7c7c7;
+      border-right: 1px solid #c7c7c7;
+    }
+
+    .ruler-mark {
+      position: absolute;
+      bottom: 0;
+      width: 1px;
+      background: #c7c7c7;
+    }
+
+    .ruler-mark.major {
+      height: 10px;
+    }
+
+    .ruler-mark.minor {
+      height: 5px;
+    }
+
+    .ruler-label {
+      position: absolute;
+      bottom: 12px;
+      font-size: 8px;
+      color: #80868b;
+      transform: translateX(-50%);
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .ruler-indent {
+      position: absolute;
+      bottom: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .ruler-indent.left-indent {
+      left: 96px;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 6px solid #80868b;
+    }
+
+    .ruler-indent.right-indent {
+      right: 96px;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid #80868b;
+    }
+
+    .ruler-indent.first-line-indent {
+      left: 96px;
+      bottom: 6px;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid #80868b;
+    }
+
+    /* ============================================================
+     * Document Canvas (Kix editor area)
+     * ============================================================ */
+    #docs-editor-container {
+      background: #f1f3f4;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: flex;
+      justify-content: center;
+      padding: 16px 0;
+    }
+
+    .kix-appview-editor {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100%;
+    }
+
+    .kix-page {
+      width: 816px;
+      min-height: 1056px;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+      padding: 96px 96px 96px 96px;
+      position: relative;
+    }
+
+    .kix-canvas-tile-content {
+      font-family: 'Arial', sans-serif;
+      font-size: 11pt;
+      line-height: 1.5;
+      color: #000000;
+    }
+
+    /* Document title (rendered in page) */
+    .doc-heading-title {
+      font-size: 26px;
+      font-weight: 400;
+      color: #000000;
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+
+    .doc-heading-subtitle {
+      font-size: 15px;
+      font-weight: 400;
+      color: #666666;
+      margin-bottom: 24px;
+      line-height: 1.4;
+    }
+
+    .doc-heading-h1 {
+      font-size: 20px;
+      font-weight: 400;
+      color: #000000;
+      margin-top: 24px;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .doc-paragraph {
+      font-size: 11pt;
+      line-height: 1.5;
+      color: #000000;
+      margin-bottom: 12px;
+    }
+
+    .doc-bullet-list {
+      margin-left: 36px;
+      margin-bottom: 12px;
+      list-style: disc;
+    }
+
+    .doc-bullet-list li {
+      font-size: 11pt;
+      line-height: 1.5;
+      color: #000000;
+      margin-bottom: 4px;
+      padding-left: 4px;
+    }
+
+    /* Table styling (Google Docs default) */
+    .doc-table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 8px;
+      margin-bottom: 12px;
+    }
+
+    .doc-table th {
+      background: #f3f3f3;
+      border: 1px solid #999999;
+      padding: 6px 8px;
+      font-size: 10pt;
+      font-weight: 700;
+      color: #000000;
+      text-align: left;
+    }
+
+    .doc-table td {
+      border: 1px solid #999999;
+      padding: 6px 8px;
+      font-size: 10pt;
+      color: #000000;
+    }
+
+    .doc-table td.number {
+      text-align: right;
+    }
+
+    /* Blinking cursor */
+    .kix-cursor {
+      position: absolute;
+      width: 2px;
+      height: 18px;
+      background: #000000;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .cursor-wrapper {
+      position: relative;
+      display: inline;
+    }
+
+    /* ============================================================
+     * Companion Strip (right sidebar, ~52px)
+     * ============================================================ */
+    .companion-strip {
+      width: 52px;
+      background: #f8f9fa;
+      border-left: 1px solid #dadce0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 8px;
+      gap: 4px;
+    }
+
+    .companion-icon {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      color: #5f6368;
+    }
+
+    .companion-icon:hover {
+      background: #e8eaed;
+    }
+
+    .companion-divider {
+      width: 28px;
+      height: 1px;
+      background: #dadce0;
+      margin: 4px 0;
+    }
+
+    /* ============================================================
+     * SVG icon overrides
+     * ============================================================ */
+    .toolbar-btn svg,
+    .companion-icon svg,
+    .history-icon svg,
+    .comments-icon svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .docs-icon svg {
+      width: 16px;
+      height: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+
+    <!-- ========================================================
+         Title Bar
+         ======================================================== -->
+    <div class="docs-titlebar-container" id="docs-header-container">
+      <div class="docs-icon" aria-label="Docs home">
+        <!-- Docs icon: blue page with lines -->
+        <svg viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:20px;">
+          <path d="M2 0C0.9 0 0 0.9 0 2v16c0 1.1 0.9 2 2 2h12c1.1 0 2-0.9 2-2V6l-6-6H2z" fill="#4285F4"/>
+          <path d="M10 0l6 6h-4c-1.1 0-2-0.9-2-2V0z" fill="#A1C2FA"/>
+          <rect x="4" y="10" width="8" height="1.2" rx="0.6" fill="#ffffff"/>
+          <rect x="4" y="12.5" width="8" height="1.2" rx="0.6" fill="#ffffff"/>
+          <rect x="4" y="15" width="5" height="1.2" rx="0.6" fill="#ffffff"/>
+        </svg>
+      </div>
+      <div class="title-section">
+        <div class="title-row">
+          <span class="doc-title">Q1 Marketing Strategy</span>
+          <span class="star-icon" title="Star">&#9734;</span>
+          <span class="move-icon" title="Move to folder">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="#5f6368"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+          </span>
+        </div>
+        <div class="subtitle-text">Last edit was 3 hours ago</div>
+      </div>
+      <div class="title-bar-right">
+        <div class="docs-titlebar-buttons">
+          <div class="history-icon" id="docs-revisions-appbarbutton" title="See version history">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="#5f6368"><path d="M13 3a9 9 0 00-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0013 21a9 9 0 000-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+          </div>
+          <div class="comments-icon" title="Open comment history">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="#5f6368"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+          </div>
+          <button class="share-button">
+            <span class="lock-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="#ffffff"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+            </span>
+            Share
+          </button>
+        </div>
+        <div class="avatar" title="Account">L</div>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         Menu Bar
+         ======================================================== -->
+    <div class="docs-menubar-container">
+      <span class="menu-item">File</span>
+      <span class="menu-item">Edit</span>
+      <span class="menu-item">View</span>
+      <span class="menu-item">Insert</span>
+      <span class="menu-item">Format</span>
+      <span class="menu-item">Tools</span>
+      <span class="menu-item">Extensions</span>
+      <span class="menu-item">Help</span>
+    </div>
+
+    <!-- ========================================================
+         Toolbar
+         ======================================================== -->
+    <div class="docs-toolbar-container">
+      <!-- Group 1: Undo, Redo, Print, Spell check, Format paint -->
+      <button class="toolbar-btn" title="Undo">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="#444746"><path d="M12.5 8c-2.65 0-5.05 1.04-6.83 2.73L3 8v9h9l-2.83-2.83A7.004 7.004 0 0119 12c0-.47-.04-.93-.13-1.38l1.77-.45A8.973 8.973 0 0112.5 8z"/></svg>
+      </button>
+      <button class="toolbar-btn" title="Redo">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="#444746"><path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.16 0-7.74 2.42-9.44 5.93l1.77.45A7.003 7.003 0 0111.5 10c2.08 0 3.97.79 5.4 2.09L14 15h7V8l-2.6 2.6z"/></svg>
+      </button>
+      <button class="toolbar-btn" title="Print">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="#444746"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+      </button>
+      <button class="toolbar-btn" title="Spelling and grammar check">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="#444746"><path d="M12.45 16h2.09L9.43 3H7.57L2.46 16h2.09l1.12-3h5.64l1.14 3zm-6.02-5L8.5 5.48 10.57 11H6.43zm15.16.59l-8.09 8.09L9.83 16l-1.41 1.41 5.09 5.09L23 13l-1.41-1.41z"/></svg>
+      </button>
+      <button class="toolbar-btn" title="Paint format">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="#444746"><path d="M18 4V3c0-.55-.45-1-1-1H5c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V6h1v4H9v11c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-9h8V4h-3z"/></svg>
+      </button>
+
+      <span class="toolbar-divider"></span>
+
+      <!-- Group 2: Zoom -->
+      <button class="toolbar-dropdown" title="Zoom">100%<span class="arrow">&#9662;</span></button>
+
+      <span class="toolbar-divider"></span>
+
+      <!-- Group 3: Styles -->
+      <button class="toolbar-dropdown styles-dropdown" title="Styles">Normal text<span class="arrow">&#9662;</span></button>
+
+      <span class="toolbar-divider"></span>
+
+      <!-- Group 4: Font & size -->
+      <button class="toolbar-dropdown font-dropdown" title="Font">Arial<span class="arrow">&#9662;</span></button>
+
+      <span class="toolbar-divider"></span>
+
+      <button class="toolbar-btn" title="Decrease font size" style="font-size:12px;">&#8722;</button>
+      <button class="toolbar-dropdown size-dropdown" title="Font size">11<span class="arrow">&#9662;</span></button>
+      <button class="toolbar-btn" title="Increase font size" style="font-size:12px;">+</button>
+
+      <span class="toolbar-divider"></span>
+
+      <!-- Group 5: Text style -->
+      <button class="toolbar-btn bold" title="Bold">B</button>
+      <button class="toolbar-btn italic" title="Italic">I</button>
+      <button class="toolbar-btn underline" title="Underline">U</button>
+      <button class="text-color-btn" title="Text color">
+        <span class="letter">A</span>
+        <span class="underline-bar text-color-underline"></span>
+      </button>
+      <button class="text-color-btn" title="Highlight color">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="#444746" style="margin-bottom:1px;"><path d="M16.56 8.94L7.62 0 6.21 1.41l2.38 2.38-5.15 5.15a1.49 1.49 0 000 2.12l5.5 5.5c.29.29.68.44 1.06.44s.77-.15 1.06-.44l5.5-5.5c.59-.58.59-1.53 0-2.12zM5.21 10L10 5.21 14.79 10H5.21zM19 11.5s-2 2.17-2 3.5c0 1.1.9 2 2 2s2-.9 2-2c0-1.33-2-3.5-2-3.5z"/></svg>
+        <span class="underline-bar highlight-color-underline"></span>
+      </button>
+
+      <span class="toolbar-divider"></span>
+
+      <!-- Group 6: Links, comments, images -->
+      <button class="toolbar-btn" title="Insert link">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="#444746"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+      </button>
+      <button class="toolbar-btn" title="Add comment">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="#444746"><path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+      </button>
+      <button class="toolbar-btn" title="Insert image">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="#444746"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+      </button>
+
+      <span class="toolbar-divider"></span>
+
+      <!-- Group 7: Alignment & spacing -->
+      <button class="toolbar-btn" title="Align left">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="#444746"><path d="M15 15H3v2h12v-2zm0-8H3v2h12V7zM3 13h18v-2H3v2zM3 21h18v-2H3v2zM3 3v2h18V3H3z"/></svg>
+      </button>
+      <button class="toolbar-btn" title="Line & paragraph spacing">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="#444746"><path d="M6 7h2.5L5 3.5 1.5 7H4v10H1.5L5 20.5 8.5 17H6V7zm4-2v2h12V5H10zm0 14h12v-2H10v2zm0-6h12v-2H10v2z"/></svg>
+      </button>
+
+      <span class="toolbar-divider"></span>
+
+      <!-- Group 8: Lists & indent -->
+      <button class="toolbar-btn" title="Bulleted list">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="#444746"><path d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/></svg>
+      </button>
+      <button class="toolbar-btn" title="Numbered list">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="#444746"><path d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"/></svg>
+      </button>
+      <button class="toolbar-btn" title="Decrease indent">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="#444746"><path d="M11 17h10v-2H11v2zm-8-5l4 4V8l-4 4zm0 9h18v-2H3v2zM3 3v2h18V3H3zm8 4h10V5H11v2zm0 4h10v-2H11v2z"/></svg>
+      </button>
+      <button class="toolbar-btn" title="Increase indent">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="#444746"><path d="M3 21h18v-2H3v2zM3 8v8l4-4-4-4zm8 9h10v-2H11v2zM3 3v2h18V3H3zm8 4h10V5H11v2zm0 4h10v-2H11v2z"/></svg>
+      </button>
+
+      <span class="toolbar-divider"></span>
+
+      <!-- Group 9: Clear formatting -->
+      <button class="toolbar-btn" title="Clear formatting">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="#444746"><path d="M3.27 5L2 6.27l6.97 6.97L6.5 19h3l1.57-3.66L16.73 21 18 19.73 3.27 5zM6 5v.18L8.82 8h2.4l-.72 1.68 2.1 2.1L14.21 8H20V5H6z"/></svg>
+      </button>
+    </div>
+
+    <!-- ========================================================
+         Ruler
+         ======================================================== -->
+    <div class="ruler-container">
+      <div class="ruler">
+        <div class="ruler-track">
+          <!-- Inch markers -->
+          <div class="ruler-mark major" style="left: 0;"></div>
+          <div class="ruler-mark minor" style="left: 48px;"></div>
+          <div class="ruler-mark major" style="left: 96px;"></div>
+          <div class="ruler-mark minor" style="left: 144px;"></div>
+          <div class="ruler-mark major" style="left: 192px;"></div>
+          <div class="ruler-mark minor" style="left: 240px;"></div>
+          <div class="ruler-mark major" style="left: 288px;"></div>
+          <div class="ruler-mark minor" style="left: 336px;"></div>
+          <div class="ruler-mark major" style="left: 384px;"></div>
+          <div class="ruler-mark minor" style="left: 432px;"></div>
+          <div class="ruler-mark major" style="left: 480px;"></div>
+          <div class="ruler-mark minor" style="left: 528px;"></div>
+          <div class="ruler-mark major" style="left: 576px;"></div>
+          <div class="ruler-mark minor" style="left: 624px;"></div>
+          <div class="ruler-mark major" style="left: 672px;"></div>
+          <div class="ruler-mark minor" style="left: 720px;"></div>
+          <div class="ruler-mark major" style="left: 768px;"></div>
+          <div class="ruler-mark major" style="left: 816px;"></div>
+        </div>
+
+        <!-- Ruler number labels (inches) -->
+        <span class="ruler-label" style="left: 96px;">1</span>
+        <span class="ruler-label" style="left: 192px;">2</span>
+        <span class="ruler-label" style="left: 288px;">3</span>
+        <span class="ruler-label" style="left: 384px;">4</span>
+        <span class="ruler-label" style="left: 480px;">5</span>
+        <span class="ruler-label" style="left: 576px;">6</span>
+        <span class="ruler-label" style="left: 672px;">7</span>
+        <span class="ruler-label" style="left: 768px;">8</span>
+
+        <!-- Indent controls -->
+        <div class="ruler-indent first-line-indent" title="First line indent"></div>
+        <div class="ruler-indent left-indent" title="Left indent"></div>
+        <div class="ruler-indent right-indent" title="Right indent"></div>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         Document Canvas
+         ======================================================== -->
+    <div id="docs-editor-container">
+      <div class="kix-appview-editor">
+        <div class="kix-page">
+          <div class="kix-canvas-tile-content">
+
+            <div class="doc-heading-title">Q1 Marketing Strategy</div>
+            <div class="doc-heading-subtitle">Darkly Suite - January 2026</div>
+
+            <div class="doc-heading-h1">Executive Summary</div>
+            <p class="doc-paragraph">
+              This document outlines the Q1 2026 marketing strategy for the Darkly Suite family of Chrome extensions. Our primary goal is to expand user adoption across all three products (Darkly for Gmail, Darkly for Sheets, and Darkly for Docs) while driving conversions to the unified Darkly Suite bundle. With growing demand for dark mode experiences across productivity tools, we are positioned to capture significant market share in the Chrome Web Store productivity category.
+            </p>
+            <p class="doc-paragraph">
+              Key performance indicators for Q1 include reaching 10,000 weekly active users across all extensions, achieving a 4.5+ star average rating on the Chrome Web Store, and converting 15% of free users to paid subscribers through targeted campaigns and product improvements.
+            </p>
+
+            <div class="doc-heading-h1">Target Audience</div>
+            <p class="doc-paragraph">
+              Our primary audience consists of knowledge workers, developers, and digital professionals who spend 4+ hours daily in Google Workspace applications. Secondary audiences include students, accessibility-focused users who benefit from reduced eye strain, and enterprise teams seeking consistent dark mode<span class="cursor-wrapper"> <span class="kix-cursor"></span></span> theming across their productivity stack. Research indicates that 73% of users prefer dark mode when available, with the highest adoption among 25-44 year-old professionals.
+            </p>
+
+            <div class="doc-heading-h1">Key Initiatives</div>
+            <ul class="doc-bullet-list">
+              <li>Launch coordinated Chrome Web Store listing updates with unified branding and cross-promotion banners linking all Darkly extensions</li>
+              <li>Develop a referral program offering 30-day free trials of Darkly Suite for users who share the extension with colleagues</li>
+              <li>Create video tutorials and comparison screenshots demonstrating dark mode benefits across Gmail, Sheets, and Docs workflows</li>
+              <li>Partner with productivity-focused YouTube channels and newsletter creators for sponsored reviews and feature highlights</li>
+              <li>Implement in-extension onboarding flows that guide new users through theme customization and introduce the Suite bundle upgrade path</li>
+            </ul>
+
+            <div class="doc-heading-h1">Budget Allocation</div>
+            <p class="doc-paragraph">
+              The following table summarizes the proposed budget allocation across marketing channels for Q1 2026:
+            </p>
+            <table class="doc-table">
+              <thead>
+                <tr>
+                  <th>Channel</th>
+                  <th>Budget</th>
+                  <th>Expected ROI</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Chrome Web Store Ads</td>
+                  <td class="number">$4,500</td>
+                  <td>3.2x</td>
+                </tr>
+                <tr>
+                  <td>Content Marketing</td>
+                  <td class="number">$2,800</td>
+                  <td>4.1x</td>
+                </tr>
+                <tr>
+                  <td>Influencer Partnerships</td>
+                  <td class="number">$3,200</td>
+                  <td>2.8x</td>
+                </tr>
+                <tr>
+                  <td>Social Media Ads</td>
+                  <td class="number">$1,500</td>
+                  <td>2.4x</td>
+                </tr>
+                <tr>
+                  <td>Email Campaigns</td>
+                  <td class="number">$800</td>
+                  <td>5.6x</td>
+                </tr>
+                <tr>
+                  <td><strong>Total</strong></td>
+                  <td class="number"><strong>$12,800</strong></td>
+                  <td><strong>3.4x avg</strong></td>
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         Companion Strip (right sidebar)
+         ======================================================== -->
+    <div class="companion-strip companion-guest-app-switcher" role="tablist">
+      <div class="companion-icon" role="tab" title="Calendar">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="#5f6368"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+      </div>
+      <div class="companion-icon" role="tab" title="Keep">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="#5f6368"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>
+      </div>
+      <div class="companion-icon" role="tab" title="Tasks">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="#5f6368"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 9h-2v2H9v-2H7V9h2V7h2v2h2v2zm3-3.5V9h-1V5.5L16 7.5zM6 20V4h7v5h5v11H6z"/></svg>
+      </div>
+      <div class="companion-icon" role="tab" title="Contacts">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="#5f6368"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      </div>
+      <div class="companion-divider"></div>
+      <div class="companion-icon" id="dd-sidebar-icon" role="tab" title="Darkly for Docs">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="#5f6368"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.6-.13-1.24-.2-1.86-.2z"/></svg>
+      </div>
+      <div class="companion-divider"></div>
+      <div class="companion-icon" role="tab" title="Get add-ons">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="#5f6368"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
