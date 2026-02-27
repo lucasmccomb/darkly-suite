@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Screenshot Harness Test Page</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #ffffff;
+      color: #1a1a2e;
+      padding: 32px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #e5e7eb;
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .header .badge {
+      display: inline-block;
+      background: #4f46e5;
+      color: white;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 12px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .card h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #6b7280;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .card .value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1a1a2e;
+    }
+
+    .card .delta {
+      font-size: 13px;
+      color: #10b981;
+      margin-top: 4px;
+    }
+
+    .table-section {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .table-header {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      padding: 12px 20px;
+      background: #f3f4f6;
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .table-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      padding: 14px 20px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 14px;
+      align-items: center;
+    }
+
+    .table-row .name {
+      font-weight: 500;
+    }
+
+    .table-row .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .status-dot.active { background: #10b981; }
+    .status-dot.pending { background: #f59e0b; }
+    .status-dot.inactive { background: #ef4444; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Dashboard</h1>
+      <span class="badge">Pro Plan</span>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>Total Users</h3>
+        <div class="value">12,847</div>
+        <div class="delta">+14.2% this month</div>
+      </div>
+      <div class="card">
+        <h3>Active Now</h3>
+        <div class="value">1,024</div>
+        <div class="delta">+8.7% this week</div>
+      </div>
+      <div class="card">
+        <h3>Revenue</h3>
+        <div class="value">$48.2K</div>
+        <div class="delta">+22.1% this quarter</div>
+      </div>
+    </div>
+
+    <div class="table-section">
+      <div class="table-header">
+        <span>Name</span>
+        <span>Status</span>
+        <span>Role</span>
+        <span>Last Active</span>
+      </div>
+      <div class="table-row">
+        <span class="name">Alice Johnson</span>
+        <span class="status"><span class="status-dot active"></span> Active</span>
+        <span>Admin</span>
+        <span>2 min ago</span>
+      </div>
+      <div class="table-row">
+        <span class="name">Bob Williams</span>
+        <span class="status"><span class="status-dot active"></span> Active</span>
+        <span>Editor</span>
+        <span>15 min ago</span>
+      </div>
+      <div class="table-row">
+        <span class="name">Carol Davis</span>
+        <span class="status"><span class="status-dot pending"></span> Away</span>
+        <span>Viewer</span>
+        <span>1 hour ago</span>
+      </div>
+      <div class="table-row">
+        <span class="name">Dan Martinez</span>
+        <span class="status"><span class="status-dot inactive"></span> Offline</span>
+        <span>Editor</span>
+        <span>Yesterday</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

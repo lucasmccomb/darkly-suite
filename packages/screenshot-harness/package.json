@@ -5,13 +5,17 @@
   "scripts": {
     "build:pages": "tsx src/build-pages.ts",
     "generate": "tsx src/pipeline/generate.ts",
+    "generate:example": "tsx src/pipeline/generate.ts config/example.yaml",
     "lint": "eslint src --ext .ts,.tsx",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "echo 'No tests yet'"
   },
   "dependencies": {
     "@faker-js/faker": "^9.0.0",
+    "playwright": "^1.48.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "sharp": "^0.33.0",
     "yaml": "^2.3.0"
   },
   "devDependencies": {

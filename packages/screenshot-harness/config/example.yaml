@@ -1,0 +1,9 @@
+extension: test
+screenshots:
+  - id: 01-basic-light
+    page: test.html
+    theme: light
+    title: "Screenshot Harness"
+    subtitle: "Automated CWS screenshot generation"
+    gradient: ["#1a1a2e", "#16213e"]
+    browserUrl: "example.com"
