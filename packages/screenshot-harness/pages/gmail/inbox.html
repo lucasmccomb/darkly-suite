@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en" data-darkly-theme="light" data-darkly-active="true">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280">
+  <title>Inbox - Gmail</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/reset.css">
+  <link rel="stylesheet" href="../shared/google-workspace.css">
+  <style>
+    /* Gmail Inbox specific styles */
+
+    /* Category tabs */
+    .gmail-tabs {
+      display: flex;
+      align-items: center;
+      height: 44px;
+      border-bottom: 1px solid var(--gw-border);
+      padding: 0;
+    }
+
+    .gmail-tab {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 100%;
+      padding: 0 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--gw-text-secondary);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      position: relative;
+    }
+
+    .gmail-tab:hover {
+      background: #f1f3f4;
+    }
+
+    .gmail-tab.active {
+      color: var(--gw-blue);
+      border-bottom-color: var(--gw-blue);
+    }
+
+    .gmail-tab-icon {
+      font-size: 18px;
+    }
+
+    /* Toolbar */
+    .gmail-toolbar {
+      display: flex;
+      align-items: center;
+      height: 44px;
+      padding: 0 16px;
+      gap: 4px;
+      border-bottom: 1px solid #f1f3f4;
+    }
+
+    .gmail-toolbar-checkbox {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .gmail-toolbar-checkbox input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--gw-blue);
+    }
+
+    .gmail-toolbar-dropdown {
+      font-size: 12px;
+      color: var(--gw-text-secondary);
+      cursor: pointer;
+    }
+
+    .gmail-toolbar-btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 18px;
+      color: var(--gw-text-secondary);
+      cursor: pointer;
+    }
+
+    .gmail-toolbar-btn:hover {
+      background: #f1f3f4;
+    }
+
+    .gmail-toolbar-pagination {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--gw-text-secondary);
+    }
+
+    .gmail-toolbar-pagination-text {
+      padding: 0 8px;
+    }
+
+    .gmail-toolbar-nav {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--gw-text-secondary);
+    }
+
+    .gmail-toolbar-nav:hover {
+      background: #f1f3f4;
+    }
+
+    .gmail-toolbar-nav.disabled {
+      opacity: 0.38;
+      cursor: default;
+    }
+
+    .gmail-toolbar-nav.disabled:hover {
+      background: transparent;
+    }
+
+    /* Email rows */
+    .gmail-row {
+      display: flex;
+      align-items: center;
+      height: 40px;
+      padding: 0 16px 0 0;
+      border-bottom: 1px solid #f1f3f4;
+      cursor: pointer;
+      background: #f2f6fc;
+      font-size: 14px;
+    }
+
+    .gmail-row:hover {
+      box-shadow: inset 1px 0 0 #dadce0, inset -1px 0 0 #dadce0, 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+      z-index: 1;
+      position: relative;
+    }
+
+    .gmail-row.unread {
+      background: #ffffff;
+    }
+
+    .gmail-row-checkbox {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .gmail-row-checkbox input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--gw-blue);
+    }
+
+    .gmail-row-star {
+      width: 36px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 18px;
+      color: #dadce0;
+      cursor: pointer;
+    }
+
+    .gmail-row-star.starred {
+      color: #f4b400;
+    }
+
+    .gmail-row-sender {
+      width: 200px;
+      min-width: 200px;
+      padding-right: 8px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--gw-text-secondary);
+      font-weight: 400;
+    }
+
+    .gmail-row.unread .gmail-row-sender {
+      color: var(--gw-text-primary);
+      font-weight: 700;
+    }
+
+    .gmail-row-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      min-width: 0;
+      gap: 0;
+    }
+
+    .gmail-row-subject {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--gw-text-primary);
+      font-weight: 400;
+      flex-shrink: 0;
+      max-width: 40%;
+    }
+
+    .gmail-row.unread .gmail-row-subject {
+      font-weight: 700;
+    }
+
+    .gmail-row-snippet {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--gw-text-secondary);
+      font-weight: 400;
+      min-width: 0;
+    }
+
+    .gmail-row-meta {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: auto;
+      padding-left: 8px;
+      flex-shrink: 0;
+    }
+
+    .gmail-row-attachment {
+      font-size: 16px;
+      color: var(--gw-text-secondary);
+    }
+
+    .gmail-row-date {
+      font-size: 12px;
+      white-space: nowrap;
+      color: var(--gw-text-secondary);
+    }
+
+    .gmail-row.unread .gmail-row-date {
+      font-weight: 700;
+      color: var(--gw-text-primary);
+    }
+
+    /* Gmail logo SVG colors */
+    .gmail-logo-svg {
+      height: 24px;
+      width: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="gw-layout">
+    <!-- Header -->
+    <header class="gw-header">
+      <div class="gw-header-left">
+        <button class="gw-header-hamburger" aria-label="Main menu">&#9776;</button>
+        <div class="gw-header-logo">
+          <div class="gw-header-logo-img">
+            <svg class="gmail-logo-svg" viewBox="0 0 75 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2.16 18.64V6.04l6.84 5.3 6.84-5.3v12.6H13.8V10.44L8.98 14.3l-4.84-3.86v8.2H2.16z" fill="#ea4335"/>
+              <text x="19" y="18" font-family="'Product Sans', Roboto, sans-serif" font-size="17" font-weight="500" fill="#5f6368">Gmail</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="gw-header-center">
+        <div class="gw-search-bar">
+          <span class="gw-search-icon">&#128269;</span>
+          <input class="gw-search-input" type="text" placeholder="Search mail">
+          <span class="gw-search-options" title="Search options">&#9776;</span>
+        </div>
+      </div>
+
+      <div class="gw-header-right">
+        <!-- InboxSDK Injection Point -->
+        <div class="inboxsdk__appButton" style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;cursor:pointer;">
+          <div style="width:22px;height:22px;background:#5f6368;border-radius:4px;display:flex;align-items:center;justify-content:center;">
+            <span style="color:white;font-size:12px;font-weight:700;">D</span>
+          </div>
+        </div>
+        <button class="gw-header-icon" title="Support">?</button>
+        <button class="gw-header-icon" title="Settings">&#9881;</button>
+        <button class="gw-header-icon" title="Google apps">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="5" cy="5" r="2" fill="#5f6368"/>
+            <circle cx="12" cy="5" r="2" fill="#5f6368"/>
+            <circle cx="19" cy="5" r="2" fill="#5f6368"/>
+            <circle cx="5" cy="12" r="2" fill="#5f6368"/>
+            <circle cx="12" cy="12" r="2" fill="#5f6368"/>
+            <circle cx="19" cy="12" r="2" fill="#5f6368"/>
+            <circle cx="5" cy="19" r="2" fill="#5f6368"/>
+            <circle cx="12" cy="19" r="2" fill="#5f6368"/>
+            <circle cx="19" cy="19" r="2" fill="#5f6368"/>
+          </svg>
+        </button>
+        <div class="gw-header-avatar" title="Account">LM</div>
+      </div>
+    </header>
+
+    <!-- Sidebar -->
+    <nav class="gw-sidebar">
+      <button class="gw-compose-btn">
+        <span class="gw-compose-icon">&#9998;</span>
+        <span>Compose</span>
+      </button>
+
+      <div class="gw-nav-item active">
+        <span class="gw-nav-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#202124"><path d="M19 3H4.99c-1.11 0-1.98.89-1.98 2L3 19c0 1.1.88 2 1.99 2H19c1.1 0 2-.9 2-2V5c0-1.11-.9-2-2-2zm0 12h-4c0 1.66-1.35 3-3 3s-3-1.34-3-3H4.99V5H19v10z"/></svg>
+        </span>
+        <span class="gw-nav-label">Inbox</span>
+        <span class="gw-nav-badge">3,432</span>
+      </div>
+      <div class="gw-nav-item">
+        <span class="gw-nav-icon">&#9734;</span>
+        <span class="gw-nav-label">Starred</span>
+      </div>
+      <div class="gw-nav-item">
+        <span class="gw-nav-icon">&#9200;</span>
+        <span class="gw-nav-label">Snoozed</span>
+      </div>
+      <div class="gw-nav-item">
+        <span class="gw-nav-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </span>
+        <span class="gw-nav-label">Sent</span>
+      </div>
+      <div class="gw-nav-item">
+        <span class="gw-nav-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368"><path d="M21.99 8c0-.72-.37-1.35-.94-1.7L12 1 2.95 6.3C2.38 6.65 2 7.28 2 8v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2l-.01-10zM12 13L3.74 7.84 12 3l8.26 4.84L12 13z"/></svg>
+        </span>
+        <span class="gw-nav-label">Drafts</span>
+        <span class="gw-nav-badge">2</span>
+      </div>
+      <div class="gw-nav-item">
+        <span class="gw-nav-icon" style="font-size:12px;">&#9660;</span>
+        <span class="gw-nav-label">More</span>
+      </div>
+
+      <div class="gw-nav-divider"></div>
+
+      <div class="gw-nav-section">Labels</div>
+      <div class="gw-nav-item">
+        <span class="gw-nav-icon"><span class="gw-label-dot" style="background:#4285f4;"></span></span>
+        <span class="gw-nav-label">Personal</span>
+      </div>
+      <div class="gw-nav-item">
+        <span class="gw-nav-icon"><span class="gw-label-dot" style="background:#0b8043;"></span></span>
+        <span class="gw-nav-label">Work</span>
+      </div>
+      <div class="gw-nav-item">
+        <span class="gw-nav-icon"><span class="gw-label-dot" style="background:#e37400;"></span></span>
+        <span class="gw-nav-label">Travel</span>
+      </div>
+    </nav>
+
+    <!-- Main content area -->
+    <main class="gw-content">
+      <!-- Toolbar -->
+      <div class="gmail-toolbar">
+        <div class="gmail-toolbar-checkbox">
+          <input type="checkbox" aria-label="Select all">
+        </div>
+        <span class="gmail-toolbar-dropdown">&#9660;</span>
+        <button class="gmail-toolbar-btn" title="Refresh">&#8635;</button>
+        <button class="gmail-toolbar-btn" title="More">&#8942;</button>
+        <div class="gmail-toolbar-pagination">
+          <span class="gmail-toolbar-pagination-text">1-50 of 3,432</span>
+          <button class="gmail-toolbar-nav disabled" aria-label="Newer">&lsaquo;</button>
+          <button class="gmail-toolbar-nav" aria-label="Older">&rsaquo;</button>
+        </div>
+      </div>
+
+      <!-- Category tabs -->
+      <div class="gmail-tabs">
+        <div class="gmail-tab active">
+          <span class="gmail-tab-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#1a73e8"><path d="M19 3H4.99c-1.11 0-1.98.89-1.98 2L3 19c0 1.1.88 2 1.99 2H19c1.1 0 2-.9 2-2V5c0-1.11-.9-2-2-2zm0 12h-4c0 1.66-1.35 3-3 3s-3-1.34-3-3H4.99V5H19v10z"/></svg>
+          </span>
+          <span>Primary</span>
+        </div>
+        <div class="gmail-tab">
+          <span class="gmail-tab-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+          </span>
+          <span>Social</span>
+        </div>
+        <div class="gmail-tab">
+          <span class="gmail-tab-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg>
+          </span>
+          <span>Promotions</span>
+        </div>
+        <div class="gmail-tab">
+          <span class="gmail-tab-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+          </span>
+          <span>Updates</span>
+        </div>
+      </div>
+
+      <!-- Email list -->
+      <div class="gmail-email-list">
+        <!-- Row 1: Google Cloud - unread, attachment -->
+        <div class="gmail-row unread">
+          <div class="gmail-row-checkbox"><input type="checkbox"></div>
+          <div class="gmail-row-star">&#9734;</div>
+          <div class="gmail-row-sender">Google Cloud</div>
+          <div class="gmail-row-content">
+            <span class="gmail-row-subject">Your January billing summary is ready</span>
+            <span class="gmail-row-snippet">&nbsp;- Hi there, your Google Cloud Platform billing summary for Jan...</span>
+          </div>
+          <div class="gmail-row-meta">
+            <span class="gmail-row-attachment">&#128206;</span>
+            <span class="gmail-row-date">Jan 28</span>
+          </div>
+        </div>
+
+        <!-- Row 2: Sarah Chen - unread -->
+        <div class="gmail-row unread">
+          <div class="gmail-row-checkbox"><input type="checkbox"></div>
+          <div class="gmail-row-star">&#9734;</div>
+          <div class="gmail-row-sender">Sarah Chen</div>
+          <div class="gmail-row-content">
+            <span class="gmail-row-subject">Re: Q1 planning doc - feedback</span>
+            <span class="gmail-row-snippet">&nbsp;- Thanks for sharing! I left a few comments on the budget section...</span>
+          </div>
+          <div class="gmail-row-meta">
+            <span class="gmail-row-date">Jan 28</span>
+          </div>
+        </div>
+
+        <!-- Row 3: GitHub - read -->
+        <div class="gmail-row">
+          <div class="gmail-row-checkbox"><input type="checkbox"></div>
+          <div class="gmail-row-star">&#9734;</div>
+          <div class="gmail-row-sender">GitHub</div>
+          <div class="gmail-row-content">
+            <span class="gmail-row-subject">[darkly-suite] PR #605 merged</span>
+            <span class="gmail-row-snippet">&nbsp;- lucasmccomb merged pull request #605: Show subscription end date...</span>
+          </div>
+          <div class="gmail-row-meta">
+            <span class="gmail-row-date">Jan 27</span>
+          </div>
+        </div>
+
+        <!-- Row 4: Stripe - read, starred -->
+        <div class="gmail-row">
+          <div class="gmail-row-checkbox"><input type="checkbox"></div>
+          <div class="gmail-row-star starred">&#9733;</div>
+          <div class="gmail-row-sender">Stripe</div>
+          <div class="gmail-row-content">
+            <span class="gmail-row-subject">Your January payout has been initiated</span>
+            <span class="gmail-row-snippet">&nbsp;- A payout of $847.23 is on its way to your bank account ending in...</span>
+          </div>
+          <div class="gmail-row-meta">
+            <span class="gmail-row-date">Jan 27</span>
+          </div>
+        </div>
+
+        <!-- Row 5: Alex Rivera - unread -->
+        <div class="gmail-row unread">
+          <div class="gmail-row-checkbox"><input type="checkbox"></div>
+          <div class="gmail-row-star">&#9734;</div>
+          <div class="gmail-row-sender">Alex Rivera</div>
+          <div class="gmail-row-content">
+            <span class="gmail-row-subject">Design review - new color presets</span>
+            <span class="gmail-row-snippet">&nbsp;- Hey! I finished the mockups for the new Catppuccin and Rose Pine...</span>
+          </div>
+          <div class="gmail-row-meta">
+            <span class="gmail-row-date">Jan 26</span>
+          </div>
+        </div>
+
+        <!-- Row 6: LinkedIn - read -->
+        <div class="gmail-row">
+          <div class="gmail-row-checkbox"><input type="checkbox"></div>
+          <div class="gmail-row-star">&#9734;</div>
+          <div class="gmail-row-sender">LinkedIn</div>
+          <div class="gmail-row-content">
+            <span class="gmail-row-subject">12 new jobs match your preferences</span>
+            <span class="gmail-row-snippet">&nbsp;- Senior Frontend Engineer at Vercel, Staff Developer at Notion, and 10 more...</span>
+          </div>
+          <div class="gmail-row-meta">
+            <span class="gmail-row-date">Jan 26</span>
+          </div>
+        </div>
+
+        <!-- Row 7: Jessica Park - unread -->
+        <div class="gmail-row unread">
+          <div class="gmail-row-checkbox"><input type="checkbox"></div>
+          <div class="gmail-row-star">&#9734;</div>
+          <div class="gmail-row-sender">Jessica Park</div>
+          <div class="gmail-row-content">
+            <span class="gmail-row-subject">Lunch tomorrow?</span>
+            <span class="gmail-row-snippet">&nbsp;- Hey, are you free for lunch tomorrow? There's a new ramen spot that opened...</span>
+          </div>
+          <div class="gmail-row-meta">
+            <span class="gmail-row-date">Jan 26</span>
+          </div>
+        </div>
+
+        <!-- Row 8: Figma - read -->
+        <div class="gmail-row">
+          <div class="gmail-row-checkbox"><input type="checkbox"></div>
+          <div class="gmail-row-star">&#9734;</div>
+          <div class="gmail-row-sender">Figma</div>
+          <div class="gmail-row-content">
+            <span class="gmail-row-subject">New comment on "Darkly Suite - Settings Panel"</span>
+            <span class="gmail-row-snippet">&nbsp;- Marcus left a comment: "The toggle animation feels a bit slow, can we..."</span>
+          </div>
+          <div class="gmail-row-meta">
+            <span class="gmail-row-date">Jan 25</span>
+          </div>
+        </div>
+
+        <!-- Row 9: Cloudflare - read -->
+        <div class="gmail-row">
+          <div class="gmail-row-checkbox"><input type="checkbox"></div>
+          <div class="gmail-row-star">&#9734;</div>
+          <div class="gmail-row-sender">Cloudflare</div>
+          <div class="gmail-row-content">
+            <span class="gmail-row-subject">Pages deployment successful</span>
+            <span class="gmail-row-snippet">&nbsp;- Your project darklysuite-com deployed successfully. Preview URL: https://...</span>
+          </div>
+          <div class="gmail-row-meta">
+            <span class="gmail-row-date">Jan 25</span>
+          </div>
+        </div>
+
+        <!-- Row 10: David Kim - unread -->
+        <div class="gmail-row unread">
+          <div class="gmail-row-checkbox"><input type="checkbox"></div>
+          <div class="gmail-row-star">&#9734;</div>
+          <div class="gmail-row-sender">David Kim</div>
+          <div class="gmail-row-content">
+            <span class="gmail-row-subject">Re: Weekend hiking trip</span>
+            <span class="gmail-row-snippet">&nbsp;- I'm in! The weather forecast looks great for Saturday. Should we meet at the...</span>
+          </div>
+          <div class="gmail-row-meta">
+            <span class="gmail-row-date">Jan 25</span>
+          </div>
+        </div>
+
+        <!-- Row 11: Google - read -->
+        <div class="gmail-row">
+          <div class="gmail-row-checkbox"><input type="checkbox"></div>
+          <div class="gmail-row-star">&#9734;</div>
+          <div class="gmail-row-sender">Google</div>
+          <div class="gmail-row-content">
+            <span class="gmail-row-subject">Security alert: new sign-in from MacBook Pro</span>
+            <span class="gmail-row-snippet">&nbsp;- We noticed a new sign-in to your Google Account on a Mac device. If this was...</span>
+          </div>
+          <div class="gmail-row-meta">
+            <span class="gmail-row-date">Jan 24</span>
+          </div>
+        </div>
+
+        <!-- Row 12: Amazon - read, starred -->
+        <div class="gmail-row">
+          <div class="gmail-row-checkbox"><input type="checkbox"></div>
+          <div class="gmail-row-star starred">&#9733;</div>
+          <div class="gmail-row-sender">Amazon</div>
+          <div class="gmail-row-content">
+            <span class="gmail-row-subject">Your order has shipped</span>
+            <span class="gmail-row-snippet">&nbsp;- Your package with Logitech MX Master 3S is on the way. Expected delivery...</span>
+          </div>
+          <div class="gmail-row-meta">
+            <span class="gmail-row-date">Jan 24</span>
+          </div>
+        </div>
+
+        <!-- Row 13: Notion - read -->
+        <div class="gmail-row">
+          <div class="gmail-row-checkbox"><input type="checkbox"></div>
+          <div class="gmail-row-star">&#9734;</div>
+          <div class="gmail-row-sender">Notion</div>
+          <div class="gmail-row-content">
+            <span class="gmail-row-subject">Weekly digest: 8 pages updated in your workspace</span>
+            <span class="gmail-row-snippet">&nbsp;- Here's what changed in your workspace this week: Product Roadmap Q1, Sprint...</span>
+          </div>
+          <div class="gmail-row-meta">
+            <span class="gmail-row-date">Jan 23</span>
+          </div>
+        </div>
+
+        <!-- Row 14: Mike Torres - unread -->
+        <div class="gmail-row unread">
+          <div class="gmail-row-checkbox"><input type="checkbox"></div>
+          <div class="gmail-row-star">&#9734;</div>
+          <div class="gmail-row-sender">Mike Torres</div>
+          <div class="gmail-row-content">
+            <span class="gmail-row-subject">Conference talk proposal draft</span>
+            <span class="gmail-row-snippet">&nbsp;- I put together a rough outline for the "Building Browser Extensions at Scale"...</span>
+          </div>
+          <div class="gmail-row-meta">
+            <span class="gmail-row-date">Jan 23</span>
+          </div>
+        </div>
+
+        <!-- Row 15: Spotify - read -->
+        <div class="gmail-row">
+          <div class="gmail-row-checkbox"><input type="checkbox"></div>
+          <div class="gmail-row-star">&#9734;</div>
+          <div class="gmail-row-sender">Spotify</div>
+          <div class="gmail-row-content">
+            <span class="gmail-row-subject">Your Discover Weekly is ready</span>
+            <span class="gmail-row-snippet">&nbsp;- We've put together 30 songs we think you'll love. Start listening now to...</span>
+          </div>
+          <div class="gmail-row-meta">
+            <span class="gmail-row-date">Jan 23</span>
+          </div>
+        </div>
+
+        <!-- Row 16: Chrome Web Store - read -->
+        <div class="gmail-row">
+          <div class="gmail-row-checkbox"><input type="checkbox"></div>
+          <div class="gmail-row-star">&#9734;</div>
+          <div class="gmail-row-sender">Chrome Web Store</div>
+          <div class="gmail-row-content">
+            <span class="gmail-row-subject">Your extension has been submitted for review</span>
+            <span class="gmail-row-snippet">&nbsp;- Thank you for submitting Darkly for Gmail (v1.0.1). Your extension is now...</span>
+          </div>
+          <div class="gmail-row-meta">
+            <span class="gmail-row-date">Jan 22</span>
+          </div>
+        </div>
+
+        <!-- Row 17: Emily Wong - read -->
+        <div class="gmail-row">
+          <div class="gmail-row-checkbox"><input type="checkbox"></div>
+          <div class="gmail-row-star">&#9734;</div>
+          <div class="gmail-row-sender">Emily Wong</div>
+          <div class="gmail-row-content">
+            <span class="gmail-row-subject">Re: Book club pick for February</span>
+            <span class="gmail-row-snippet">&nbsp;- I vote for "The Pragmatic Programmer"! It's been on my list forever and I...</span>
+          </div>
+          <div class="gmail-row-meta">
+            <span class="gmail-row-date">Jan 22</span>
+          </div>
+        </div>
+
+        <!-- Row 18: Vercel - read -->
+        <div class="gmail-row">
+          <div class="gmail-row-checkbox"><input type="checkbox"></div>
+          <div class="gmail-row-star">&#9734;</div>
+          <div class="gmail-row-sender">Vercel</div>
+          <div class="gmail-row-content">
+            <span class="gmail-row-subject">Deployment summary for portfolio-site</span>
+            <span class="gmail-row-snippet">&nbsp;- Build completed in 42s. 3 pages generated. No errors detected. Preview at...</span>
+          </div>
+          <div class="gmail-row-meta">
+            <span class="gmail-row-date">Jan 21</span>
+          </div>
+        </div>
+
+        <!-- Row 19: Rachel Martinez - unread -->
+        <div class="gmail-row unread">
+          <div class="gmail-row-checkbox"><input type="checkbox"></div>
+          <div class="gmail-row-star">&#9734;</div>
+          <div class="gmail-row-sender">Rachel Martinez</div>
+          <div class="gmail-row-content">
+            <span class="gmail-row-subject">Happy birthday!</span>
+            <span class="gmail-row-snippet">&nbsp;- Wishing you the best birthday ever! Hope you have an amazing day. Let's grab...</span>
+          </div>
+          <div class="gmail-row-meta">
+            <span class="gmail-row-date">Jan 21</span>
+          </div>
+        </div>
+
+        <!-- Row 20: npm - read -->
+        <div class="gmail-row">
+          <div class="gmail-row-checkbox"><input type="checkbox"></div>
+          <div class="gmail-row-star">&#9734;</div>
+          <div class="gmail-row-sender">npm</div>
+          <div class="gmail-row-content">
+            <span class="gmail-row-subject">@darkly/core v0.8.2 published successfully</span>
+            <span class="gmail-row-snippet">&nbsp;- Package @darkly/core@0.8.2 has been published to the npm registry. View the...</span>
+          </div>
+          <div class="gmail-row-meta">
+            <span class="gmail-row-date">Jan 20</span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Companion strip -->
+    <aside class="gw-companion">
+      <button class="gw-companion-icon" title="Calendar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+      </button>
+      <button class="gw-companion-icon" title="Keep">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
+      </button>
+      <button class="gw-companion-icon" title="Tasks">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368"><path d="M22 5.18L10.59 16.6l-4.24-4.24 1.41-1.41 2.83 2.83 10-10L22 5.18zM19.79 10.22C19.92 10.79 20 11.39 20 12c0 4.42-3.58 8-8 8s-8-3.58-8-8c0-4.42 3.58-8 8-8 1.58 0 3.04.46 4.28 1.25l1.44-1.44C16.1 2.67 14.13 2 12 2 6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10c0-1.19-.22-2.33-.6-3.39l-1.61 1.61z"/></svg>
+      </button>
+      <button class="gw-companion-icon" title="Contacts">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      </button>
+      <div class="gw-companion-divider"></div>
+      <button class="gw-companion-icon" title="Get add-ons">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      </button>
+    </aside>
+  </div>
+</body>
+</html>
