@@ -1,0 +1,27 @@
+/*
+ * Nord Preset -- Injectable CSS for Screenshot Harness
+ *
+ * Overrides --darkly-* custom properties with Nord palette values.
+ * Sourced from @darkly/core presets.ts "nord" definition.
+ *
+ * Must be injected AFTER darkly-dark.css, which sets up the --gw-*
+ * variable mapping. Changing --darkly-* here cascades through
+ * var() references into the mock page elements.
+ */
+:root {
+  --darkly-bg-primary: #2e3440;
+  --darkly-bg-secondary: #3b4252;
+  --darkly-bg-surface: #434c5e;
+  --darkly-bg-hover: #4c566a;
+  --darkly-text-primary: #eceff4;
+  --darkly-text-secondary: #d8dee9;
+  --darkly-text-link: #8ec5d4;
+  --darkly-border: #4c566a;
+  --darkly-accent: #8ec5d4;
+  --darkly-action-bg: #5e81ac;
+  --darkly-shadow: rgba(0, 0, 0, 0.3);
+  --darkly-unread-bg: #434c5e;
+  --darkly-read-bg: #3b4252;
+  --darkly-selected-bg: #4c566a;
+  --darkly-compose-bg: #3b4252;
+}

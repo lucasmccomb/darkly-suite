@@ -1,0 +1,51 @@
+extension: sheets-darkly
+defaults:
+  frameStyle: macos-dark
+  textPosition: top
+  textColor: "#ffffff"
+screenshots:
+  - id: 01-spreadsheet-dark
+    page: sheets/spreadsheet.html
+    theme: dark
+    title: "Dark Mode for Sheets"
+    subtitle: "Spreadsheets without the glare"
+    gradient: ["#0d1117", "#161b22"]
+    browserUrl: "docs.google.com/spreadsheets"
+    injectCss:
+      - ../css/darkly-dark.css
+
+  - id: 02-spreadsheet-nord
+    page: sheets/spreadsheet.html
+    theme: dark
+    preset: nord
+    title: "Nord Theme"
+    subtitle: "Arctic-inspired spreadsheets"
+    gradient: ["#2e3440", "#3b4252"]
+    browserUrl: "docs.google.com/spreadsheets"
+    injectCss:
+      - ../css/darkly-dark.css
+      - ../css/presets/nord.css
+
+  - id: 03-spreadsheet-solarized
+    page: sheets/spreadsheet.html
+    theme: dark
+    preset: solarized
+    title: "Solarized Theme"
+    subtitle: "Precision colors for data"
+    gradient: ["#002b36", "#073642"]
+    browserUrl: "docs.google.com/spreadsheets"
+    injectCss:
+      - ../css/darkly-dark.css
+      - ../css/presets/solarized.css
+
+  - id: 04-spreadsheet-rose-pine
+    page: sheets/spreadsheet.html
+    theme: dark
+    preset: rose-pine
+    title: "Rose Pine Theme"
+    subtitle: "All natural pine, faux fur, and a bit of soho vibes"
+    gradient: ["#191724", "#1f1d2e"]
+    browserUrl: "docs.google.com/spreadsheets"
+    injectCss:
+      - ../css/darkly-dark.css
+      - ../css/presets/rose-pine.css

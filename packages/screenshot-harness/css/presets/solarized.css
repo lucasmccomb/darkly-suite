@@ -1,0 +1,25 @@
+/*
+ * Solarized Dark Preset -- Injectable CSS for Screenshot Harness
+ *
+ * Overrides --darkly-* custom properties with Solarized Dark palette.
+ * Sourced from @darkly/core presets.ts "solarized" definition.
+ *
+ * Must be injected AFTER darkly-dark.css.
+ */
+:root {
+  --darkly-bg-primary: #002b36;
+  --darkly-bg-secondary: #073642;
+  --darkly-bg-surface: #073642;
+  --darkly-bg-hover: #0a4050;
+  --darkly-text-primary: #fdf6e3;
+  --darkly-text-secondary: #93a1a1;
+  --darkly-text-link: #5aafda;
+  --darkly-border: #586e75;
+  --darkly-accent: #5aafda;
+  --darkly-action-bg: #268bd2;
+  --darkly-shadow: rgba(0, 0, 0, 0.35);
+  --darkly-unread-bg: #073642;
+  --darkly-read-bg: #002b36;
+  --darkly-selected-bg: #0a4050;
+  --darkly-compose-bg: #073642;
+}

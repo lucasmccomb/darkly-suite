@@ -1,0 +1,531 @@
+/*
+ * Darkly Dark Mode -- Injectable CSS for Screenshot Harness
+ *
+ * Applies Darkly's dark theme to Google Workspace mock pages.
+ * Color values sourced from @darkly/core themes.css [data-darkly-theme="dark"].
+ *
+ * This file targets both:
+ *   - Gmail mock pages (using --gw-* variables + Gmail-specific selectors)
+ *   - Sheets mock pages (using hardcoded color overrides on class selectors)
+ *
+ * Preset CSS files (in presets/) override --darkly-* variables set here.
+ * The mapping from --darkly-* to --gw-* ensures presets automatically
+ * cascade into the mock page elements.
+ */
+
+/* ============================================================
+ * 1. Darkly CSS custom properties (dark theme)
+ *    These are the canonical values from themes.css.
+ *    Preset files override these to change the palette.
+ * ============================================================ */
+:root {
+  --darkly-bg-primary: #000000;
+  --darkly-bg-secondary: #000000;
+  --darkly-bg-surface: #111111;
+  --darkly-bg-hover: #1a1a1a;
+  --darkly-text-primary: #e8eaed;
+  --darkly-text-secondary: #b0b3b8;
+  --darkly-text-link: #8ab4f8;
+  --darkly-border: #222222;
+  --darkly-accent: #8ab4f8;
+  --darkly-action-bg: #1a73e8;
+  --darkly-shadow: rgba(0, 0, 0, 0.4);
+  --darkly-unread-bg: #111111;
+  --darkly-read-bg: #000000;
+  --darkly-selected-bg: #1a1a1a;
+  --darkly-compose-bg: #111111;
+}
+
+/* ============================================================
+ * 2. Gmail mock pages -- override --gw-* variables
+ *    The shared google-workspace.css uses --gw-* variables, so
+ *    remapping them to --darkly-* values applies dark mode to
+ *    header, sidebar, companion strip, and content area.
+ * ============================================================ */
+:root {
+  --gw-shell-bg: var(--darkly-bg-secondary);
+  --gw-content-bg: var(--darkly-bg-primary);
+  --gw-header-bg: var(--darkly-bg-surface);
+  --gw-border: var(--darkly-border);
+  --gw-text-primary: var(--darkly-text-primary);
+  --gw-text-secondary: var(--darkly-text-secondary);
+  --gw-blue: var(--darkly-accent);
+  --gw-sidebar-bg: var(--darkly-bg-secondary);
+  --gw-nav-active-bg: var(--darkly-selected-bg);
+  --gw-nav-hover-bg: var(--darkly-bg-hover);
+  --gw-compose-bg: var(--darkly-compose-bg);
+  --gw-compose-text: var(--darkly-text-primary);
+}
+
+/* Body base */
+html, body {
+  background: var(--darkly-bg-primary) !important;
+  color: var(--darkly-text-primary) !important;
+}
+
+/* ============================================================
+ * 3. Gmail-specific element overrides
+ *    Targets elements with hardcoded colors in the mock HTML.
+ * ============================================================ */
+
+/* Search bar */
+.gw-search-bar {
+  background: var(--darkly-bg-surface) !important;
+}
+
+.gw-search-bar:hover,
+.gw-search-bar:focus-within {
+  background: var(--darkly-bg-hover) !important;
+}
+
+.gw-search-input {
+  color: var(--darkly-text-primary) !important;
+}
+
+.gw-search-input::placeholder {
+  color: var(--darkly-text-secondary) !important;
+}
+
+/* Header icons */
+.gw-header-icon,
+.gw-header-hamburger,
+.gw-search-icon,
+.gw-search-options {
+  color: var(--darkly-text-secondary) !important;
+}
+
+.gw-header-icon svg circle,
+.gw-header-icon svg path {
+  fill: var(--darkly-text-secondary) !important;
+}
+
+/* Gmail logo text in dark mode */
+.gmail-logo-svg text {
+  fill: var(--darkly-text-secondary) !important;
+}
+
+/* Sidebar nav items */
+.gw-nav-item {
+  color: var(--darkly-text-primary) !important;
+}
+
+.gw-nav-icon svg path {
+  fill: var(--darkly-text-secondary) !important;
+}
+
+.gw-nav-item.active .gw-nav-icon svg path {
+  fill: var(--darkly-text-primary) !important;
+}
+
+.gw-nav-badge {
+  color: var(--darkly-text-primary) !important;
+}
+
+.gw-nav-section {
+  color: var(--darkly-text-secondary) !important;
+}
+
+/* Companion strip icons */
+.gw-companion-icon svg path {
+  fill: var(--darkly-text-secondary) !important;
+}
+
+/* Gmail toolbar */
+.gmail-toolbar {
+  border-bottom-color: var(--darkly-border) !important;
+}
+
+.gmail-toolbar-btn,
+.gmail-toolbar-dropdown,
+.gmail-toolbar-nav {
+  color: var(--darkly-text-secondary) !important;
+}
+
+.gmail-toolbar-btn:hover,
+.gmail-toolbar-nav:hover {
+  background: var(--darkly-bg-hover) !important;
+}
+
+.gmail-toolbar-pagination-text {
+  color: var(--darkly-text-secondary) !important;
+}
+
+/* Gmail category tabs */
+.gmail-tabs {
+  border-bottom-color: var(--darkly-border) !important;
+}
+
+.gmail-tab {
+  color: var(--darkly-text-secondary) !important;
+}
+
+.gmail-tab:hover {
+  background: var(--darkly-bg-hover) !important;
+}
+
+.gmail-tab.active {
+  color: var(--darkly-accent) !important;
+  border-bottom-color: var(--darkly-accent) !important;
+}
+
+.gmail-tab svg path {
+  fill: var(--darkly-text-secondary) !important;
+}
+
+.gmail-tab.active svg path {
+  fill: var(--darkly-accent) !important;
+}
+
+/* Gmail email rows */
+.gmail-row {
+  background: var(--darkly-read-bg) !important;
+  border-bottom-color: var(--darkly-border) !important;
+}
+
+.gmail-row.unread {
+  background: var(--darkly-unread-bg) !important;
+}
+
+.gmail-row:hover {
+  box-shadow: inset 1px 0 0 var(--darkly-border),
+              inset -1px 0 0 var(--darkly-border),
+              0 1px 2px 0 var(--darkly-shadow),
+              0 1px 3px 1px var(--darkly-shadow) !important;
+}
+
+.gmail-row-sender {
+  color: var(--darkly-text-secondary) !important;
+}
+
+.gmail-row.unread .gmail-row-sender {
+  color: var(--darkly-text-primary) !important;
+}
+
+.gmail-row-subject {
+  color: var(--darkly-text-primary) !important;
+}
+
+.gmail-row-snippet {
+  color: var(--darkly-text-secondary) !important;
+}
+
+.gmail-row-date {
+  color: var(--darkly-text-secondary) !important;
+}
+
+.gmail-row.unread .gmail-row-date {
+  color: var(--darkly-text-primary) !important;
+}
+
+.gmail-row-attachment {
+  color: var(--darkly-text-secondary) !important;
+}
+
+.gmail-row-star {
+  color: var(--darkly-border) !important;
+}
+
+.gmail-row-star.starred {
+  color: #f4b400 !important;
+}
+
+/* Gmail thread / reading view */
+.gmail-thread-toolbar {
+  border-bottom-color: var(--darkly-border) !important;
+}
+
+.gmail-thread-btn {
+  color: var(--darkly-text-secondary) !important;
+}
+
+.gmail-thread-btn:hover {
+  background: var(--darkly-bg-hover) !important;
+}
+
+.gmail-thread-btn svg {
+  fill: var(--darkly-text-secondary) !important;
+}
+
+.gmail-thread-nav {
+  color: var(--darkly-text-secondary) !important;
+}
+
+.gmail-thread-nav:hover {
+  background: var(--darkly-bg-hover) !important;
+}
+
+.gmail-thread {
+  background: var(--darkly-bg-primary) !important;
+  color: var(--darkly-text-primary) !important;
+}
+
+.gmail-thread-subject {
+  color: var(--darkly-text-primary) !important;
+}
+
+.gmail-message {
+  background: var(--darkly-bg-surface) !important;
+  border-color: var(--darkly-border) !important;
+}
+
+.gmail-message-sender {
+  color: var(--darkly-text-primary) !important;
+}
+
+.gmail-message-date,
+.gmail-message-to {
+  color: var(--darkly-text-secondary) !important;
+}
+
+.gmail-message-body {
+  color: var(--darkly-text-primary) !important;
+}
+
+.gmail-message-body a {
+  color: var(--darkly-text-link) !important;
+}
+
+/* Gmail compose overlay */
+.gmail-compose-window {
+  background: var(--darkly-compose-bg) !important;
+  border-color: var(--darkly-border) !important;
+  box-shadow: 0 8px 32px var(--darkly-shadow) !important;
+}
+
+.gmail-compose-header {
+  background: var(--darkly-bg-surface) !important;
+  color: var(--darkly-text-primary) !important;
+}
+
+.gmail-compose-field {
+  border-bottom-color: var(--darkly-border) !important;
+  color: var(--darkly-text-primary) !important;
+}
+
+.gmail-compose-field label {
+  color: var(--darkly-text-secondary) !important;
+}
+
+.gmail-compose-field input {
+  color: var(--darkly-text-primary) !important;
+}
+
+.gmail-compose-body {
+  color: var(--darkly-text-primary) !important;
+}
+
+.gmail-compose-toolbar {
+  border-top-color: var(--darkly-border) !important;
+}
+
+.gmail-compose-toolbar-icon {
+  color: var(--darkly-text-secondary) !important;
+}
+
+/* ============================================================
+ * 4. Sheets mock page overrides
+ *    Sheets uses hardcoded colors (no --gw-* variables), so we
+ *    override each major section directly.
+ * ============================================================ */
+
+/* Title bar */
+.title-bar,
+#docs-header-container {
+  background: var(--darkly-bg-surface) !important;
+}
+
+.doc-title {
+  color: var(--darkly-text-primary) !important;
+}
+
+.subtitle-text {
+  color: var(--darkly-text-secondary) !important;
+}
+
+.star-icon,
+.move-icon,
+.history-icon,
+.comments-icon {
+  color: var(--darkly-text-secondary) !important;
+}
+
+.share-button {
+  background: var(--darkly-action-bg) !important;
+}
+
+.avatar {
+  background: var(--darkly-action-bg) !important;
+}
+
+/* Menu bar */
+.menu-bar {
+  background: var(--darkly-bg-surface) !important;
+}
+
+.menu-item {
+  color: var(--darkly-text-primary) !important;
+}
+
+.menu-item:hover {
+  background: var(--darkly-bg-hover) !important;
+}
+
+/* Toolbar */
+.toolbar {
+  background: var(--darkly-bg-secondary) !important;
+}
+
+.toolbar-btn {
+  color: var(--darkly-text-secondary) !important;
+}
+
+.toolbar-btn:hover {
+  background: var(--darkly-bg-hover) !important;
+}
+
+.toolbar-separator {
+  background: var(--darkly-border) !important;
+}
+
+.font-selector,
+.font-size-selector {
+  background: var(--darkly-bg-surface) !important;
+  color: var(--darkly-text-primary) !important;
+  border-color: var(--darkly-border) !important;
+}
+
+.text-color-underline {
+  background: var(--darkly-text-primary) !important;
+}
+
+.fill-color-underline {
+  background: var(--darkly-bg-surface) !important;
+  border-color: var(--darkly-border) !important;
+}
+
+/* Formula bar */
+.formula-bar {
+  background: var(--darkly-bg-surface) !important;
+  border-bottom-color: var(--darkly-border) !important;
+}
+
+.formula-bar .cell-name {
+  color: var(--darkly-text-primary) !important;
+  background: var(--darkly-bg-surface) !important;
+  border-color: var(--darkly-border) !important;
+}
+
+.formula-bar .fx-label {
+  color: var(--darkly-text-secondary) !important;
+}
+
+.formula-bar .formula-input {
+  color: var(--darkly-text-primary) !important;
+  background: var(--darkly-bg-surface) !important;
+}
+
+/* Spreadsheet grid */
+.grid-area {
+  background: var(--darkly-bg-primary) !important;
+}
+
+.grid-table {
+  background: var(--darkly-bg-primary) !important;
+}
+
+.grid-table th {
+  background: var(--darkly-bg-secondary) !important;
+  color: var(--darkly-text-secondary) !important;
+  border-color: var(--darkly-border) !important;
+}
+
+.grid-table td {
+  background: var(--darkly-bg-primary) !important;
+  color: var(--darkly-text-primary) !important;
+  border-color: var(--darkly-border) !important;
+}
+
+/* Row/column headers */
+.row-header,
+.col-header {
+  background: var(--darkly-bg-secondary) !important;
+  color: var(--darkly-text-secondary) !important;
+  border-color: var(--darkly-border) !important;
+}
+
+/* Selected cell highlight */
+.grid-table td.selected,
+.grid-table td:focus {
+  background: var(--darkly-selected-bg) !important;
+}
+
+/* Sheet tabs */
+.sheet-tabs-bar {
+  background: var(--darkly-bg-secondary) !important;
+  border-top-color: var(--darkly-border) !important;
+}
+
+.sheet-tab {
+  background: var(--darkly-bg-secondary) !important;
+  color: var(--darkly-text-secondary) !important;
+  border-color: var(--darkly-border) !important;
+}
+
+.sheet-tab.active {
+  background: var(--darkly-bg-surface) !important;
+  color: var(--darkly-text-primary) !important;
+}
+
+.sheet-tab-add {
+  color: var(--darkly-text-secondary) !important;
+}
+
+/* Companion strip (Sheets variant) */
+.companion-strip {
+  background: var(--darkly-bg-secondary) !important;
+  border-left-color: var(--darkly-border) !important;
+}
+
+.companion-strip button {
+  color: var(--darkly-text-secondary) !important;
+}
+
+.companion-strip svg path {
+  fill: var(--darkly-text-secondary) !important;
+}
+
+/* ============================================================
+ * 5. Checkbox accent color for dark mode
+ * ============================================================ */
+input[type="checkbox"] {
+  accent-color: var(--darkly-accent) !important;
+}
+
+/* ============================================================
+ * 6. InboxSDK injection point (Darkly icon in header)
+ * ============================================================ */
+.inboxsdk__appButton div {
+  background: var(--darkly-text-secondary) !important;
+}
+
+/* ============================================================
+ * 7. SVG fills -- catch-all for workspace icons
+ * ============================================================ */
+.gw-layout svg path,
+.gw-layout svg circle {
+  fill: var(--darkly-text-secondary) !important;
+}
+
+/* Preserve specific colored icons */
+.gw-nav-item.active svg path {
+  fill: var(--darkly-text-primary) !important;
+}
+
+.gmail-row-star.starred {
+  color: #f4b400 !important;
+}
+
+/* Sheets green icon */
+.sheets-icon {
+  background: #0f9d58 !important;
+}
