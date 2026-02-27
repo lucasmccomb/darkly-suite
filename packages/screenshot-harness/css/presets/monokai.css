@@ -1,0 +1,25 @@
+/*
+ * Monokai Preset -- Injectable CSS for Screenshot Harness
+ *
+ * Overrides --darkly-* custom properties with Monokai palette.
+ * Sourced from @darkly/core presets.ts "monokai" definition.
+ *
+ * Must be injected AFTER darkly-dark.css.
+ */
+:root {
+  --darkly-bg-primary: #272822;
+  --darkly-bg-secondary: #1e1f1c;
+  --darkly-bg-surface: #3e3d32;
+  --darkly-bg-hover: #49483e;
+  --darkly-text-primary: #f8f8f2;
+  --darkly-text-secondary: #b8b8a8;
+  --darkly-text-link: #66d9ef;
+  --darkly-border: #49483e;
+  --darkly-accent: #a6e22e;
+  --darkly-action-bg: #7ba717;
+  --darkly-shadow: rgba(0, 0, 0, 0.35);
+  --darkly-unread-bg: #3e3d32;
+  --darkly-read-bg: #1e1f1c;
+  --darkly-selected-bg: #49483e;
+  --darkly-compose-bg: #272822;
+}

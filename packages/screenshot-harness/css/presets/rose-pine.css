@@ -1,0 +1,25 @@
+/*
+ * Rose Pine Preset -- Injectable CSS for Screenshot Harness
+ *
+ * Overrides --darkly-* custom properties with Rose Pine palette.
+ * Sourced from @darkly/core presets.ts "rose-pine" definition.
+ *
+ * Must be injected AFTER darkly-dark.css.
+ */
+:root {
+  --darkly-bg-primary: #191724;
+  --darkly-bg-secondary: #1f1d2e;
+  --darkly-bg-surface: #26233a;
+  --darkly-bg-hover: #2a283e;
+  --darkly-text-primary: #e0def4;
+  --darkly-text-secondary: #908caa;
+  --darkly-text-link: #9ccfd8;
+  --darkly-border: #3a374b;
+  --darkly-accent: #c4a7e7;
+  --darkly-action-bg: #907aa9;
+  --darkly-shadow: rgba(0, 0, 0, 0.35);
+  --darkly-unread-bg: #26233a;
+  --darkly-read-bg: #1f1d2e;
+  --darkly-selected-bg: #2a283e;
+  --darkly-compose-bg: #1f1d2e;
+}

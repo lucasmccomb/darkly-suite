@@ -1,0 +1,61 @@
+extension: gmail-darkly
+defaults:
+  frameStyle: macos-dark
+  textPosition: top
+  textColor: "#ffffff"
+screenshots:
+  - id: 01-inbox-dark
+    page: gmail/inbox.html
+    theme: dark
+    title: "Dark Mode for Gmail"
+    subtitle: "Easy on the eyes, day and night"
+    gradient: ["#1a1a2e", "#16213e"]
+    browserUrl: "mail.google.com"
+    injectCss:
+      - ../css/darkly-dark.css
+
+  - id: 02-inbox-nord
+    page: gmail/inbox.html
+    theme: dark
+    preset: nord
+    title: "Nord Theme"
+    subtitle: "Arctic-inspired color palette"
+    gradient: ["#2e3440", "#3b4252"]
+    browserUrl: "mail.google.com"
+    injectCss:
+      - ../css/darkly-dark.css
+      - ../css/presets/nord.css
+
+  - id: 03-reading-dark
+    page: gmail/reading.html
+    theme: dark
+    title: "Read Emails in Comfort"
+    subtitle: "Reduced eye strain for long sessions"
+    gradient: ["#0f0f23", "#1a1a3e"]
+    browserUrl: "mail.google.com"
+    injectCss:
+      - ../css/darkly-dark.css
+
+  - id: 04-compose-monokai
+    page: gmail/compose.html
+    theme: dark
+    preset: monokai
+    title: "Monokai Theme"
+    subtitle: "Vibrant colors for your inbox"
+    gradient: ["#272822", "#3e3d32"]
+    browserUrl: "mail.google.com"
+    injectCss:
+      - ../css/darkly-dark.css
+      - ../css/presets/monokai.css
+
+  - id: 05-inbox-catppuccin
+    page: gmail/inbox.html
+    theme: dark
+    preset: catppuccin
+    title: "Catppuccin Theme"
+    subtitle: "Soothing pastel color palette"
+    gradient: ["#1e1e2e", "#313244"]
+    browserUrl: "mail.google.com"
+    injectCss:
+      - ../css/darkly-dark.css
+      - ../css/presets/catppuccin.css
