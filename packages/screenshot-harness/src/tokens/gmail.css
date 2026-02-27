@@ -1,0 +1,11 @@
+:root {
+  --gmail-shell-bg: #f6f8fc;
+  --gmail-nav-active-bg: #d3e3fd;
+  --gmail-nav-hover-bg: #e8eaed;
+  --gmail-star-yellow: #f4b400;
+  --gmail-unread-bg: #ffffff;
+  --gmail-read-bg: #f2f6fc;
+  --gmail-compose-btn-bg: #c2e7ff;
+  --gmail-compose-btn-text: #001d35;
+  --gmail-row-height: 40px;
+}
