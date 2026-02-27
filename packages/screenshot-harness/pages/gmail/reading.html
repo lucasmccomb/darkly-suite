@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en" data-darkly-theme="light" data-darkly-active="true">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280">
+  <title>Re: Q1 planning doc - feedback - Gmail</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/reset.css">
+  <link rel="stylesheet" href="../shared/google-workspace.css">
+  <style>
+    /* Gmail Reading View specific styles */
+
+    /* Thread toolbar */
+    .gmail-thread-toolbar {
+      display: flex;
+      align-items: center;
+      height: 48px;
+      padding: 0 16px;
+      gap: 2px;
+      border-bottom: 1px solid #f1f3f4;
+    }
+
+    .gmail-thread-btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 18px;
+      color: var(--gw-text-secondary);
+      cursor: pointer;
+    }
+
+    .gmail-thread-btn:hover {
+      background: #f1f3f4;
+    }
+
+    .gmail-thread-btn svg {
+      fill: #5f6368;
+    }
+
+    .gmail-thread-separator {
+      width: 1px;
+      height: 20px;
+      background: var(--gw-border);
+      margin: 0 4px;
+    }
+
+    .gmail-thread-pagination {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--gw-text-secondary);
+    }
+
+    .gmail-thread-pagination-text {
+      padding: 0 8px;
+    }
+
+    .gmail-thread-nav {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--gw-text-secondary);
+    }
+
+    .gmail-thread-nav:hover {
+      background: #f1f3f4;
+    }
+
+    /* Thread content */
+    .gmail-thread {
+      padding: 0 60px 40px 72px;
+      overflow-y: auto;
+      height: calc(100vh - var(--gw-header-height) - 48px);
+    }
+
+    .gmail-thread-subject {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 0 16px 0;
+    }
+
+    .gmail-thread-subject h2 {
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--gw-text-primary);
+      line-height: 28px;
+    }
+
+    .gmail-thread-label {
+      display: inline-flex;
+      align-items: center;
+      padding: 0 8px;
+      height: 20px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      background: #e8eaed;
+      color: var(--gw-text-secondary);
+      flex-shrink: 0;
+    }
+
+    .gmail-thread-label.inbox {
+      background: #e8eaed;
+    }
+
+    /* Message card */
+    .gmail-message {
+      border: 1px solid var(--gw-border);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      background: #ffffff;
+    }
+
+    .gmail-message-header {
+      display: flex;
+      align-items: flex-start;
+      padding: 16px 16px 12px 16px;
+      gap: 12px;
+    }
+
+    .gmail-message-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 500;
+      color: #ffffff;
+      flex-shrink: 0;
+    }
+
+    .gmail-message-header-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .gmail-message-sender-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .gmail-message-sender {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gw-text-primary);
+    }
+
+    .gmail-message-date {
+      font-size: 12px;
+      color: var(--gw-text-secondary);
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .gmail-message-to {
+      font-size: 12px;
+      color: var(--gw-text-secondary);
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .gmail-message-to-dropdown {
+      font-size: 10px;
+      cursor: pointer;
+    }
+
+    .gmail-message-actions {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .gmail-message-action {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 16px;
+      color: var(--gw-text-secondary);
+      cursor: pointer;
+    }
+
+    .gmail-message-action:hover {
+      background: #f1f3f4;
+    }
+
+    .gmail-message-body {
+      padding: 0 16px 16px 68px;
+      font-size: 14px;
+      line-height: 22px;
+      color: var(--gw-text-primary);
+    }
+
+    .gmail-message-body p {
+      margin-bottom: 14px;
+    }
+
+    .gmail-message-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Reply section */
+    .gmail-reply-actions {
+      display: flex;
+      gap: 8px;
+      padding: 16px 0 0 0;
+    }
+
+    .gmail-reply-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 24px;
+      border: 1px solid var(--gw-border);
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--gw-text-primary);
+      cursor: pointer;
+      background: #ffffff;
+    }
+
+    .gmail-reply-btn:hover {
+      background: #f6f8fc;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .gmail-reply-btn svg {
+      fill: #5f6368;
+    }
+
+    /* Quick reply box */
+    .gmail-quick-reply {
+      margin-top: 16px;
+      border: 1px solid var(--gw-border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: text;
+      color: var(--gw-text-secondary);
+      font-size: 14px;
+    }
+
+    .gmail-quick-reply-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #1a73e8;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="gw-layout">
+    <!-- Header -->
+    <header class="gw-header">
+      <div class="gw-header-left">
+        <button class="gw-header-hamburger" aria-label="Main menu">&#9776;</button>
+        <div class="gw-header-logo">
+          <div class="gw-header-logo-img">
+            <svg height="24" viewBox="0 0 75 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2.16 18.64V6.04l6.84 5.3 6.84-5.3v12.6H13.8V10.44L8.98 14.3l-4.84-3.86v8.2H2.16z" fill="#ea4335"/>
+              <text x="19" y="18" font-family="'Product Sans', Roboto, sans-serif" font-size="17" font-weight="500" fill="#5f6368">Gmail</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="gw-header-center">
+        <div class="gw-search-bar">
+          <span class="gw-search-icon">&#128269;</span>
+          <input class="gw-search-input" type="text" placeholder="Search mail">
+          <span class="gw-search-options" title="Search options">&#9776;</span>
+        </div>
+      </div>
+
+      <div class="gw-header-right">
+        <!-- InboxSDK Injection Point -->
+        <div class="inboxsdk__appButton" style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;cursor:pointer;">
+          <div style="width:22px;height:22px;background:#5f6368;border-radius:4px;display:flex;align-items:center;justify-content:center;">
+            <span style="color:white;font-size:12px;font-weight:700;">D</span>
+          </div>
+        </div>
+        <button class="gw-header-icon" title="Support">?</button>
+        <button class="gw-header-icon" title="Settings">&#9881;</button>
+        <button class="gw-header-icon" title="Google apps">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="5" cy="5" r="2" fill="#5f6368"/>
+            <circle cx="12" cy="5" r="2" fill="#5f6368"/>
+            <circle cx="19" cy="5" r="2" fill="#5f6368"/>
+            <circle cx="5" cy="12" r="2" fill="#5f6368"/>
+            <circle cx="12" cy="12" r="2" fill="#5f6368"/>
+            <circle cx="19" cy="12" r="2" fill="#5f6368"/>
+            <circle cx="5" cy="19" r="2" fill="#5f6368"/>
+            <circle cx="12" cy="19" r="2" fill="#5f6368"/>
+            <circle cx="19" cy="19" r="2" fill="#5f6368"/>
+          </svg>
+        </button>
+        <div class="gw-header-avatar" title="Account">LM</div>
+      </div>
+    </header>
+
+    <!-- Sidebar -->
+    <nav class="gw-sidebar">
+      <button class="gw-compose-btn">
+        <span class="gw-compose-icon">&#9998;</span>
+        <span>Compose</span>
+      </button>
+
+      <div class="gw-nav-item active">
+        <span class="gw-nav-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#202124"><path d="M19 3H4.99c-1.11 0-1.98.89-1.98 2L3 19c0 1.1.88 2 1.99 2H19c1.1 0 2-.9 2-2V5c0-1.11-.9-2-2-2zm0 12h-4c0 1.66-1.35 3-3 3s-3-1.34-3-3H4.99V5H19v10z"/></svg>
+        </span>
+        <span class="gw-nav-label">Inbox</span>
+        <span class="gw-nav-badge">3,432</span>
+      </div>
+      <div class="gw-nav-item">
+        <span class="gw-nav-icon">&#9734;</span>
+        <span class="gw-nav-label">Starred</span>
+      </div>
+      <div class="gw-nav-item">
+        <span class="gw-nav-icon">&#9200;</span>
+        <span class="gw-nav-label">Snoozed</span>
+      </div>
+      <div class="gw-nav-item">
+        <span class="gw-nav-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </span>
+        <span class="gw-nav-label">Sent</span>
+      </div>
+      <div class="gw-nav-item">
+        <span class="gw-nav-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368"><path d="M21.99 8c0-.72-.37-1.35-.94-1.7L12 1 2.95 6.3C2.38 6.65 2 7.28 2 8v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2l-.01-10zM12 13L3.74 7.84 12 3l8.26 4.84L12 13z"/></svg>
+        </span>
+        <span class="gw-nav-label">Drafts</span>
+        <span class="gw-nav-badge">2</span>
+      </div>
+      <div class="gw-nav-item">
+        <span class="gw-nav-icon" style="font-size:12px;">&#9660;</span>
+        <span class="gw-nav-label">More</span>
+      </div>
+
+      <div class="gw-nav-divider"></div>
+
+      <div class="gw-nav-section">Labels</div>
+      <div class="gw-nav-item">
+        <span class="gw-nav-icon"><span class="gw-label-dot" style="background:#4285f4;"></span></span>
+        <span class="gw-nav-label">Personal</span>
+      </div>
+      <div class="gw-nav-item">
+        <span class="gw-nav-icon"><span class="gw-label-dot" style="background:#0b8043;"></span></span>
+        <span class="gw-nav-label">Work</span>
+      </div>
+      <div class="gw-nav-item">
+        <span class="gw-nav-icon"><span class="gw-label-dot" style="background:#e37400;"></span></span>
+        <span class="gw-nav-label">Travel</span>
+      </div>
+    </nav>
+
+    <!-- Main content area -->
+    <main class="gw-content">
+      <!-- Thread toolbar -->
+      <div class="gmail-thread-toolbar">
+        <button class="gmail-thread-btn" title="Back to Inbox">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#5f6368"/></svg>
+        </button>
+        <button class="gmail-thread-btn" title="Archive">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z" fill="#5f6368"/></svg>
+        </button>
+        <button class="gmail-thread-btn" title="Report spam">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="#5f6368"/></svg>
+        </button>
+        <button class="gmail-thread-btn" title="Delete">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="#5f6368"/></svg>
+        </button>
+        <div class="gmail-thread-separator"></div>
+        <button class="gmail-thread-btn" title="Mark as unread">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="#5f6368"/></svg>
+        </button>
+        <button class="gmail-thread-btn" title="Snooze">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" fill="#5f6368"/></svg>
+        </button>
+        <button class="gmail-thread-btn" title="Add to Tasks">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22 5.18L10.59 16.6l-4.24-4.24 1.41-1.41 2.83 2.83 10-10L22 5.18z" fill="#5f6368"/></svg>
+        </button>
+        <button class="gmail-thread-btn" title="Move to">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z" fill="#5f6368"/></svg>
+        </button>
+        <button class="gmail-thread-btn" title="Labels">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z" fill="#5f6368"/></svg>
+        </button>
+        <button class="gmail-thread-btn" title="More">&#8942;</button>
+
+        <div class="gmail-thread-pagination">
+          <span class="gmail-thread-pagination-text">2 of 3,432</span>
+          <button class="gmail-thread-nav" aria-label="Newer">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="#5f6368"/></svg>
+          </button>
+          <button class="gmail-thread-nav" aria-label="Older">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="#5f6368"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Thread content -->
+      <div class="gmail-thread">
+        <!-- Subject line -->
+        <div class="gmail-thread-subject">
+          <h2>Re: Q1 planning doc - feedback</h2>
+          <span class="gmail-thread-label inbox">Inbox</span>
+        </div>
+
+        <!-- Message 1: Original message (collapsed summary) -->
+        <div class="gmail-message" style="border-color:#e8eaed;background:#f8f9fa;cursor:pointer;">
+          <div class="gmail-message-header" style="padding:12px 16px;">
+            <div class="gmail-message-avatar" style="background:#1a73e8;width:32px;height:32px;font-size:13px;">LM</div>
+            <div class="gmail-message-header-info" style="display:flex;align-items:center;gap:8px;">
+              <span class="gmail-message-sender" style="font-size:13px;">Lucas McComb</span>
+              <span style="font-size:12px;color:#5f6368;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">- Hey Sarah, I just shared the Q1 planning doc with the team. Would love your...</span>
+            </div>
+            <span class="gmail-message-date" style="font-size:12px;">Jan 27, 2026, 4:15 PM</span>
+          </div>
+        </div>
+
+        <!-- Message 2: Sarah's reply (expanded) -->
+        <div class="gmail-message">
+          <div class="gmail-message-header">
+            <div class="gmail-message-avatar" style="background:#e37400;">SC</div>
+            <div class="gmail-message-header-info">
+              <div class="gmail-message-sender-row">
+                <span class="gmail-message-sender">Sarah Chen</span>
+                <span style="font-size:12px;color:#5f6368;">&lt;sarah.chen@company.com&gt;</span>
+                <span class="gmail-message-date">Jan 28, 2026, 2:34 PM</span>
+              </div>
+              <div class="gmail-message-to">
+                to me
+                <span class="gmail-message-to-dropdown">&#9660;</span>
+              </div>
+            </div>
+            <div class="gmail-message-actions">
+              <button class="gmail-message-action" title="Reply">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z" fill="#5f6368"/></svg>
+              </button>
+              <button class="gmail-message-action" title="More">&#8942;</button>
+            </div>
+          </div>
+          <div class="gmail-message-body">
+            <p>Thanks for sharing! I left a few comments on the budget section, but overall it looks really solid. Here are my main thoughts:</p>
+
+            <p>The engineering hiring timeline seems aggressive for Q1. We had trouble filling the senior frontend role last quarter, and adding two more headcount on top of that might stretch recruiting thin. Maybe we phase it: one hire in February and the second in March?</p>
+
+            <p>I love the idea of moving the design system to a monorepo. It would help with the consistency issues we've been seeing across the product. I talked to Marcus about it and he's on board. He suggested we could use Turborepo or Nx for the build orchestration since it would give us caching out of the box.</p>
+
+            <p>One thing I noticed is missing from the OKRs: we don't have any metrics around customer retention. Given the churn numbers from Q4, I think we should add at least one KR focused on reducing monthly churn by a specific percentage. Happy to draft something if you want.</p>
+
+            <p>Let me know if you want to grab coffee this week to go through the rest of it in person!</p>
+
+            <p>Best,<br>Sarah</p>
+          </div>
+        </div>
+
+        <!-- Reply / Forward buttons -->
+        <div class="gmail-reply-actions">
+          <button class="gmail-reply-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z" fill="#5f6368"/></svg>
+            Reply
+          </button>
+          <button class="gmail-reply-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M14 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1-5 4-10 11-11z" fill="#5f6368"/></svg>
+            Forward
+          </button>
+        </div>
+
+        <!-- Quick reply box -->
+        <div class="gmail-quick-reply">
+          <div class="gmail-quick-reply-avatar">LM</div>
+          <span>Click here to <b>Reply</b> or <b>Forward</b></span>
+        </div>
+      </div>
+    </main>
+
+    <!-- Companion strip -->
+    <aside class="gw-companion">
+      <button class="gw-companion-icon" title="Calendar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+      </button>
+      <button class="gw-companion-icon" title="Keep">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
+      </button>
+      <button class="gw-companion-icon" title="Tasks">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368"><path d="M22 5.18L10.59 16.6l-4.24-4.24 1.41-1.41 2.83 2.83 10-10L22 5.18zM19.79 10.22C19.92 10.79 20 11.39 20 12c0 4.42-3.58 8-8 8s-8-3.58-8-8c0-4.42 3.58-8 8-8 1.58 0 3.04.46 4.28 1.25l1.44-1.44C16.1 2.67 14.13 2 12 2 6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10c0-1.19-.22-2.33-.6-3.39l-1.61 1.61z"/></svg>
+      </button>
+      <button class="gw-companion-icon" title="Contacts">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      </button>
+      <div class="gw-companion-divider"></div>
+      <button class="gw-companion-icon" title="Get add-ons">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      </button>
+    </aside>
+  </div>
+</body>
+</html>
