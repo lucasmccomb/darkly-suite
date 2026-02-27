@@ -557,6 +557,8 @@ importers:
         specifier: ^5.3.0
         version: 5.9.3
 
+  packages/screenshot-harness: {}
+
   packages/sheets-darkly:
     dependencies:
       '@darkly/core':

@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en" data-darkly-theme="light" data-darkly-active="true">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280">
+  <title>Q1 Budget Planning - Google Sheets</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+     * Reset & Base
+     * ============================================================ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 1280px;
+      height: 800px;
+      overflow: hidden;
+      font-family: 'Roboto', Arial, sans-serif;
+      background: #ffffff;
+      color: #202124;
+    }
+
+    /* ============================================================
+     * Layout - CSS Grid: stacked rows
+     * ============================================================ */
+    .app-layout {
+      display: grid;
+      grid-template-rows: 48px 30px 40px 30px 1fr 28px;
+      grid-template-columns: 1fr 52px;
+      width: 1280px;
+      height: 800px;
+    }
+
+    /* Header rows span full width */
+    .title-bar      { grid-column: 1 / -1; }
+    .menu-bar       { grid-column: 1 / -1; }
+    .toolbar        { grid-column: 1 / -1; }
+    .formula-bar    { grid-column: 1 / -1; }
+
+    /* Main content: grid area + companion strip */
+    .grid-area      { grid-column: 1 / 2; overflow: hidden; }
+    .companion-strip { grid-column: 2 / 3; grid-row: 5 / 7; }
+
+    /* Sheet tabs span only the grid column */
+    .sheet-tabs-bar { grid-column: 1 / 2; }
+
+    /* ============================================================
+     * Title Bar (~48px)
+     * ============================================================ */
+    .title-bar {
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      height: 48px;
+      border-bottom: 1px solid #e8eaed;
+      background: #ffffff;
+    }
+
+    .sheets-icon {
+      width: 24px;
+      height: 32px;
+      background: #0f9d58;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 8px;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .sheets-icon::before {
+      content: '';
+      display: block;
+      width: 14px;
+      height: 16px;
+      background: #ffffff;
+      border-radius: 1px;
+      position: relative;
+    }
+
+    .sheets-icon::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px;
+      height: 10px;
+      border: 1.5px solid #0f9d58;
+      background: transparent;
+      border-radius: 0;
+    }
+
+    .title-section {
+      display: flex;
+      flex-direction: column;
+      margin-right: auto;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .doc-title {
+      font-size: 18px;
+      font-weight: 400;
+      color: #202124;
+      line-height: 1.3;
+    }
+
+    .star-icon {
+      color: #5f6368;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .move-icon {
+      color: #5f6368;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .subtitle-text {
+      font-size: 12px;
+      color: #5f6368;
+      line-height: 1.2;
+      margin-top: 1px;
+    }
+
+    .title-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: 16px;
+    }
+
+    .history-icon, .comments-icon {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      cursor: pointer;
+      color: #5f6368;
+      font-size: 16px;
+    }
+
+    .history-icon:hover, .comments-icon:hover {
+      background: #e8eaed;
+    }
+
+    .share-button {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 20px;
+      height: 36px;
+      background: #1a73e8;
+      color: #ffffff;
+      border: none;
+      border-radius: 18px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: 'Roboto', sans-serif;
+      cursor: pointer;
+    }
+
+    .share-button .lock-icon {
+      font-size: 14px;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #8ab4f8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 500;
+      color: #202124;
+      cursor: pointer;
+    }
+
+    /* ============================================================
+     * Menu Bar (~30px)
+     * ============================================================ */
+    .menu-bar {
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      height: 30px;
+      background: #ffffff;
+      border-bottom: 1px solid #e8eaed;
+    }
+
+    .menu-item {
+      padding: 4px 8px;
+      font-size: 14px;
+      color: #202124;
+      cursor: pointer;
+      border-radius: 4px;
+      white-space: nowrap;
+      line-height: 1.4;
+    }
+
+    .menu-item:hover {
+      background: #e8eaed;
+    }
+
+    /* ============================================================
+     * Toolbar (~40px)
+     * ============================================================ */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      height: 40px;
+      background: #edf2fa;
+      border-bottom: 1px solid #dadce0;
+      gap: 2px;
+      overflow: hidden;
+    }
+
+    .toolbar-btn {
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #444746;
+      font-size: 16px;
+      background: transparent;
+      border: none;
+      font-family: 'Roboto', Arial, sans-serif;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .toolbar-btn:hover {
+      background: #d3d3d3;
+    }
+
+    .toolbar-btn.bold { font-weight: 700; font-size: 15px; }
+    .toolbar-btn.italic { font-style: italic; font-size: 15px; font-family: serif; }
+    .toolbar-btn.strikethrough { text-decoration: line-through; font-size: 14px; }
+
+    .toolbar-divider {
+      width: 1px;
+      height: 20px;
+      background: #c7c7c7;
+      margin: 0 4px;
+      flex-shrink: 0;
+    }
+
+    .toolbar-dropdown {
+      display: inline-flex;
+      align-items: center;
+      height: 28px;
+      padding: 0 4px 0 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #444746;
+      font-size: 13px;
+      background: transparent;
+      border: none;
+      font-family: 'Roboto', sans-serif;
+      white-space: nowrap;
+      flex-shrink: 0;
+      gap: 2px;
+    }
+
+    .toolbar-dropdown:hover {
+      background: #d3d3d3;
+    }
+
+    .toolbar-dropdown .arrow {
+      font-size: 10px;
+      color: #444746;
+    }
+
+    .font-dropdown {
+      width: 100px;
+      overflow: hidden;
+    }
+
+    .size-dropdown {
+      width: 40px;
+      justify-content: center;
+    }
+
+    .text-color-btn {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      flex-shrink: 0;
+    }
+
+    .text-color-btn:hover {
+      background: #d3d3d3;
+    }
+
+    .text-color-btn .letter {
+      font-size: 14px;
+      font-weight: 700;
+      color: #444746;
+      line-height: 1;
+    }
+
+    .text-color-btn .underline {
+      width: 14px;
+      height: 3px;
+      border-radius: 1px;
+      margin-top: 1px;
+    }
+
+    .text-color-underline { background: #202124; }
+    .fill-color-underline { background: #ffffff; border: 1px solid #c7c7c7; }
+
+    .darkly-toolbar-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .darkly-toolbar-button:hover {
+      background: #d3d3d3;
+    }
+
+    .darkly-toolbar-button span {
+      font-size: 14px;
+    }
+
+    /* ============================================================
+     * Formula Bar (~30px)
+     * ============================================================ */
+    .formula-bar {
+      display: flex;
+      align-items: center;
+      height: 30px;
+      background: #ffffff;
+      border-bottom: 1px solid #dadce0;
+    }
+
+    .name-box {
+      width: 80px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-right: 1px solid #dadce0;
+      font-size: 13px;
+      color: #202124;
+      font-family: 'Roboto', Arial, sans-serif;
+      padding: 0 8px;
+      cursor: pointer;
+    }
+
+    .fx-icon {
+      width: 32px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #80868b;
+      font-size: 14px;
+      font-style: italic;
+      font-weight: 700;
+      border-right: 1px solid #dadce0;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .formula-input {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      font-size: 13px;
+      color: #202124;
+      font-family: 'Roboto Mono', Arial, monospace;
+    }
+
+    /* ============================================================
+     * Grid Area
+     * ============================================================ */
+    .grid-area {
+      display: flex;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    #waffle-grid-container {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .spreadsheet-table {
+      border-collapse: collapse;
+      table-layout: fixed;
+      width: 100%;
+    }
+
+    /* Column headers */
+    .col-header-row {
+      height: 21px;
+      background: #f8f9fa;
+    }
+
+    .corner-cell {
+      width: 46px;
+      min-width: 46px;
+      max-width: 46px;
+      height: 21px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #c4c7c5;
+      border-right: 1px solid #c4c7c5;
+      position: sticky;
+      top: 0;
+      left: 0;
+      z-index: 3;
+    }
+
+    .col-header {
+      height: 21px;
+      min-width: 100px;
+      text-align: center;
+      font-size: 12px;
+      font-family: 'Roboto', sans-serif;
+      font-weight: 500;
+      color: #5f6368;
+      background: #f8f9fa;
+      border-bottom: 1px solid #c4c7c5;
+      border-right: 1px solid #e2e2e2;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      user-select: none;
+    }
+
+    .col-header.selected {
+      color: #1a73e8;
+      border-bottom: 2px solid #1a73e8;
+    }
+
+    /* Column widths - realistic Sheets defaults */
+    .col-a { width: 140px; min-width: 140px; }
+    .col-b { width: 120px; min-width: 120px; }
+    .col-c { width: 130px; min-width: 130px; }
+    .col-d { width: 100px; min-width: 100px; }
+    .col-e { width: 100px; min-width: 100px; }
+    .col-f { width: 100px; min-width: 100px; }
+    .col-g { width: 100px; min-width: 100px; }
+    .col-h { width: 100px; min-width: 100px; }
+    .col-i { width: 100px; min-width: 100px; }
+    .col-j { width: 100px; min-width: 100px; }
+    .col-k { width: 100px; min-width: 100px; }
+    .col-l { width: 100px; min-width: 100px; }
+
+    /* Row headers */
+    .row-header {
+      width: 46px;
+      min-width: 46px;
+      max-width: 46px;
+      text-align: center;
+      font-size: 12px;
+      font-family: 'Roboto', sans-serif;
+      color: #5f6368;
+      background: #f8f9fa;
+      border-right: 1px solid #c4c7c5;
+      border-bottom: 1px solid #e2e2e2;
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      user-select: none;
+    }
+
+    .row-header.selected {
+      color: #1a73e8;
+      border-right: 2px solid #1a73e8;
+    }
+
+    /* Data cells */
+    .data-row {
+      height: 21px;
+    }
+
+    .cell {
+      height: 21px;
+      max-height: 21px;
+      padding: 0 4px;
+      font-size: 13.333px;
+      font-family: Arial, sans-serif;
+      color: #000000;
+      border-bottom: 1px solid #e2e2e2;
+      border-right: 1px solid #e2e2e2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: middle;
+      line-height: 21px;
+    }
+
+    .cell.number {
+      text-align: right;
+    }
+
+    .cell.header-cell {
+      font-weight: 700;
+      background: #e8eaed;
+    }
+
+    .cell.total-cell {
+      font-weight: 700;
+      border-top: 2px solid #202124;
+    }
+
+    .cell.active-cell {
+      outline: 2px solid #1a73e8;
+      outline-offset: -1px;
+      background: #ffffff;
+      z-index: 1;
+      position: relative;
+    }
+
+    .cell.selected-range {
+      background: #e8f0fe;
+    }
+
+    /* Status colors */
+    .cell.status-on-track {
+      color: #1e8e3e;
+    }
+
+    .cell.status-over-budget {
+      color: #d93025;
+    }
+
+    .cell.variance-positive {
+      color: #d93025;
+    }
+
+    .cell.variance-negative {
+      color: #1e8e3e;
+    }
+
+    /* Empty cells fill remaining space */
+    .cell.empty {
+      color: transparent;
+    }
+
+    /* ============================================================
+     * Sheet Tabs Bar (~28px)
+     * ============================================================ */
+    .sheet-tabs-bar {
+      display: flex;
+      align-items: center;
+      height: 28px;
+      background: #f8f9fa;
+      border-top: 1px solid #dadce0;
+      padding: 0 4px;
+    }
+
+    .tab-controls {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      margin-right: 8px;
+    }
+
+    .tab-btn {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #5f6368;
+      font-size: 16px;
+      background: transparent;
+      border: none;
+    }
+
+    .tab-btn:hover {
+      background: #e8eaed;
+    }
+
+    .sheet-tabs {
+      display: flex;
+      align-items: stretch;
+      height: 100%;
+    }
+
+    .sheet-tab {
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      font-size: 13px;
+      font-family: 'Roboto', sans-serif;
+      color: #5f6368;
+      cursor: pointer;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      height: 100%;
+      background: transparent;
+    }
+
+    .sheet-tab:hover {
+      background: #e8eaed;
+    }
+
+    .sheet-tab.active {
+      background: #ffffff;
+      color: #202124;
+      font-weight: 500;
+      border: 1px solid #dadce0;
+      border-bottom: 1px solid #ffffff;
+      border-top: 3px solid #0f9d58;
+      margin-bottom: -1px;
+    }
+
+    /* ============================================================
+     * Companion Strip (right sidebar, ~52px)
+     * ============================================================ */
+    .companion-strip {
+      width: 52px;
+      background: #f8f9fa;
+      border-left: 1px solid #dadce0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 8px;
+      gap: 4px;
+    }
+
+    .companion-icon {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      color: #5f6368;
+    }
+
+    .companion-icon:hover {
+      background: #e8eaed;
+    }
+
+    .companion-divider {
+      width: 28px;
+      height: 1px;
+      background: #dadce0;
+      margin: 4px 0;
+    }
+
+    /* ============================================================
+     * Active cell resize handle (blue dot, bottom-right corner)
+     * ============================================================ */
+    .cell.active-cell::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      right: -3px;
+      width: 6px;
+      height: 6px;
+      background: #1a73e8;
+      border-radius: 50%;
+      z-index: 2;
+    }
+
+    /* ============================================================
+     * Scrollbar track styling (light mode)
+     * ============================================================ */
+    .grid-area::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
+
+    .grid-area::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    .grid-area::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+
+    <!-- ========================================================
+         Title Bar
+         ======================================================== -->
+    <div class="title-bar" id="docs-header-container">
+      <div class="sheets-icon" aria-label="Sheets home"></div>
+      <div class="title-section">
+        <div class="title-row">
+          <span class="doc-title">Q1 Budget Planning</span>
+          <span class="star-icon" title="Star">&#9734;</span>
+          <span class="move-icon" title="Move">&#128193;</span>
+        </div>
+        <div class="subtitle-text">Last edit was 2 hours ago</div>
+      </div>
+      <div class="title-bar-right">
+        <div class="history-icon" title="See version history">&#128339;</div>
+        <div class="comments-icon" title="Open comment history">&#128172;</div>
+        <button class="share-button">
+          <span class="lock-icon">&#128274;</span>
+          Share
+        </button>
+        <div class="avatar" title="Account">L</div>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         Menu Bar
+         ======================================================== -->
+    <div class="menu-bar">
+      <span class="menu-item">File</span>
+      <span class="menu-item">Edit</span>
+      <span class="menu-item">View</span>
+      <span class="menu-item">Insert</span>
+      <span class="menu-item">Format</span>
+      <span class="menu-item">Data</span>
+      <span class="menu-item">Tools</span>
+      <span class="menu-item">Extensions</span>
+      <span class="menu-item">Help</span>
+    </div>
+
+    <!-- ========================================================
+         Toolbar
+         ======================================================== -->
+    <div class="toolbar">
+      <!-- Group 1: Undo, Redo, Print, Format paint -->
+      <button class="toolbar-btn" title="Undo">&#8617;</button>
+      <button class="toolbar-btn" title="Redo">&#8618;</button>
+      <button class="toolbar-btn" title="Print">&#128424;</button>
+      <button class="toolbar-btn" title="Paint format">&#127912;</button>
+
+      <span class="toolbar-divider"></span>
+
+      <!-- Group 2: Zoom -->
+      <button class="toolbar-dropdown" title="Zoom">100%<span class="arrow">&#9662;</span></button>
+
+      <span class="toolbar-divider"></span>
+
+      <!-- Group 3: Number formatting -->
+      <button class="toolbar-btn" title="Format as currency" style="font-size:14px;font-weight:500;">$</button>
+      <button class="toolbar-btn" title="Format as percent" style="font-size:14px;font-weight:500;">%</button>
+      <button class="toolbar-btn" title="Decrease decimal places" style="font-size:11px;">.0</button>
+      <button class="toolbar-btn" title="Increase decimal places" style="font-size:11px;">.00</button>
+
+      <span class="toolbar-divider"></span>
+
+      <!-- Group 4: Font & size -->
+      <button class="toolbar-dropdown font-dropdown" title="Font">Arial<span class="arrow">&#9662;</span></button>
+      <button class="toolbar-dropdown size-dropdown" title="Font size">10<span class="arrow">&#9662;</span></button>
+
+      <span class="toolbar-divider"></span>
+
+      <!-- Group 5: Text style -->
+      <button class="toolbar-btn bold" title="Bold">B</button>
+      <button class="toolbar-btn italic" title="Italic">I</button>
+      <button class="toolbar-btn strikethrough" title="Strikethrough">S</button>
+      <button class="text-color-btn" title="Text color">
+        <span class="letter">A</span>
+        <span class="underline text-color-underline"></span>
+      </button>
+      <button class="text-color-btn" title="Fill color">
+        <span class="letter" style="font-size:12px;">&#9649;</span>
+        <span class="underline fill-color-underline"></span>
+      </button>
+
+      <span class="toolbar-divider"></span>
+
+      <!-- Group 6: Layout -->
+      <button class="toolbar-btn" title="Borders" style="font-size:14px;">&#9638;</button>
+      <button class="toolbar-btn" title="Merge cells" style="font-size:14px;">&#9645;</button>
+      <button class="toolbar-dropdown" title="Horizontal align">&#9776;<span class="arrow">&#9662;</span></button>
+      <button class="toolbar-btn" title="Text wrapping" style="font-size:14px;">&#8629;</button>
+
+      <span class="toolbar-divider"></span>
+
+      <!-- Group 7: Data -->
+      <button class="toolbar-btn" title="Create a filter" style="font-size:14px;">&#9661;</button>
+      <button class="toolbar-dropdown" title="Functions">&#931;<span class="arrow">&#9662;</span></button>
+
+      <!-- Darkly injection point -->
+      <div class="darkly-toolbar-button" id="sd-toolbar-button" title="Darkly for Sheets">
+        <span style="font-size:14px;">&#127769;</span>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         Formula Bar
+         ======================================================== -->
+    <div class="formula-bar">
+      <div class="name-box">B4</div>
+      <div class="fx-icon">fx</div>
+      <div class="formula-input">=SUM(D2:D15)</div>
+    </div>
+
+    <!-- ========================================================
+         Grid Area (spreadsheet)
+         ======================================================== -->
+    <div class="grid-area">
+      <div id="waffle-grid-container">
+        <table class="spreadsheet-table">
+          <colgroup>
+            <col style="width:46px">  <!-- row header -->
+            <col class="col-a">       <!-- A -->
+            <col class="col-b">       <!-- B -->
+            <col class="col-c">       <!-- C -->
+            <col class="col-d">       <!-- D -->
+            <col class="col-e">       <!-- E -->
+            <col class="col-f">       <!-- F -->
+            <col class="col-g">       <!-- G -->
+            <col class="col-h">       <!-- H -->
+            <col class="col-i">       <!-- I -->
+            <col class="col-j">       <!-- J -->
+            <col class="col-k">       <!-- K -->
+            <col class="col-l">       <!-- L -->
+          </colgroup>
+
+          <!-- Column headers -->
+          <thead>
+            <tr class="col-header-row">
+              <th class="corner-cell"></th>
+              <th class="col-header">A</th>
+              <th class="col-header selected">B</th>
+              <th class="col-header">C</th>
+              <th class="col-header">D</th>
+              <th class="col-header">E</th>
+              <th class="col-header">F</th>
+              <th class="col-header">G</th>
+              <th class="col-header">H</th>
+              <th class="col-header">I</th>
+              <th class="col-header">J</th>
+              <th class="col-header">K</th>
+              <th class="col-header">L</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <!-- Row 1: Header row -->
+            <tr class="data-row">
+              <td class="row-header">1</td>
+              <td class="cell header-cell">Name</td>
+              <td class="cell header-cell">Department</td>
+              <td class="cell header-cell">Role</td>
+              <td class="cell header-cell number">Q1 Target</td>
+              <td class="cell header-cell number">Q1 Actual</td>
+              <td class="cell header-cell number">Variance</td>
+              <td class="cell header-cell">Status</td>
+              <td class="cell header-cell empty"></td>
+              <td class="cell header-cell empty"></td>
+              <td class="cell header-cell empty"></td>
+              <td class="cell header-cell empty"></td>
+              <td class="cell header-cell empty"></td>
+            </tr>
+
+            <!-- Row 2 -->
+            <tr class="data-row">
+              <td class="row-header">2</td>
+              <td class="cell">Sarah Chen</td>
+              <td class="cell">Engineering</td>
+              <td class="cell">Senior Dev</td>
+              <td class="cell number">$45,000</td>
+              <td class="cell number">$42,800</td>
+              <td class="cell number variance-negative">-$2,200</td>
+              <td class="cell status-on-track">On Track</td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+            </tr>
+
+            <!-- Row 3 -->
+            <tr class="data-row">
+              <td class="row-header">3</td>
+              <td class="cell">Alex Rivera</td>
+              <td class="cell">Design</td>
+              <td class="cell">Lead Designer</td>
+              <td class="cell number">$32,000</td>
+              <td class="cell number">$31,500</td>
+              <td class="cell number variance-negative">-$500</td>
+              <td class="cell status-on-track">On Track</td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+            </tr>
+
+            <!-- Row 4 (active cell at B4) -->
+            <tr class="data-row">
+              <td class="row-header selected">4</td>
+              <td class="cell">Jordan Kim</td>
+              <td class="cell active-cell">Marketing</td>
+              <td class="cell">Content Mgr</td>
+              <td class="cell number">$28,000</td>
+              <td class="cell number">$29,200</td>
+              <td class="cell number variance-positive">+$1,200</td>
+              <td class="cell status-over-budget">Over Budget</td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+            </tr>
+
+            <!-- Row 5 -->
+            <tr class="data-row">
+              <td class="row-header">5</td>
+              <td class="cell">Taylor Brooks</td>
+              <td class="cell">Sales</td>
+              <td class="cell">Account Exec</td>
+              <td class="cell number">$52,000</td>
+              <td class="cell number">$48,900</td>
+              <td class="cell number variance-negative">-$3,100</td>
+              <td class="cell status-on-track">On Track</td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+            </tr>
+
+            <!-- Row 6 -->
+            <tr class="data-row">
+              <td class="row-header">6</td>
+              <td class="cell">Morgan Lee</td>
+              <td class="cell">Engineering</td>
+              <td class="cell">DevOps</td>
+              <td class="cell number">$38,000</td>
+              <td class="cell number">$37,200</td>
+              <td class="cell number variance-negative">-$800</td>
+              <td class="cell status-on-track">On Track</td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+            </tr>
+
+            <!-- Row 7 -->
+            <tr class="data-row">
+              <td class="row-header">7</td>
+              <td class="cell">Casey Williams</td>
+              <td class="cell">Product</td>
+              <td class="cell">PM</td>
+              <td class="cell number">$35,000</td>
+              <td class="cell number">$36,800</td>
+              <td class="cell number variance-positive">+$1,800</td>
+              <td class="cell status-over-budget">Over Budget</td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+            </tr>
+
+            <!-- Row 8 -->
+            <tr class="data-row">
+              <td class="row-header">8</td>
+              <td class="cell">Jamie Patel</td>
+              <td class="cell">Finance</td>
+              <td class="cell">Analyst</td>
+              <td class="cell number">$25,000</td>
+              <td class="cell number">$24,100</td>
+              <td class="cell number variance-negative">-$900</td>
+              <td class="cell status-on-track">On Track</td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+            </tr>
+
+            <!-- Row 9 -->
+            <tr class="data-row">
+              <td class="row-header">9</td>
+              <td class="cell">Avery Scott</td>
+              <td class="cell">Engineering</td>
+              <td class="cell">Frontend Dev</td>
+              <td class="cell number">$42,000</td>
+              <td class="cell number">$41,500</td>
+              <td class="cell number variance-negative">-$500</td>
+              <td class="cell status-on-track">On Track</td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+            </tr>
+
+            <!-- Row 10 -->
+            <tr class="data-row">
+              <td class="row-header">10</td>
+              <td class="cell">Riley Johnson</td>
+              <td class="cell">HR</td>
+              <td class="cell">Recruiter</td>
+              <td class="cell number">$22,000</td>
+              <td class="cell number">$21,800</td>
+              <td class="cell number variance-negative">-$200</td>
+              <td class="cell status-on-track">On Track</td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+            </tr>
+
+            <!-- Row 11 -->
+            <tr class="data-row">
+              <td class="row-header">11</td>
+              <td class="cell">Quinn Martinez</td>
+              <td class="cell">Design</td>
+              <td class="cell">UX Research</td>
+              <td class="cell number">$30,000</td>
+              <td class="cell number">$28,400</td>
+              <td class="cell number variance-negative">-$1,600</td>
+              <td class="cell status-on-track">On Track</td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+            </tr>
+
+            <!-- Row 12 -->
+            <tr class="data-row">
+              <td class="row-header">12</td>
+              <td class="cell">Dakota Nguyen</td>
+              <td class="cell">Engineering</td>
+              <td class="cell">Backend Dev</td>
+              <td class="cell number">$44,000</td>
+              <td class="cell number">$43,200</td>
+              <td class="cell number variance-negative">-$800</td>
+              <td class="cell status-on-track">On Track</td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+            </tr>
+
+            <!-- Row 13 -->
+            <tr class="data-row">
+              <td class="row-header">13</td>
+              <td class="cell">Skyler Thompson</td>
+              <td class="cell">Marketing</td>
+              <td class="cell">SEO Specialist</td>
+              <td class="cell number">$26,000</td>
+              <td class="cell number">$27,100</td>
+              <td class="cell number variance-positive">+$1,100</td>
+              <td class="cell status-over-budget">Over Budget</td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+            </tr>
+
+            <!-- Row 14 -->
+            <tr class="data-row">
+              <td class="row-header">14</td>
+              <td class="cell">Reese Campbell</td>
+              <td class="cell">Sales</td>
+              <td class="cell">Sales Mgr</td>
+              <td class="cell number">$48,000</td>
+              <td class="cell number">$46,500</td>
+              <td class="cell number variance-negative">-$1,500</td>
+              <td class="cell status-on-track">On Track</td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+            </tr>
+
+            <!-- Row 15 -->
+            <tr class="data-row">
+              <td class="row-header">15</td>
+              <td class="cell">Emerson Park</td>
+              <td class="cell">Product</td>
+              <td class="cell">UX Writer</td>
+              <td class="cell number">$24,000</td>
+              <td class="cell number">$23,600</td>
+              <td class="cell number variance-negative">-$400</td>
+              <td class="cell status-on-track">On Track</td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+            </tr>
+
+            <!-- Row 16: Totals -->
+            <tr class="data-row">
+              <td class="row-header">16</td>
+              <td class="cell total-cell"></td>
+              <td class="cell total-cell"></td>
+              <td class="cell total-cell" style="font-weight:700;">TOTAL</td>
+              <td class="cell total-cell number">$491,000</td>
+              <td class="cell total-cell number">$482,600</td>
+              <td class="cell total-cell number variance-negative">-$8,400</td>
+              <td class="cell total-cell"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+              <td class="cell empty"></td>
+            </tr>
+
+            <!-- Rows 17-30: Empty rows to fill the grid -->
+            <tr class="data-row">
+              <td class="row-header">17</td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+            </tr>
+            <tr class="data-row">
+              <td class="row-header">18</td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+            </tr>
+            <tr class="data-row">
+              <td class="row-header">19</td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+            </tr>
+            <tr class="data-row">
+              <td class="row-header">20</td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+            </tr>
+            <tr class="data-row">
+              <td class="row-header">21</td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+            </tr>
+            <tr class="data-row">
+              <td class="row-header">22</td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+            </tr>
+            <tr class="data-row">
+              <td class="row-header">23</td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+            </tr>
+            <tr class="data-row">
+              <td class="row-header">24</td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+            </tr>
+            <tr class="data-row">
+              <td class="row-header">25</td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+            </tr>
+            <tr class="data-row">
+              <td class="row-header">26</td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+            </tr>
+            <tr class="data-row">
+              <td class="row-header">27</td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+            </tr>
+            <tr class="data-row">
+              <td class="row-header">28</td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+            </tr>
+            <tr class="data-row">
+              <td class="row-header">29</td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+            </tr>
+            <tr class="data-row">
+              <td class="row-header">30</td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+              <td class="cell empty"></td><td class="cell empty"></td><td class="cell empty"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         Sheet Tabs Bar
+         ======================================================== -->
+    <div class="sheet-tabs-bar docs-sheet-tab-bar">
+      <div class="tab-controls">
+        <button class="tab-btn" title="Add sheet">+</button>
+        <button class="tab-btn" title="All sheets">&#9776;</button>
+      </div>
+      <div class="sheet-tabs">
+        <div class="sheet-tab active">Budget</div>
+        <div class="sheet-tab">Summary</div>
+        <div class="sheet-tab">Raw Data</div>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         Companion Strip (right sidebar)
+         ======================================================== -->
+    <div class="companion-strip companion-guest-app-switcher" role="tablist">
+      <div class="companion-icon" role="tab" title="Calendar">&#128197;</div>
+      <div class="companion-icon" role="tab" title="Keep">&#128221;</div>
+      <div class="companion-icon" role="tab" title="Tasks">&#9745;</div>
+      <div class="companion-icon" role="tab" title="Contacts">&#128100;</div>
+      <div class="companion-divider"></div>
+      <div class="companion-icon" id="sd-sidebar-icon" role="tab" title="Darkly for Sheets">&#127769;</div>
+      <div class="companion-divider"></div>
+      <div class="companion-icon" role="tab" title="Get add-ons">+</div>
+    </div>
+
+  </div>
+</body>
+</html>
