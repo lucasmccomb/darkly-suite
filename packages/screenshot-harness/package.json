@@ -1,0 +1,24 @@
+{
+  "name": "@darkly/screenshot-harness",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build:pages": "tsx src/build-pages.ts",
+    "generate": "tsx src/pipeline/generate.ts",
+    "lint": "eslint src --ext .ts,.tsx",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^9.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "yaml": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.3.0"
+  }
+}

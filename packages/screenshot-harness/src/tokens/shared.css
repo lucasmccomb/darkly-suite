@@ -1,0 +1,32 @@
+:root {
+  /* Typography */
+  --gw-font-primary: 'Google Sans', Roboto, Arial, sans-serif;
+  --gw-font-body: Roboto, Arial, sans-serif;
+  --gw-font-mono: 'Roboto Mono', 'Courier New', monospace;
+
+  /* Core colors */
+  --gw-color-primary: #1a73e8;
+  --gw-color-primary-hover: #1765cc;
+  --gw-color-on-primary: #ffffff;
+  --gw-color-surface: #ffffff;
+  --gw-color-on-surface: #202124;
+  --gw-color-on-surface-variant: #5f6368;
+  --gw-color-surface-container: #f1f3f4;
+  --gw-color-surface-container-high: #e8eaed;
+  --gw-color-outline: #dadce0;
+  --gw-color-error: #d93025;
+  --gw-color-warning: #f9ab00;
+  --gw-color-success: #1e8e3e;
+
+  /* Layout */
+  --gw-header-height: 64px;
+  --gw-sidebar-width: 256px;
+  --gw-sidebar-collapsed: 68px;
+  --gw-companion-width: 52px;
+  --gw-search-height: 48px;
+  --gw-search-radius: 24px;
+
+  /* Shadows */
+  --gw-shadow-1: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+  --gw-shadow-2: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+}

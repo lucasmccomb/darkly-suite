@@ -1,0 +1,11 @@
+:root {
+  --sheets-brand-green: #0f9d58;
+  --sheets-cell-height: 21px;
+  --sheets-cell-width: 100px;
+  --sheets-header-height: 21px;
+  --sheets-row-header-width: 46px;
+  --sheets-formula-bar-height: 30px;
+  --sheets-tab-bar-height: 28px;
+  --sheets-cell-font: Arial, sans-serif;
+  --sheets-cell-font-size: 13.3px;
+}

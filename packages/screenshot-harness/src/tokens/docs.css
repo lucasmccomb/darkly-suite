@@ -1,0 +1,10 @@
+:root {
+  --docs-brand-blue: #4285f4;
+  --docs-page-width: 816px;
+  --docs-page-bg: #ffffff;
+  --docs-canvas-bg: #f8f9fa;
+  --docs-margin: 72px;
+  --docs-body-font: Arial, sans-serif;
+  --docs-body-font-size: 14.7px;
+  --docs-ruler-height: 20px;
+}
