@@ -429,34 +429,60 @@ html, body {
   background: var(--darkly-bg-primary) !important;
 }
 
-.grid-table {
+.spreadsheet-table {
   background: var(--darkly-bg-primary) !important;
 }
 
-.grid-table th {
-  background: var(--darkly-bg-secondary) !important;
-  color: var(--darkly-text-secondary) !important;
-  border-color: var(--darkly-border) !important;
-}
-
-.grid-table td {
-  background: var(--darkly-bg-primary) !important;
-  color: var(--darkly-text-primary) !important;
-  border-color: var(--darkly-border) !important;
-}
-
-/* Row/column headers */
-.row-header,
+/* Column headers (A, B, C...) */
+.col-header-row th,
 .col-header {
   background: var(--darkly-bg-secondary) !important;
   color: var(--darkly-text-secondary) !important;
   border-color: var(--darkly-border) !important;
 }
 
-/* Selected cell highlight */
-.grid-table td.selected,
-.grid-table td:focus {
+/* Row headers (1, 2, 3...) */
+.row-header {
+  background: var(--darkly-bg-secondary) !important;
+  color: var(--darkly-text-secondary) !important;
+  border-color: var(--darkly-border) !important;
+}
+
+/* All data cells */
+.cell {
+  background: var(--darkly-bg-primary) !important;
+  color: var(--darkly-text-primary) !important;
+  border-color: var(--darkly-border) !important;
+}
+
+.cell.header-cell {
+  background: var(--darkly-bg-secondary) !important;
+  color: var(--darkly-text-primary) !important;
+}
+
+.cell.active-cell {
   background: var(--darkly-selected-bg) !important;
+}
+
+.cell.total-cell {
+  border-top-color: var(--darkly-text-secondary) !important;
+}
+
+/* Preserve status colors */
+.cell.status-on-track {
+  color: #1e8e3e !important;
+}
+
+.cell.status-over-budget {
+  color: #d93025 !important;
+}
+
+.cell.variance-positive {
+  color: #d93025 !important;
+}
+
+.cell.variance-negative {
+  color: #1e8e3e !important;
 }
 
 /* Sheet tabs */
@@ -528,4 +554,143 @@ input[type="checkbox"] {
 /* Sheets green icon */
 .sheets-icon {
   background: #0f9d58 !important;
+}
+
+/* ============================================================
+ * 8. Docs mock page overrides
+ *    Targets the Kix editor canvas, document page, and text.
+ * ============================================================ */
+
+/* Docs title bar */
+.docs-titlebar-container {
+  background: var(--darkly-bg-surface) !important;
+  border-bottom-color: var(--darkly-border) !important;
+}
+
+/* Docs menu bar */
+.docs-menubar-container {
+  background: var(--darkly-bg-surface) !important;
+}
+
+.docs-menubar-container .menu-item {
+  color: var(--darkly-text-primary) !important;
+}
+
+.docs-menubar-container .menu-item:hover {
+  background: var(--darkly-bg-hover) !important;
+}
+
+/* Docs toolbar */
+.docs-toolbar-container {
+  background: var(--darkly-bg-secondary) !important;
+}
+
+.docs-toolbar-container .toolbar-btn {
+  color: var(--darkly-text-secondary) !important;
+}
+
+.docs-toolbar-container .toolbar-btn:hover {
+  background: var(--darkly-bg-hover) !important;
+}
+
+.docs-toolbar-container .toolbar-dropdown {
+  color: var(--darkly-text-primary) !important;
+  background: var(--darkly-bg-surface) !important;
+  border-color: var(--darkly-border) !important;
+}
+
+.docs-toolbar-container .toolbar-divider {
+  background: var(--darkly-border) !important;
+}
+
+.docs-toolbar-container .text-color-btn {
+  color: var(--darkly-text-secondary) !important;
+}
+
+/* Ruler */
+.ruler-container {
+  background: var(--darkly-bg-secondary) !important;
+}
+
+.ruler {
+  background: var(--darkly-bg-secondary) !important;
+}
+
+.ruler-track {
+  background: var(--darkly-bg-surface) !important;
+}
+
+.ruler-mark {
+  background: var(--darkly-text-secondary) !important;
+}
+
+.ruler-label {
+  color: var(--darkly-text-secondary) !important;
+}
+
+/* Editor canvas area (gray surround) */
+#docs-editor-container {
+  background: var(--darkly-bg-secondary) !important;
+}
+
+/* The white document page */
+.kix-page {
+  background: var(--darkly-bg-surface) !important;
+  box-shadow: 0 1px 3px var(--darkly-shadow), 0 1px 2px var(--darkly-shadow) !important;
+}
+
+/* Document text content */
+.kix-canvas-tile-content {
+  color: var(--darkly-text-primary) !important;
+}
+
+.doc-heading-title {
+  color: var(--darkly-text-primary) !important;
+}
+
+.doc-heading-subtitle {
+  color: var(--darkly-text-secondary) !important;
+}
+
+.doc-heading-h1 {
+  color: var(--darkly-text-primary) !important;
+}
+
+.doc-paragraph {
+  color: var(--darkly-text-primary) !important;
+}
+
+.doc-bullet-list li {
+  color: var(--darkly-text-primary) !important;
+}
+
+/* Document table */
+.doc-table th {
+  background: var(--darkly-bg-hover) !important;
+  border-color: var(--darkly-border) !important;
+  color: var(--darkly-text-primary) !important;
+}
+
+.doc-table td {
+  border-color: var(--darkly-border) !important;
+  color: var(--darkly-text-primary) !important;
+}
+
+/* Docs cursor */
+.kix-cursor {
+  background: var(--darkly-text-primary) !important;
+}
+
+/* Docs companion strip */
+.app-layout > .companion-strip {
+  background: var(--darkly-bg-secondary) !important;
+  border-left-color: var(--darkly-border) !important;
+}
+
+.app-layout > .companion-strip button {
+  color: var(--darkly-text-secondary) !important;
+}
+
+.app-layout > .companion-strip svg path {
+  fill: var(--darkly-text-secondary) !important;
 }

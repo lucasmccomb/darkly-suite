@@ -1,0 +1,51 @@
+extension: docs-darkly
+defaults:
+  frameStyle: macos-dark
+  textPosition: top
+  textColor: "#ffffff"
+screenshots:
+  - id: 01-document-dark
+    page: docs/document.html
+    theme: dark
+    title: "Dark Mode for Docs"
+    subtitle: "Write comfortably, day and night"
+    gradient: ["#1a1a2e", "#16213e"]
+    browserUrl: "docs.google.com/document"
+    injectCss:
+      - ../css/darkly-dark.css
+
+  - id: 02-document-nord
+    page: docs/document.html
+    theme: dark
+    preset: nord
+    title: "Nord Theme"
+    subtitle: "Arctic-inspired document editing"
+    gradient: ["#2e3440", "#3b4252"]
+    browserUrl: "docs.google.com/document"
+    injectCss:
+      - ../css/darkly-dark.css
+      - ../css/presets/nord.css
+
+  - id: 03-document-solarized
+    page: docs/document.html
+    theme: dark
+    preset: solarized
+    title: "Solarized Theme"
+    subtitle: "Precision colors for focused writing"
+    gradient: ["#002b36", "#073642"]
+    browserUrl: "docs.google.com/document"
+    injectCss:
+      - ../css/darkly-dark.css
+      - ../css/presets/solarized.css
+
+  - id: 04-document-catppuccin
+    page: docs/document.html
+    theme: dark
+    preset: catppuccin
+    title: "Catppuccin Theme"
+    subtitle: "Soothing pastels for your documents"
+    gradient: ["#1e1e2e", "#313244"]
+    browserUrl: "docs.google.com/document"
+    injectCss:
+      - ../css/darkly-dark.css
+      - ../css/presets/catppuccin.css
