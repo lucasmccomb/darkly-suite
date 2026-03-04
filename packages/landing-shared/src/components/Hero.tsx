@@ -10,12 +10,13 @@ interface HeroProps {
   subtitle: string
   ctaText: string
   ctaLink: string
+  ctaExternal?: boolean
   badge?: string
   icon?: ReactNode
   screenshots?: ScreenshotImage[]
 }
 
-export function Hero({ title, subtitle, ctaText, ctaLink, badge, icon, screenshots }: HeroProps) {
+export function Hero({ title, subtitle, ctaText, ctaLink, ctaExternal, badge, icon, screenshots }: HeroProps) {
   return (
     <section className="hero">
       <div className="hero-content">
@@ -29,9 +30,15 @@ export function Hero({ title, subtitle, ctaText, ctaLink, badge, icon, screensho
         </h1>
         <p className="hero-subtitle">{subtitle}</p>
         <div className="hero-cta">
-          <Link to={ctaLink} className="btn btn-primary">
-            <span className="btn-label">{ctaText}</span>
-          </Link>
+          {ctaExternal ? (
+            <a href={ctaLink} className="btn btn-primary" target="_blank" rel="noopener noreferrer">
+              <span className="btn-label">{ctaText}</span>
+            </a>
+          ) : (
+            <Link to={ctaLink} className="btn btn-primary">
+              <span className="btn-label">{ctaText}</span>
+            </Link>
+          )}
           <a href="#features" className="btn btn-secondary">
             See Features
           </a>
