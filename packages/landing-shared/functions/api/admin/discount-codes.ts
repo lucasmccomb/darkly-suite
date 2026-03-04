@@ -152,6 +152,10 @@ export const onRequestPost: PagesFunction<Env> = async (context: CFContext) => {
     return errorResponse(400, 'Invalid product scope')
   }
 
+  if (body.code && !/^[a-zA-Z0-9-]+$/.test(body.code.trim())) {
+    return errorResponse(400, 'Code can only contain letters, numbers, and dashes')
+  }
+
   try {
     let appliesTo: string[] | undefined
     if (body.product) {
