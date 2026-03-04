@@ -8,10 +8,8 @@ SITE_URL_GMAIL = "https://gmaildarkly.com"
 SITE_URL_SHEETS = "https://sheetsdarkly.com"
 SITE_URL_DOCS = "https://docsdarkly.com"
 SITE_URL_BROWSE = "https://browsedarkly.com"
-# Stripe price IDs (sandbox — swap for live IDs when launching)
-STRIPE_PRICE_GMAIL_MONTHLY = "price_1T2ZhWJY6QkfGXSJEACPhWhv"
-STRIPE_PRICE_GMAIL_YEARLY = "price_1T2ZjQJY6QkfGXSJJ9rFh6Fc"
-STRIPE_PRICE_GMAIL_LIFETIME = "price_1T2ZkVJY6QkfGXSJkdPt1CAu"
+# Gmail Stripe IDs are set as production secrets (live mode).
+# For local dev, use .dev.vars with sandbox values.
 STRIPE_PRICE_SHEETS_MONTHLY = "price_1T2ZvUJY6QkfGXSJCox6fvLl"
 STRIPE_PRICE_SHEETS_YEARLY = "price_1T2a6aJY6QkfGXSJety0QUCM"
 STRIPE_PRICE_SHEETS_LIFETIME = "price_1T2a6aJY6QkfGXSJjtHrMCWf"
@@ -28,7 +26,7 @@ STRIPE_PRICE_BROWSE_LIFETIME = "price_1T3o29JY6QkfGXSJH4UewpKW"
 # Resend API key for admin email notifications (set in Cloudflare dashboard for production)
 # RESEND_API_KEY = ""
 # Stripe product IDs (sandbox — used for coupon applies_to restriction)
-STRIPE_PRODUCT_GMAIL = "prod_U0atcDlecMJ3xS"
+# STRIPE_PRODUCT_GMAIL set as production secret (live mode)
 STRIPE_PRODUCT_SHEETS = "prod_U0b73lYnFW1ZRW"
 STRIPE_PRODUCT_DOCS = "prod_U0bNUH4OAwazJj"
 STRIPE_PRODUCT_SUITE = "prod_U0bNcnlzOCpMmS"
