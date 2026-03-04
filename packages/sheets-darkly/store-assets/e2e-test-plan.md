@@ -13,8 +13,8 @@ Before starting, verify these are live:
 - [ ] **darklysuite.com/api/status/00000000-0000-4000-8000-000000000000?product=sheets** — Returns `{"paid":false}` (not a 500 or DNS error). Token must be a valid UUID v4.
 - [ ] **sheetsdarkly.com/privacy** — Privacy policy page is accessible
 - [ ] **sheetsdarkly.com/subscribe** — Subscribe page loads with pricing tiers
-- [ ] **Stripe test mode** — Products and prices configured for sheets (monthly/yearly/lifetime)
-- [ ] **Promo code** — `CWSREVIEWSHEETS` (or equivalent test code) created in Stripe dashboard
+- [ ] **Stripe** — Products and prices configured for sheets (monthly/yearly/lifetime)
+- [ ] **CWS reviewer promo code** — Verify the promo code `CWSREVIEWSHEETS` is active in Stripe
 - [ ] **Production zip** — Built from latest main: `pnpm --filter sheets-darkly build`, then zip `dist/`
 
 ---
@@ -24,8 +24,8 @@ Before starting, verify these are live:
 **Setup**: Use a Chrome profile signed into the fresh Google account. No previous Darkly extension installed.
 
 1. [ ] Load the extension as unpacked from the production `dist/` directory
-2. [ ] **Verify**: Browser opens `sheetsdarkly.com/subscribe?token=...&email=...` in a new tab
-3. [ ] **Verify**: The subscribe page loads with pricing tiers (monthly/yearly/lifetime)
+2. [ ] **Verify**: Browser opens `sheetsdarkly.com/subscribe?product=sheets` in a new tab
+3. [ ] **Verify**: The subscribe page loads correctly (not a DNS error)
 4. [ ] Navigate to `docs.google.com/spreadsheets` and open any spreadsheet
 5. [ ] **Verify**: Google Sheets loads normally (no crashes, no console errors)
 6. [ ] **Verify**: The Darkly toolbar button appears in the Sheets header bar
@@ -233,6 +233,44 @@ Test dark mode appearance across all Sheets UI elements:
 
 ---
 
+## Test 11: Extension Token Handoff (landing-bridge.js)
+
+**Setup**: Verify the extension properly communicates its token to the checkout page via the landing-bridge content script.
+
+1. [ ] With the extension installed, navigate to `sheetsdarkly.com/subscribe`
+2. [ ] Open the browser console on the subscribe page
+3. [ ] **Verify**: A `darkly-extension-token` CustomEvent is dispatched (add a listener: `window.addEventListener('darkly-extension-token', e => console.log('token:', e.detail))`)
+4. [ ] **Verify**: The event detail contains `{ token: "...", productId: "sheets" }`
+5. [ ] **Verify**: The subscribe page receives the token and uses it for the checkout flow (the "Subscribe" buttons include the token in the checkout URL)
+6. [ ] Navigate to `darklysuite.com`
+7. [ ] **Verify**: The landing-bridge content script also runs here (same CustomEvent mechanism)
+
+**How it works**: The manifest declares a `landing-bridge.js` content script on `sheetsdarkly.com/*` and `darklysuite.com/*`. This content script requests the extension's anonymous device token from the background worker via `chrome.runtime.sendMessage` and broadcasts it to the page via CustomEvent. This works for both published and unpacked extensions without needing a known extension ID.
+
+---
+
+## Test 12: Restore Purchase Flow
+
+**Setup**: Simulate a user who reinstalled the extension and needs to recover their license.
+
+1. [ ] Start with a paid user (from Test 2)
+2. [ ] Remove the extension from `chrome://extensions`
+3. [ ] Re-install the extension (load unpacked from `dist/`)
+4. [ ] Navigate to `docs.google.com/spreadsheets` and open any spreadsheet
+5. [ ] **Verify**: Extension shows the paywall (new device token has no license)
+6. [ ] Click "Already purchased? Restore" link in the paywall
+7. [ ] **Verify**: A new tab opens to `darklysuite.com/api/auth/start?type=restore&token=...&product=sheets`
+8. [ ] **Verify**: Google OAuth flow asks you to confirm your email
+9. [ ] **Verify**: After OAuth, you're redirected to `sheetsdarkly.com/success?restored=true`
+10. [ ] **Verify**: The success page shows "Purchase Restored" heading with a refresh icon (not "Payment Successful" with a checkmark)
+11. [ ] **Verify**: The setup/install section is hidden (since the extension is already installed)
+12. [ ] Return to the Sheets tab
+13. [ ] **Verify**: Within a few minutes, the paywall dismisses and dark mode becomes available (the restore flow updates the license's device token on the backend)
+
+**Note**: The restore flow uses the same OAuth mechanism as checkout but with `type=restore`. Instead of creating a new Stripe subscription, it looks up the existing license by email and updates the device token to match the new extension instance.
+
+---
+
 ## Blocker Checklist
 
 If ANY of these fail, do NOT submit to Chrome Web Store:
@@ -248,6 +286,8 @@ If ANY of these fail, do NOT submit to Chrome Web Store:
 - [ ] No console errors that would concern a Google reviewer
 - [ ] `sheetsdarkly.com/privacy` is accessible
 - [ ] `darklysuite.com/api/status/{uuid-v4-token}?product=sheets` responds correctly
+- [ ] CWS listing description mentions subscription requirement
+- [ ] "Contains in-app purchases" is checked in CWS dashboard Distribution tab
 - [ ] Account portal login and subscription display works at `darklysuite.com/account`
 - [ ] Manage Billing opens Stripe customer portal for recurring plans
 - [ ] Lifetime plans show "Lifetime access" label (not "Manage Billing")
