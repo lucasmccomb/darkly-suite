@@ -2,9 +2,8 @@ import type { PricingTier } from '@darkly/landing-shared'
 
 /**
  * Chrome Web Store listing URL.
- * Replace placeholder ID with real extension ID after publishing.
  */
-export const STORE_URL = 'https://chromewebstore.google.com/detail/darkly-for-gmail/PLACEHOLDER_GMAIL_ID'
+export const STORE_URL = 'https://chromewebstore.google.com/detail/darkly-for-gmail/kfgkinaheobhehhcaobkehpgghipeife'
 
 export const CHECKOUT_API_URL = 'https://darklysuite.com/api/checkout'
 export const AUTH_API_URL = 'https://darklysuite.com/api/auth/start'
@@ -19,13 +18,18 @@ export const NAV_LINKS = [
   { to: 'https://darklysuite.com/account', label: 'Account', external: true },
 ]
 
-export const NAV_CTA = { to: '/#pricing', label: 'Get Darkly for Gmail' }
+export const NAV_CTA = { to: STORE_URL, label: 'Add to Chrome', external: true }
 
 export const FOOTER_LINKS = [
   { to: STORE_URL, label: 'Chrome Web Store', external: true },
   { to: '/privacy', label: 'Privacy Policy' },
   { to: 'mailto:support@gmaildarkly.com', label: 'Contact', external: true },
 ]
+
+export const CWS_BADGE = {
+  url: STORE_URL,
+  label: 'Available in the Chrome Web Store',
+}
 
 export const GMAIL_FEATURES = [
   'Dark mode for Gmail',

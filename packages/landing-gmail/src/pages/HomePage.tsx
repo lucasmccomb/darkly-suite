@@ -4,7 +4,7 @@ import { Nav, Hero, Features, Pricing, FAQ, Footer, buildCheckoutUrl, getOrCreat
 import type { ScreenshotImage } from '@darkly/landing-shared'
 import {
   NAV_LINKS, NAV_CTA, FOOTER_LINKS, SITE_NAME, STORE_URL, CHECKOUT_API_URL,
-  GMAIL_FEATURES, GMAIL_FAQ, individualTiers,
+  GMAIL_FEATURES, GMAIL_FAQ, individualTiers, CWS_BADGE,
 } from '../config.ts'
 
 const heroScreenshots: ScreenshotImage[] = [
@@ -30,8 +30,9 @@ export function HomePage() {
       <Hero
         title="Intelligent dark mode<br />for Gmail"
         subtitle="Automatically switch your Gmail theme to an optimized dark mode based on your machine's OS, sunset/sunrise, or a custom schedule."
-        ctaText="Get Darkly for Gmail"
-        ctaLink="#pricing"
+        ctaText="Add to Chrome"
+        ctaLink={STORE_URL}
+        ctaExternal
         icon={<Mail size={48} color="#ea4335" strokeWidth={1.5} />}
         screenshots={heroScreenshots}
       />
@@ -53,6 +54,7 @@ export function HomePage() {
         links={FOOTER_LINKS}
         copyrightName={SITE_NAME}
         trademarkText="Gmail is a trademark of Google LLC. Darkly is not affiliated with or endorsed by Google."
+        cwsBadge={CWS_BADGE}
       />
     </>
   )

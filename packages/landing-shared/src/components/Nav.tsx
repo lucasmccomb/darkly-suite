@@ -8,10 +8,16 @@ interface NavLink {
   external?: boolean
 }
 
+interface NavCta {
+  to: string
+  label: string
+  external?: boolean
+}
+
 interface NavProps {
   brandLabel?: string
   links: NavLink[]
-  cta: { to: string; label: string }
+  cta: NavCta
 }
 
 export function Nav({ brandLabel, links, cta }: NavProps) {
@@ -41,9 +47,15 @@ export function Nav({ brandLabel, links, cta }: NavProps) {
           )}
         </div>
         <div className="nav-cta">
-          <Link to={cta.to} className="btn btn-primary">
-            <span className="btn-label">{cta.label}</span>
-          </Link>
+          {cta.external ? (
+            <a href={cta.to} className="btn btn-primary" target="_blank" rel="noopener noreferrer">
+              <span className="btn-label">{cta.label}</span>
+            </a>
+          ) : (
+            <Link to={cta.to} className="btn btn-primary">
+              <span className="btn-label">{cta.label}</span>
+            </Link>
+          )}
         </div>
       </div>
     </nav>

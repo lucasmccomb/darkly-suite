@@ -1340,6 +1340,45 @@ button.product-card {
   color: var(--color-text-muted);
 }
 
+/* CWS Badge */
+
+.footer-cws-badge {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border);
+}
+
+.cws-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all var(--transition);
+}
+
+.cws-badge:hover {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+  background: var(--color-surface-hover);
+}
+
+.cws-badge-icon {
+  flex-shrink: 0;
+}
+
+.cws-badge-text {
+  white-space: nowrap;
+}
+
 /* ============================================
    Privacy Policy
    ============================================ */
