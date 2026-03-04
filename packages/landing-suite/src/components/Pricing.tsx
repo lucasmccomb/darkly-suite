@@ -40,9 +40,9 @@ const individualTiers = (product: string): PricingTier[] => [
   },
   {
     plan: 'Yearly',
-    price: '$9.99',
+    price: '$5.99',
     period: '/yr',
-    subtitle: 'Save 16%',
+    subtitle: 'Save 50%',
     highlighted: true,
     badge: 'Best Value',
     cta: 'Get Started',
@@ -50,7 +50,7 @@ const individualTiers = (product: string): PricingTier[] => [
   },
   {
     plan: 'Lifetime',
-    price: '$29.99',
+    price: '$9.99',
     period: '',
     subtitle: 'One-time payment',
     highlighted: false,
@@ -62,7 +62,7 @@ const individualTiers = (product: string): PricingTier[] => [
 const bundleTiers: PricingTier[] = [
   {
     plan: 'Monthly',
-    price: '$2.99',
+    price: '$1.99',
     period: '/mo',
     subtitle: 'Cancel anytime',
     highlighted: false,
@@ -71,9 +71,9 @@ const bundleTiers: PricingTier[] = [
   },
   {
     plan: 'Yearly',
-    price: '$29.99',
+    price: '$9.99',
     period: '/yr',
-    subtitle: 'Save 16%',
+    subtitle: 'Save 58%',
     highlighted: true,
     badge: 'Best Value',
     cta: 'Get the Suite',
@@ -81,7 +81,7 @@ const bundleTiers: PricingTier[] = [
   },
   {
     plan: 'Lifetime',
-    price: '$49.99',
+    price: '$19.99',
     period: '',
     subtitle: 'One-time payment',
     highlighted: false,

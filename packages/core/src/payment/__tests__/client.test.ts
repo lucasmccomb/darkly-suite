@@ -316,7 +316,7 @@ describe('getPrices', () => {
     fetchMock.mockResolvedValueOnce(new Response(
       JSON.stringify({
         paid: false,
-        prices: { monthly: '$0.99', yearly: '$9.99', lifetime: '$29.99' },
+        prices: { monthly: '$0.99', yearly: '$5.99', lifetime: '$9.99' },
       }),
       { status: 200 },
     ) as unknown as globalThis.Response);
@@ -326,8 +326,8 @@ describe('getPrices', () => {
 
     expect(prices).toEqual({
       monthly: '$0.99',
-      yearly: '$9.99',
-      lifetime: '$29.99',
+      yearly: '$5.99',
+      lifetime: '$9.99',
     });
   });
 

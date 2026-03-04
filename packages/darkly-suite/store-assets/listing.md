@@ -63,9 +63,9 @@ PRICING
 
 Darkly Suite offers bundle pricing that saves you money compared to purchasing individual extensions:
 
-- Monthly: $2.99/mo (vs $2.97/mo for three separate extensions, plus Drive is Suite-exclusive)
-- Yearly: $29.99/yr (vs $29.97/yr individually) — save with annual billing
-- Lifetime: $49.99 one-time (vs $89.97 for three separate lifetime licenses) — save over 44%
+- Monthly: $1.99/mo (vs $2.97/mo for three separate extensions, plus Drive is Suite-exclusive)
+- Yearly: $9.99/yr (vs $17.97/yr individually) - save 44%
+- Lifetime: $19.99 one-time (vs $29.97 for three separate lifetime licenses) - save 33%
 
 The lifetime plan is the best value: pay once and get dark mode for Gmail, Sheets, Docs, and Drive forever. All plans include full access to every feature across all four apps.
 

@@ -32,7 +32,7 @@ Before starting, verify these are live:
 8. [ ] Click the Darkly toolbar button
 9. [ ] **Verify**: Dark mode does NOT activate (free user, paywall blocks it)
 10. [ ] **Verify**: A paywall/upgrade prompt appears showing "Darkly for Docs" (NOT "for Gmail" or "for Sheets")
-11. [ ] **Verify**: The paywall shows three plan options: Monthly ($0.99/mo), Yearly ($9.99/yr), Lifetime ($29.99)
+11. [ ] **Verify**: The paywall shows three plan options: Monthly ($0.99/mo), Yearly ($5.99/yr), Lifetime ($9.99)
 12. [ ] **Verify**: The "Subscribe Now" button is visible
 13. [ ] Check the browser console (Right-click > Inspect > Console tab)
 14. [ ] **Verify**: No errors (warnings about Pro status check are OK if the API is unreachable)

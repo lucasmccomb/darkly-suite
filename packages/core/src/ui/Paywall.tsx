@@ -9,14 +9,14 @@ type Plan = 'monthly' | 'yearly' | 'lifetime';
 
 const INDIVIDUAL_PLANS: { id: Plan; name: string; price: string; period: string; subtitle: string }[] = [
   { id: 'monthly', name: 'Monthly', price: '$0.99', period: '/mo', subtitle: 'Cancel anytime' },
-  { id: 'yearly', name: 'Yearly', price: '$9.99', period: '/yr', subtitle: 'Save 16%' },
-  { id: 'lifetime', name: 'Lifetime', price: '$29.99', period: '', subtitle: 'One-time' },
+  { id: 'yearly', name: 'Yearly', price: '$5.99', period: '/yr', subtitle: 'Save 50%' },
+  { id: 'lifetime', name: 'Lifetime', price: '$9.99', period: '', subtitle: 'One-time' },
 ];
 
 const SUITE_PLANS: typeof INDIVIDUAL_PLANS = [
-  { id: 'monthly', name: 'Monthly', price: '$2.99', period: '/mo', subtitle: 'Cancel anytime' },
-  { id: 'yearly', name: 'Yearly', price: '$29.99', period: '/yr', subtitle: 'Save 16%' },
-  { id: 'lifetime', name: 'Lifetime', price: '$49.99', period: '', subtitle: 'One-time' },
+  { id: 'monthly', name: 'Monthly', price: '$1.99', period: '/mo', subtitle: 'Cancel anytime' },
+  { id: 'yearly', name: 'Yearly', price: '$9.99', period: '/yr', subtitle: 'Save 58%' },
+  { id: 'lifetime', name: 'Lifetime', price: '$19.99', period: '', subtitle: 'One-time' },
 ];
 
 interface PaywallProps {
