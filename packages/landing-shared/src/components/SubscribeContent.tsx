@@ -98,7 +98,7 @@ export function SubscribeContent({
         </div>
       </section>
 
-      <section style={{ textAlign: 'center', padding: '0 24px 60px' }}>
+      <section style={{ textAlign: 'center', padding: '0 24px 24px' }}>
         <a
           href={setupPath}
           style={{
