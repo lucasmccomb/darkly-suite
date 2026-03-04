@@ -9,7 +9,7 @@ const gmailFeatures = [
   'Manual toggle',
   'Time-based scheduling',
   'Sunrise/sunset scheduling',
-  'Cross-device sync',
+  'Syncs across computers',
   'In-Gmail settings panel',
   'Priority email support',
 ]

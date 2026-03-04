@@ -13,7 +13,7 @@ All of the following features require an active subscription.
 - OS theme sync - Match your system's light/dark preference so Sheets follows your desktop setting
 - Settings panel inside Sheets - Access all settings from a toolbar button or sidebar icon without leaving your spreadsheet
 - Smooth transitions - No jarring white flashes when toggling between light and dark modes
-- Cross-device sync - Preferences sync across all your Chrome browsers via Chrome's built-in storage
+- Syncs across computers - Preferences sync across all your Chrome Desktop browsers via Chrome's built-in storage
 
 SUBSCRIPTION
 
@@ -25,7 +25,7 @@ After installing, a subscription page opens at sheetsdarkly.com where you can ch
 
 Toggle "Preserve Grid Colors" to keep your spreadsheet data colors intact while the UI around it stays dark - particularly useful for spreadsheets with color-coded data, conditional formatting, or charts.
 
-Your preferences sync across your desktop Chrome browsers using Chrome's built-in sync.
+Your preferences sync across all your Chrome Desktop browsers using Chrome's built-in sync.
 
 PRIVACY
 

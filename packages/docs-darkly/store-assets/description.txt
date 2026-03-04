@@ -13,7 +13,7 @@ FEATURES
 - OS theme sync — Match your system's light/dark preference so Docs follows your desktop setting
 - Settings panel inside Docs — Access all settings from a toolbar button or sidebar icon without leaving your document
 - Smooth transitions — No jarring white flashes when toggling between light and dark modes
-- Cross-device sync — Preferences sync across all your Chrome browsers via Chrome's built-in storage
+- Syncs across computers — Preferences sync across all your Chrome Desktop browsers via Chrome's built-in storage
 
 HOW IT WORKS
 
@@ -21,7 +21,7 @@ After installing, you'll see a dark mode toggle button in the Google Docs toolba
 
 Open the settings panel to configure scheduling, sunrise/sunset mode, or OS sync. Toggle "Preserve Page Colors" to keep your document pages in their original light appearance while the UI around them stays dark — particularly useful for documents with carefully designed page colors, embedded images, or complex formatting.
 
-Your preferences sync across devices using Chrome's built-in sync. No account required.
+Your preferences sync across all your Chrome Desktop browsers using Chrome's built-in sync. No account required.
 
 PRIVACY
 

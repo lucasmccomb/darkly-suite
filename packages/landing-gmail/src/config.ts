@@ -37,7 +37,7 @@ export const GMAIL_FEATURES = [
   'Manual toggle',
   'Time-based scheduling',
   'Sunrise/sunset scheduling',
-  'Cross-device sync',
+  'Syncs across computers',
   'Settings panel in Gmail',
   'Priority email support',
 ]
@@ -56,8 +56,8 @@ export const GMAIL_FAQ = [
     answer: 'When you enable sunset scheduling, Darkly requests your approximate location (with your permission) to calculate sunrise and sunset times. Your location is only sent to the sunrise-sunset.org API and is never stored on our servers.',
   },
   {
-    question: 'Does it work across multiple devices?',
-    answer: "Yes. Darkly uses Chrome's built-in sync storage, so your settings automatically sync across every device where you're signed into Chrome.",
+    question: 'Does it work on multiple computers?',
+    answer: "Yes. Darkly works anywhere Chrome Desktop is installed. Your settings automatically sync across every Chrome browser where you're signed into the same Google account.",
   },
   {
     question: 'Can I customize the colors?',

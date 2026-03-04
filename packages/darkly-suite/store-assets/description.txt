@@ -45,7 +45,7 @@ SHARED FEATURES ACROSS ALL APPS
 - Sunrise/sunset sync — Automatically follow your local daylight hours so dark mode turns on at dusk and off at dawn
 - OS theme sync — Match your system's light/dark preference so Google Workspace follows your desktop setting
 - Smooth transitions — No jarring white flashes when toggling between light and dark modes
-- Cross-device sync — Preferences sync across all your Chrome browsers via Chrome's built-in storage
+- Syncs across computers — Preferences sync across all your Chrome Desktop browsers via Chrome's built-in storage
 
 PRICING
 
@@ -63,7 +63,7 @@ Install Darkly Suite and dark mode is ready across Gmail, Google Sheets, Google 
 
 Open the settings panel in any app to configure that app's dark mode independently. Set scheduling, enable Preserve Grid Colors in Sheets or Preserve Page Colors in Docs — each app remembers its own preferences.
 
-Your preferences sync across devices using Chrome's built-in sync. No account required for preference syncing.
+Your preferences sync across all your Chrome Desktop browsers using Chrome's built-in sync. No account required for preference syncing.
 
 WORKS WITH STANDALONE DARKLY EXTENSIONS
 
