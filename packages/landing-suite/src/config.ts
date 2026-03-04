@@ -108,7 +108,7 @@ export const COMPARISON_FEATURES: ComparisonFeature[] = [
   { name: 'OS theme sync', gmail: true, sheets: true, docs: true, suite: true },
   { name: 'Time-based scheduling', gmail: true, sheets: true, docs: true, suite: true },
   { name: 'Sunrise/sunset scheduling', gmail: true, sheets: true, docs: true, suite: true },
-  { name: 'Cross-device sync', gmail: true, sheets: true, docs: true, suite: true },
+  { name: 'Syncs across computers', gmail: true, sheets: true, docs: true, suite: true },
   { name: 'Preserve Grid Colors', gmail: false, sheets: true, docs: false, suite: true },
   { name: 'In-app settings panel', gmail: true, sheets: true, docs: true, suite: true },
   { name: 'Priority email support', gmail: true, sheets: true, docs: true, suite: true },
@@ -120,7 +120,7 @@ export const DEFAULT_FEATURES = [
   'Manual toggle',
   'Time-based scheduling',
   'Sunrise/sunset scheduling',
-  'Cross-device sync',
+  'Syncs across computers',
   'In-app settings panel',
   'Priority email support',
 ]

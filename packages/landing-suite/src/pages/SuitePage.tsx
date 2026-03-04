@@ -8,7 +8,7 @@ const suiteFeatures = [
   'Manual toggle',
   'Time-based scheduling',
   'Sunrise/sunset scheduling',
-  'Cross-device sync',
+  'Syncs across computers',
   'In-app settings panel',
   'Priority email support',
 ]
