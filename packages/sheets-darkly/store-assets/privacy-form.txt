@@ -42,9 +42,18 @@ Content scripts match the narrower docs.google.com/spreadsheets/* pattern to app
 themes and render controls only on spreadsheet pages.
 
 https://darklysuite.com/*:
-Communicates with the Darkly payment API to check license status. An anonymous device
-token (randomly generated UUID) is sent to verify whether the user has a paid license.
-No personal information is transmitted.
+Communicates with the Darkly payment API to check subscription status and initiate
+checkout. An anonymous device token (randomly generated UUID) is sent to verify whether
+the user has a paid subscription. No personal information is transmitted. A lightweight
+content script (landing-bridge.js) also runs on darklysuite.com to pass the extension's
+anonymous device token to the checkout page via a CustomEvent, ensuring Stripe licenses
+are linked to the correct extension instance.
+
+sheetsdarkly.com + darklysuite.com (landing-bridge.js content script):
+A small content script bridges communication between the landing/checkout pages and the
+extension's background worker. It passes the extension's anonymous device token to the
+page for checkout linking and forwards a checkout-complete signal back to the extension.
+No page content is read or transmitted.
 
 https://api.sunrise-sunset.org/*:
 Fetches sunrise and sunset times for the user's approximate location when they opt into

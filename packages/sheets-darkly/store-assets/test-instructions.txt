@@ -1,10 +1,9 @@
-1. Install extension, open any spreadsheet on docs.google.com
-2. Darkly icon appears in toolbar
-3. Click icon - settings panel shows subscription prompt
-4. Click "Subscribe Now" - opens OAuth then Stripe checkout
-5. Enter promo code CWSREVIEWSHEETS for free access
-6. Test card: 4242 4242 4242 4242, any future exp, any CVC
-7. Return to Sheets - paywall dismisses within 1-2 min
-8. Click Darkly icon to toggle dark mode on/off
+1. Install extension: sheetsdarkly.com/subscribe opens automatically
+2. Select a plan, sign in with Google, complete Stripe checkout
+3. Promo: CWSREVIEWSHEETS | Card: 4242 4242 4242 4242, any exp/CVC
+4. After checkout, go to docs.google.com/spreadsheets (refresh if needed)
+5. Click Darkly icon in toolbar to open the mini-panel
+6. Use mini-panel controls to enable dark mode
+7. Open All Settings for Schedule, OS Sync, Sunrise/Sunset modes
 
-All features require paid subscription. Promo gives free review access.
+All features require a subscription. Promo code gives free access.

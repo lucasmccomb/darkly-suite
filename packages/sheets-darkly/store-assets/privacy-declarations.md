@@ -45,6 +45,7 @@ it is collected, the purpose, whether it is sold, and whether it is transmitted.
 ### Personal communications
 
 - Collected: NO
+- Note: The extension does not read, access, or store any spreadsheet data or cell contents.
 
 ### Location
 
