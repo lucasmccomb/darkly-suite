@@ -149,10 +149,12 @@ export function AdminDiscountsPage() {
               <input
                 type="text"
                 value={code}
-                onChange={(e) => setCode(e.target.value)}
+                onChange={(e) => setCode(e.target.value.replace(/[^a-zA-Z0-9-]/g, ''))}
                 placeholder="e.g. LAUNCH50"
                 className="admin-input"
+                maxLength={500}
               />
+              <span className="admin-form-hint">Letters, numbers, and dashes only</span>
             </label>
           </div>
           <div className="admin-form-row admin-form-row--inline">
