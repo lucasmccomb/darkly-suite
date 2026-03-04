@@ -51,7 +51,7 @@ export function SubscribeContent({
         </div>
       </section>
 
-      <section className="pricing section" style={{ paddingTop: 32 }}>
+      <section className="pricing section">
         <div className="container">
           <div className="pricing-tiers">
             {tiers.map((tier) => {
@@ -98,7 +98,7 @@ export function SubscribeContent({
         </div>
       </section>
 
-      <section style={{ textAlign: 'center', padding: '0 24px 24px' }}>
+      <section style={{ textAlign: 'center', padding: '0 24px 48px' }}>
         <a
           href={setupPath}
           style={{
