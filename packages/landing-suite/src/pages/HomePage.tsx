@@ -79,7 +79,7 @@ export function HomePage() {
               description="All four apps in one bundle. One license, one price, full coverage."
               icon={<SuiteIcon size={28} />}
               link="/suite"
-              price="$2.99/mo"
+              price="$1.99/mo"
             />
           </div>
         </div>

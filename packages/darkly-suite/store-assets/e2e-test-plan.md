@@ -38,7 +38,7 @@ Before starting, verify these are live:
 7. [ ] Click the Darkly toolbar button
 8. [ ] **Verify**: Dark mode does NOT activate (free user, paywall blocks it)
 9. [ ] **Verify**: A paywall/upgrade prompt appears showing "Darkly Suite" (NOT "for Gmail" standalone branding)
-10. [ ] **Verify**: The paywall shows three plan options: Monthly ($0.99/mo), Yearly ($9.99/yr), Lifetime ($29.99)
+10. [ ] **Verify**: The paywall shows three plan options: Monthly ($0.99/mo), Yearly ($5.99/yr), Lifetime ($9.99)
 
 ### Sheets
 

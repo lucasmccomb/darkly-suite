@@ -81,9 +81,9 @@ export const individualTiers = (): PricingTier[] => [
   },
   {
     plan: 'Yearly',
-    price: '$9.99',
+    price: '$5.99',
     period: '/yr',
-    subtitle: 'Save 16%',
+    subtitle: 'Save 50%',
     highlighted: true,
     badge: 'Best Value',
     cta: 'Subscribe',
@@ -91,7 +91,7 @@ export const individualTiers = (): PricingTier[] => [
   },
   {
     plan: 'Lifetime',
-    price: '$29.99',
+    price: '$9.99',
     period: '',
     subtitle: 'One-time payment',
     highlighted: false,

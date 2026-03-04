@@ -147,7 +147,7 @@ describe('webhook — checkout.session.completed', () => {
           customer: 'cus_n',
           subscription: 'sub_n',
           customer_details: { email: 'buyer@example.com' },
-          amount_total: 999,
+          amount_total: 599,
         }),
         { status: 200 },
       ),
@@ -173,7 +173,7 @@ describe('webhook — checkout.session.completed', () => {
     expect(emailBody.subject).toContain('New purchase');
     expect(emailBody.subject).toContain('Sheets');
     expect(emailBody.subject).toContain('buyer@example.com');
-    expect(emailBody.text).toContain('$9.99');
+    expect(emailBody.text).toContain('$5.99');
   });
 
   it('includes promo code info in purchase notification', async () => {
@@ -256,7 +256,7 @@ describe('webhook — checkout.session.completed', () => {
           customer: 'cus_lt',
           subscription: null,
           customer_details: { email: 'lt@example.com' },
-          amount_total: 4999,
+          amount_total: 1999,
         }),
         { status: 200 },
       ),

@@ -265,8 +265,8 @@ describe('status/[token] — GET', () => {
   it('includes dynamic prices from Stripe when available', async () => {
     mockGetProductPrices.mockResolvedValueOnce({
       monthly: '$0.99',
-      yearly: '$9.99',
-      lifetime: '$29.99',
+      yearly: '$5.99',
+      lifetime: '$9.99',
     });
 
     const context = createMockContext({
@@ -284,8 +284,8 @@ describe('status/[token] — GET', () => {
     expect(body.paid).toBe(false);
     expect(body.prices).toEqual({
       monthly: '$0.99',
-      yearly: '$9.99',
-      lifetime: '$29.99',
+      yearly: '$5.99',
+      lifetime: '$9.99',
     });
   });
 

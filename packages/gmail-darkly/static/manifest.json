@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Darkly for Gmail\u2122",
   "description": "Dark mode for Gmail with OS theme sync, sunset scheduling, and schedule mode. Settings right inside Gmail.",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "permissions": ["storage", "alarms", "offscreen", "scripting"],
   "host_permissions": ["https://mail.google.com/*", "https://darklysuite.com/*", "https://api.sunrise-sunset.org/*"],
   "background": {

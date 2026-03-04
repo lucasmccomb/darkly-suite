@@ -99,7 +99,7 @@ function formatCents(cents: number): string {
 
 /**
  * Fetches all 3 plan prices for a product from Stripe and returns
- * formatted display strings (e.g. "$0.99", "$9.99", "$29.99").
+ * formatted display strings (e.g. "$0.99", "$5.99", "$9.99").
  */
 export async function getProductPrices(
   env: Env,
