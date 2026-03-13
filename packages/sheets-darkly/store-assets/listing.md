@@ -1,4 +1,4 @@
-# Chrome Web Store Listing — Darkly for Google Sheets
+# Chrome Web Store Listing - Darkly for Google Sheets
 
 ## Extension Name
 
@@ -16,16 +16,16 @@ SUBSCRIPTION FEATURES
 
 All of the following features require an active subscription.
 
-- Grid-aware dark mode — Darkens the toolbar, formula bar, menus, and sidebar while intelligently handling the spreadsheet grid
-- Preserve Grid Colors toggle — Keep your spreadsheet cells in their original colors while the surrounding UI goes dark, so conditional formatting, colored cells, and data bars remain accurate
-- Color picker swatch preservation — Cell background and text color swatches display their true colors even in dark mode, so you always pick the right shade
-- Chart re-inversion — Embedded charts and chart editor previews display in their original colors, keeping your visualizations readable
-- Automatic scheduling — Set dark mode to activate and deactivate at specific times each day
-- Sunrise/sunset sync — Automatically follow your local daylight hours so dark mode turns on at dusk and off at dawn
-- OS theme sync — Match your system's light/dark preference so Sheets follows your desktop setting
-- Settings panel inside Sheets — Access all settings from a toolbar button or sidebar icon without leaving your spreadsheet
-- Smooth transitions — No jarring white flashes when toggling between light and dark modes
-- Syncs across computers — Preferences sync across all your Chrome Desktop browsers via Chrome's built-in storage
+- Grid-aware dark mode - Darkens the toolbar, formula bar, menus, and sidebar while intelligently handling the spreadsheet grid
+- Preserve Grid Colors toggle - Keep your spreadsheet cells in their original colors while the surrounding UI goes dark, so conditional formatting, colored cells, and data bars remain accurate
+- Color picker swatch preservation - Cell background and text color swatches display their true colors even in dark mode, so you always pick the right shade
+- Chart re-inversion - Embedded charts and chart editor previews display in their original colors, keeping your visualizations readable
+- Automatic scheduling - Set dark mode to activate and deactivate at specific times each day
+- Sunrise/sunset sync - Automatically follow your local daylight hours so dark mode turns on at dusk and off at dawn
+- OS theme sync - Match your system's light/dark preference so Sheets follows your desktop setting
+- Settings panel inside Sheets - Access all settings from a toolbar button or sidebar icon without leaving your spreadsheet
+- Smooth transitions - No jarring white flashes when toggling between light and dark modes
+- Syncs across computers - Preferences sync across all your Chrome Desktop browsers via Chrome's built-in storage
 
 SUBSCRIPTION
 
@@ -49,7 +49,7 @@ Visit https://sheetsdarkly.com for documentation and support, or email admin@dar
 
 ## Category
 
-Functionality & UI
+Productivity
 
 ## Language
 
