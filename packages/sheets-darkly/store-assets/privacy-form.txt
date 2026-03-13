@@ -76,9 +76,9 @@ Website content:                      Not collected
 
 Location details:
   - Collected with user opt-in only (sunrise/sunset scheduling feature)
-  - Use purpose: Functionality — calculating sunrise/sunset times
+  - Use purpose: Functionality - calculating sunrise/sunset times
   - Sold to third parties: No
-  - Transmitted outside the extension: Yes — approximate coordinates sent to the
+  - Transmitted outside the extension: Yes - approximate coordinates sent to the
     public sunrise-sunset.org API to retrieve sunrise/sunset times
   - Browser shows its own permission dialog before access is granted
   - Coordinates are cached locally for up to 24 hours

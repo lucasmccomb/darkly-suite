@@ -129,7 +129,7 @@ Verify the zip contains: `manifest.json`, JS bundles, CSS, icons.
 | Title | *(auto-populated from manifest)* |
 | Summary | *(auto-populated from manifest)* |
 | Description | Paste from `description.txt` |
-| Category | **Functionality & UI** |
+| Category | **Productivity** |
 | Language | **English** |
 | Homepage URL | Product landing page URL |
 | Support URL | Product landing page URL |
@@ -230,4 +230,6 @@ If rejected, the email includes the reason. Fix and resubmit.
 
 | Product | Submitted | Extension ID | Status |
 |---------|-----------|-------------|--------|
-| Gmail | 2026-02-19 | kfgkinaheobhehhcaobkehpgghipeife | In review |
+| Gmail | 2026-02-19 | kfgkinaheobhehhcaobkehpgghipeife | Published |
+| Sheets | 2026-03-13 | TBD | In review |
+| Docs | 2026-03-13 | TBD | In review |

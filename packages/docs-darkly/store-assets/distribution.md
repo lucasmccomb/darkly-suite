@@ -1,23 +1,19 @@
-# Distribution Settings — Darkly for Google Docs
+# Distribution Settings - Darkly for Google Docs
+
+## Payments
+
+Select: **Contains in-app purchases**
+
+All dark mode features require a paid subscription via Stripe checkout
+at darklysuite.com. Plans: monthly ($0.99/mo), yearly ($5.99/yr), or lifetime
+($9.99 one-time). No free tier - the extension shows a subscription prompt
+until the user subscribes.
 
 ## Visibility
 
-Public
+Select: **Public**
 
-## Regions
+## Distribution
 
-All regions
-
-## Pricing
-
-Free
-
-## In-App Purchases
-
-Yes — premium features (sunrise/sunset scheduling, advanced themes) available
-via Stripe checkout at darklysuite.com. Free tier includes basic dark mode toggle
-and manual scheduling.
-
-## Mature Content
-
-No
+- [x] All regions
+- [x] All unlisted regions

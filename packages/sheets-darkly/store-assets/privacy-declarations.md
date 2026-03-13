@@ -50,9 +50,9 @@ it is collected, the purpose, whether it is sold, and whether it is transmitted.
 ### Location
 
 - Collected: YES (with user opt-in only)
-- Use purpose: Functionality — calculating sunrise/sunset times for automatic scheduling
+- Use purpose: Functionality - calculating sunrise/sunset times for automatic scheduling
 - Sold to third parties: NO
-- Transmitted to entities outside the extension: YES — approximate coordinates are sent
+- Transmitted to entities outside the extension: YES - approximate coordinates are sent
   to the public sunrise-sunset.org API to retrieve sunrise/sunset times
 - Note: Location is requested only when the user enables sunrise/sunset mode. The browser
   shows its own permission dialog. Coordinates are cached locally for up to 24 hours.
@@ -75,7 +75,7 @@ it is collected, the purpose, whether it is sold, and whether it is transmitted.
 
 Does this extension execute remote code?
 
-NO — All code is bundled in the extension package. No remote scripts are loaded or executed.
+NO - All code is bundled in the extension package. No remote scripts are loaded or executed.
 
 ## Data Usage Certifications
 

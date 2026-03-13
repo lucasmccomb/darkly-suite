@@ -7,7 +7,8 @@ Copy-paste ready for the CWS developer dashboard.
 SINGLE PURPOSE DESCRIPTION
 ---------------------------
 Darkly for Google Docs applies a dark mode theme to Google Docs with automatic
-scheduling based on time of day, sunrise/sunset, or OS theme preference.
+scheduling based on time of day, sunrise/sunset, or OS theme preference. A paid
+subscription is required for all features.
 
 
 PERMISSION JUSTIFICATIONS
@@ -22,7 +23,8 @@ sunrise/sunset times cache. No personal data is stored.
 alarms:
 Runs periodic checks (every minute) for schedule-based and sunrise/sunset dark mode.
 Determines whether dark mode should be active based on the user's configured schedule
-or local sunrise/sunset times.
+or local sunrise/sunset times. Also used for background polling after checkout to
+detect when payment completes.
 
 offscreen:
 Creates an offscreen document to access the browser's Geolocation API, which is not
@@ -40,9 +42,18 @@ Content scripts match the narrower docs.google.com/document/* pattern to apply
 themes and render controls only on document pages.
 
 https://darklysuite.com/*:
-Communicates with the Darkly payment API to check license status. An anonymous device
-token (randomly generated UUID) is sent to verify whether the user has a paid license.
-No personal information is transmitted.
+Communicates with the Darkly payment API to check subscription status and initiate
+checkout. An anonymous device token (randomly generated UUID) is sent to verify whether
+the user has a paid subscription. No personal information is transmitted. A lightweight
+content script (landing-bridge.js) also runs on darklysuite.com to pass the extension's
+anonymous device token to the checkout page via a CustomEvent, ensuring Stripe licenses
+are linked to the correct extension instance.
+
+docsdarkly.com + darklysuite.com (landing-bridge.js content script):
+A small content script bridges communication between the landing/checkout pages and the
+extension's background worker. It passes the extension's anonymous device token to the
+page for checkout linking and forwards a checkout-complete signal back to the extension.
+No page content is read or transmitted.
 
 https://api.sunrise-sunset.org/*:
 Fetches sunrise and sunset times for the user's approximate location when they opt into
@@ -65,9 +76,9 @@ Website content:                      Not collected
 
 Location details:
   - Collected with user opt-in only (sunrise/sunset scheduling feature)
-  - Use purpose: Functionality --- calculating sunrise/sunset times
+  - Use purpose: Functionality - calculating sunrise/sunset times
   - Sold to third parties: No
-  - Transmitted outside the extension: Yes --- approximate coordinates sent to the
+  - Transmitted outside the extension: Yes - approximate coordinates sent to the
     public sunrise-sunset.org API to retrieve sunrise/sunset times
   - Browser shows its own permission dialog before access is granted
   - Coordinates are cached locally for up to 24 hours
@@ -81,4 +92,4 @@ All code is bundled in the extension package. No remote scripts are loaded or ex
 
 PRIVACY POLICY URL
 -------------------
-https://darklysuite.com/privacy
+https://docsdarkly.com/privacy
