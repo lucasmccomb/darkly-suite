@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "FPORT=$(grep FRONTEND_PORT ../../.env.clone 2>/dev/null | cut -d= -f2) && vite --port ${FPORT:-5285}",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
