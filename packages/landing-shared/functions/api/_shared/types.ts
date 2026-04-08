@@ -45,9 +45,14 @@ export interface Env {
   SITE_URL_BROWSE?: string;
   // Resend API key for admin email notifications
   RESEND_API_KEY?: string;
-  // CORS — comma-separated list of allowed Chrome extension IDs (stable CWS IDs)
-  // When unset, all chrome-extension:// origins are allowed (for local development)
+  // CORS — comma-separated list of allowed Chrome extension IDs (stable CWS IDs).
+  // In production, this MUST be set or all chrome-extension:// origins are rejected.
+  // In development (ENVIRONMENT === 'development'), unset means all extensions are allowed.
   ALLOWED_EXTENSION_IDS?: string;
+  // Deployment environment marker. When set to "development", relaxed CORS rules
+  // permit any chrome-extension:// origin if ALLOWED_EXTENSION_IDS is unset.
+  // Any other value (or unset) is treated as production: fail-closed CORS.
+  ENVIRONMENT?: string;
 }
 
 export interface License {
