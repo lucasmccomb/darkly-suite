@@ -1,0 +1,9 @@
+extension: sheets-quick-test
+screenshots:
+  - id: 01-spreadsheet-light
+    page: sheets/spreadsheet.html
+    theme: light
+    title: "Dark Mode for Sheets"
+    subtitle: "Spreadsheets without the glare"
+    gradient: ["#0d1117", "#161b22"]
+    browserUrl: "docs.google.com/spreadsheets"
