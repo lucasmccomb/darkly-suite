@@ -6,8 +6,6 @@
 
 ## Chrome Web Store Launch Status
 
-<!-- This table is consumed by lem.work to display project status. Keep it up to date. -->
-
 | Extension | In Development | CWS In-Review | CWS Approved | Published | Version |
 |-----------|:-:|:-:|:-:|:-:|---------|
 | Darkly for Gmail | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | 1.0.1 |
@@ -18,9 +16,24 @@
 
 **Legend:** :white_check_mark: = stage completed. Rightmost checkmark indicates current status.
 
+## Screenshots
+
+### Darkly for Gmail
+
+![Darkly for Gmail](packages/landing-gmail/public/images/screenshots/panel-open-dark.jpg)
+
+### Darkly for Sheets
+
+![Darkly for Sheets](packages/sheets-darkly/store-assets/screenshots/panel-open-dark-1280x800.jpg)
+
+### Darkly for Docs
+
+![Darkly for Docs](packages/landing-docs/public/images/screenshots/panel-open-dark.jpg)
+
 ## Table of Contents
 
 - [Chrome Web Store Launch Status](#chrome-web-store-launch-status)
+- [Screenshots](#screenshots)
 - [What is Darkly Suite?](#what-is-darkly-suite)
 - [Extensions at a Glance](#extensions-at-a-glance)
 - [Repository Structure](#repository-structure)
@@ -45,6 +58,7 @@
   - [Pre-Push Verification](#pre-push-verification)
   - [Chrome Extension Context Rules](#chrome-extension-context-rules)
 - [CI/CD](#cicd)
+- [License](#license)
 
 ## What is Darkly Suite?
 
@@ -305,9 +319,9 @@ When both a standalone extension (e.g., Darkly for Gmail) and the Darkly Suite b
 
 ## Testing
 
-**379 tests** across 2 test suites (19 test files):
+**410 tests** across 2 test suites (21 test files):
 
-**@darkly/core** (9 test files, 179 tests):
+**@darkly/core** (10 test files, 198 tests):
 - Theme engine, presets, contrast
 - Scheduler (time-based and sunrise/sunset)
 - Preferences storage
@@ -315,7 +329,7 @@ When both a standalone extension (e.g., Darkly for Gmail) and the Darkly Suite b
 - Sun-times geolocation
 - Conflict detection
 
-**@darkly/landing-shared** (10 test files, 200 tests):
+**@darkly/landing-shared** (11 test files, 212 tests):
 - Stripe integration
 - Webhook processing (binary status model)
 - License status endpoint
@@ -405,3 +419,7 @@ npx wrangler pages deploy dist \
 ```
 
 Manual deploy uploads the pre-built `dist/` directory directly to Cloudflare's CDN, bypassing the remote build step entirely. This is the fastest and most reliable path when you've already verified the build locally.
+
+## License
+
+MIT © 2026 Lucas McComb. See [LICENSE](LICENSE) for details.
