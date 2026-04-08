@@ -1,6 +1,7 @@
 {
   "name": "@darkly/site-docs",
   "version": "1.0.0",
+  "license": "MIT",
   "description": "Google Docs-specific plugin with Kix canvas integration and theme overrides",
   "private": true,
   "main": "src/index.ts",

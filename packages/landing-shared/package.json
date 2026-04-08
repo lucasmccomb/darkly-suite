@@ -1,6 +1,7 @@
 {
   "name": "@darkly/landing-shared",
   "version": "1.0.0",
+  "license": "MIT",
   "description": "Shared components, styles, and backend functions for Darkly landing pages",
   "private": true,
   "type": "module",
