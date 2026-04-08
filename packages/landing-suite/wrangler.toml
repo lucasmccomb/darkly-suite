@@ -8,28 +8,12 @@ SITE_URL_GMAIL = "https://gmaildarkly.com"
 SITE_URL_SHEETS = "https://sheetsdarkly.com"
 SITE_URL_DOCS = "https://docsdarkly.com"
 SITE_URL_BROWSE = "https://browsedarkly.com"
-# Gmail Stripe IDs are set as production secrets (live mode).
+# All Stripe IDs (prices + products) are set as production secrets (live mode).
 # For local dev, use .dev.vars with sandbox values.
-STRIPE_PRICE_SHEETS_MONTHLY = "price_1T73tmJ1nxcsVJaF3X8xzsTB"
-STRIPE_PRICE_SHEETS_YEARLY = "price_1T754kJ1nxcsVJaFSj9Xhpkb"
-STRIPE_PRICE_SHEETS_LIFETIME = "price_1T754lJ1nxcsVJaFt76ZcfIX"
-STRIPE_PRICE_DOCS_MONTHLY = "price_1T73tpJ1nxcsVJaF8PjxhDAx"
-STRIPE_PRICE_DOCS_YEARLY = "price_1T754nJ1nxcsVJaFgjXJXIFs"
-STRIPE_PRICE_DOCS_LIFETIME = "price_1T754oJ1nxcsVJaFxBPrbuEw"
-STRIPE_PRICE_SUITE_MONTHLY = "price_1T754pJ1nxcsVJaFTCtP17kE"
-STRIPE_PRICE_SUITE_YEARLY = "price_1T754qJ1nxcsVJaFOQOhxa7J"
-STRIPE_PRICE_SUITE_LIFETIME = "price_1T754rJ1nxcsVJaFIDX9CfcM"
-# Browse Darkly prices (sandbox)
+# Browse Darkly prices (sandbox - not yet promoted to live secrets)
 STRIPE_PRICE_BROWSE_MONTHLY = "price_1T7556J1nxcsVJaFhV6STvI4"
 STRIPE_PRICE_BROWSE_YEARLY = "price_1T7557J1nxcsVJaFaMvxaVm4"
 STRIPE_PRICE_BROWSE_LIFETIME = "price_1T7558J1nxcsVJaF4luS4efN"
-# Resend API key for admin email notifications (set in Cloudflare dashboard for production)
-# RESEND_API_KEY = ""
-# Stripe product IDs (sandbox - used for coupon applies_to restriction)
-# STRIPE_PRODUCT_GMAIL set as production secret (live mode)
-STRIPE_PRODUCT_SHEETS = "prod_U5EMLILNjCGQU0"
-STRIPE_PRODUCT_DOCS = "prod_U5EMwuGBk6Qtaw"
-STRIPE_PRODUCT_SUITE = "prod_U5EMPpu3rYUZ0q"
 STRIPE_PRODUCT_BROWSE = "prod_U5Fap9EQ9vgSvJ"
 
 [[d1_databases]]

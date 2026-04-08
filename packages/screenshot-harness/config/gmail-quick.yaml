@@ -1,0 +1,9 @@
+extension: gmail-quick-test
+screenshots:
+  - id: 01-inbox-light
+    page: gmail/inbox.html
+    theme: light
+    title: "Dark Mode for Gmail"
+    subtitle: "Easy on the eyes, day and night"
+    gradient: ["#1a1a2e", "#16213e"]
+    browserUrl: "mail.google.com"

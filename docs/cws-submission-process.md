@@ -231,5 +231,5 @@ If rejected, the email includes the reason. Fix and resubmit.
 | Product | Submitted | Extension ID | Status |
 |---------|-----------|-------------|--------|
 | Gmail | 2026-02-19 | kfgkinaheobhehhcaobkehpgghipeife | Published |
-| Sheets | 2026-03-13 | TBD | In review |
-| Docs | 2026-03-13 | TBD | In review |
+| Sheets | — | — | Not submitted |
+| Docs | — | — | Not submitted |

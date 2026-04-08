@@ -5,7 +5,12 @@ dist/
 .env
 .env.local
 .env.production
+.env.clone
 *.log
 coverage/
 .wrangler/
 .dev.vars
+.claude/
+.audit/
+*.pem
+*.key
