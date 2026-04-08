@@ -18,7 +18,9 @@ async function init(): Promise<void> {
 
   // Skip dark mode in iframes (avoid double-inversion in embedded docs)
   if (window.self !== window.top) {
-    console.log('[Darkly Suite] Docs — skipping iframe');
+    if (__DEV_MODE__) {
+      console.log('[Darkly Suite] Docs — skipping iframe');
+    }
     return;
   }
 
@@ -27,13 +29,17 @@ async function init(): Promise<void> {
     window.location.pathname.includes('/export') ||
     window.location.pathname.includes('/preview')
   ) {
-    console.log('[Darkly Suite] Docs — skipping print/export/preview view');
+    if (__DEV_MODE__) {
+      console.log('[Darkly Suite] Docs — skipping print/export/preview view');
+    }
     return;
   }
 
-  console.log(
-    `[Darkly Suite] Docs content script loaded (prefix: ${siteConfig.prefix}, storage: ${siteConfig.storageKey})`
-  );
+  if (__DEV_MODE__) {
+    console.log(
+      `[Darkly Suite] Docs content script loaded (prefix: ${siteConfig.prefix}, storage: ${siteConfig.storageKey})`
+    );
+  }
 
   createContentScript(siteConfig, docsPlugin);
 }

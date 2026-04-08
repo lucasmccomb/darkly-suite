@@ -18,13 +18,17 @@ async function init(): Promise<void> {
 
   // Skip dark mode in iframes (avoid double-inversion in embedded Drive)
   if (window.self !== window.top) {
-    console.log('[Darkly Suite] Drive — skipping iframe');
+    if (__DEV_MODE__) {
+      console.log('[Darkly Suite] Drive — skipping iframe');
+    }
     return;
   }
 
-  console.log(
-    `[Darkly Suite] Drive content script loaded (prefix: ${siteConfig.prefix}, storage: ${siteConfig.storageKey})`
-  );
+  if (__DEV_MODE__) {
+    console.log(
+      `[Darkly Suite] Drive content script loaded (prefix: ${siteConfig.prefix}, storage: ${siteConfig.storageKey})`
+    );
+  }
 
   createContentScript(siteConfig, drivePlugin);
 }

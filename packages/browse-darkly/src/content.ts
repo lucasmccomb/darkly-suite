@@ -31,13 +31,17 @@ interface Preferences {
 
 // Defer to specialized Darkly extensions on Google Workspace sites
 if (GOOGLE_WORKSPACE_DOMAINS.has(domain)) {
-  console.log(
-    '[Browse Darkly] Deferring to specialized Darkly extension on',
-    domain
-  );
+  if (__DEV_MODE__) {
+    console.log(
+      '[Browse Darkly] Deferring to specialized Darkly extension on',
+      domain
+    );
+  }
 } else if (document.documentElement.hasAttribute('data-darkly-active')) {
   // Check if another Darkly extension already claimed this page
-  console.log('[Browse Darkly] Skipping — another Darkly extension is active');
+  if (__DEV_MODE__) {
+    console.log('[Browse Darkly] Skipping — another Darkly extension is active');
+  }
 } else {
   // Initialize based on stored preferences
   chrome.storage.local.get(

@@ -156,7 +156,9 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 // --- Single install/update handler ---
 chrome.runtime.onInstalled.addListener(async (details) => {
   if (details.reason === 'install') {
-    console.log('[Darkly Suite] Extension installed');
+    if (__DEV_MODE__) {
+      console.log('[Darkly Suite] Extension installed');
+    }
     if (typeof __DEV_MODE__ === 'undefined' || !__DEV_MODE__) {
       // Use sharedWorker.getToken() instead of raw storage read to avoid race
       // condition with initPayment() (which is fire-and-forget async).
@@ -177,10 +179,14 @@ chrome.runtime.onInstalled.addListener(async (details) => {
       await worker.setupAlarm();
     }
   } else if (details.reason === 'update') {
-    console.log(
-      `[Darkly Suite] Extension updated to ${chrome.runtime.getManifest().version}`,
-    );
+    if (__DEV_MODE__) {
+      console.log(
+        `[Darkly Suite] Extension updated to ${chrome.runtime.getManifest().version}`,
+      );
+    }
   }
 });
 
-console.log(`[Darkly Suite] Background service worker initialized (${sites.length} sites)`);
+if (__DEV_MODE__) {
+  console.log(`[Darkly Suite] Background service worker initialized (${sites.length} sites)`);
+}

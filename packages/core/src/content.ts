@@ -262,7 +262,9 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
       });
     }
 
-    console.log(`[${config.productName}] Extension loaded`);
+    if (__DEV_MODE__) {
+      console.log(`[${config.productName}] Extension loaded`);
+    }
   }
 
   init().catch((err) => {

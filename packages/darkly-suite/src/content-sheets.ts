@@ -18,7 +18,9 @@ async function init(): Promise<void> {
 
   // Skip dark mode in iframes (avoid double-inversion in embedded sheets)
   if (window.self !== window.top) {
-    console.log('[Darkly Suite] Sheets — skipping iframe');
+    if (__DEV_MODE__) {
+      console.log('[Darkly Suite] Sheets — skipping iframe');
+    }
     return;
   }
 
@@ -26,13 +28,17 @@ async function init(): Promise<void> {
     window.location.pathname.includes('/print') ||
     window.location.pathname.includes('/export')
   ) {
-    console.log('[Darkly Suite] Sheets — skipping print/export view');
+    if (__DEV_MODE__) {
+      console.log('[Darkly Suite] Sheets — skipping print/export view');
+    }
     return;
   }
 
-  console.log(
-    `[Darkly Suite] Sheets content script loaded (prefix: ${siteConfig.prefix}, storage: ${siteConfig.storageKey})`
-  );
+  if (__DEV_MODE__) {
+    console.log(
+      `[Darkly Suite] Sheets content script loaded (prefix: ${siteConfig.prefix}, storage: ${siteConfig.storageKey})`
+    );
+  }
 
   createContentScript(siteConfig, sheetsPlugin);
 }

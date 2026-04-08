@@ -11,15 +11,21 @@ const CLAIM_ID = config.prefix; // 'dd'
 
 // Skip dark mode in iframes (avoid double-inversion in embedded docs)
 if (window.self !== window.top) {
-  console.log('[Darkly for Docs] Skipping — running inside iframe');
+  if (__DEV_MODE__) {
+    console.log('[Darkly for Docs] Skipping — running inside iframe');
+  }
 } else if (
   window.location.pathname.includes('/print') ||
   window.location.pathname.includes('/export') ||
   window.location.pathname.includes('/preview')
 ) {
-  console.log('[Darkly for Docs] Skipping — print/export/preview view');
+  if (__DEV_MODE__) {
+    console.log('[Darkly for Docs] Skipping — print/export/preview view');
+  }
 } else if (!claimPage(CLAIM_ID)) {
-  console.log(`[${config.productName}] Skipping — another Darkly extension is active`);
+  if (__DEV_MODE__) {
+    console.log(`[${config.productName}] Skipping — another Darkly extension is active`);
+  }
 } else {
   createContentScript(config, docsPlugin);
 }

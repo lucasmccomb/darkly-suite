@@ -87,11 +87,9 @@ export type { NativeDarkState } from './analysis/native-dark-detection';
 export { classifyComplexity } from './analysis/complexity-classifier';
 export type { ComplexityLevel, ComplexityAnalysis } from './analysis/complexity-classifier';
 
-// Security — CSS sanitization and bundle verification
+// Security — CSS sanitization
 export { sanitizeCSS } from './security/css-sanitizer';
 export type { SanitizationResult } from './security/css-sanitizer';
-export { verifyBundleSignature } from './security/signature-verifier';
-export type { SignedBundle } from './security/signature-verifier';
 
 // Breakage pattern handlers for CSS filter inversion
 export {

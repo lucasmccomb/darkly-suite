@@ -15,9 +15,6 @@ export { PromoTile } from './components/PromoTile.tsx'
 export { HeroScreenshots, FeatureScreenshots } from './components/ScreenshotShowcase.tsx'
 export type { ScreenshotImage } from './components/ScreenshotShowcase.tsx'
 
-// Pages
-export { LogoDesignPage } from './pages/LogoDesignPage.tsx'
-
 // Utilities
 export { ScrollToHash } from './ScrollToHash.tsx'
 export { buildCheckoutUrl, buildOAuthCheckoutUrl, getOrCreateToken } from './utils/checkout.ts'
