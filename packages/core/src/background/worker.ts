@@ -285,7 +285,9 @@ export function createBackgroundWorker(config: ProductConfig): void {
   });
 
   chrome.runtime.onInstalled.addListener(async (details) => {
-    console.log(`[${config.productName}] Extension installed:`, details.reason);
+    if (__DEV_MODE__) {
+      console.log(`[${config.productName}] Extension installed:`, details.reason);
+    }
     if (details.reason === 'install') {
       if (typeof __DEV_MODE__ === 'undefined' || !__DEV_MODE__) {
         // Use worker.getToken() instead of raw storage read to avoid race

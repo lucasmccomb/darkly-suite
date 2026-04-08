@@ -10,7 +10,9 @@ import { config } from './darkly.config';
 const CLAIM_ID = config.prefix; // 'gd'
 
 if (!claimPage(CLAIM_ID)) {
-  console.log(`[${config.productName}] Skipping — another Darkly extension is active`);
+  if (__DEV_MODE__) {
+    console.log(`[${config.productName}] Skipping — another Darkly extension is active`);
+  }
 } else {
   createContentScript(config, gmailPlugin);
 }

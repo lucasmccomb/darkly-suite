@@ -16,9 +16,11 @@ const CLAIM_ID = 'ds-gmail';
 async function init(): Promise<void> {
   if (!claimPage(CLAIM_ID)) return;
 
-  console.log(
-    `[Darkly Suite] Gmail content script loaded (prefix: ${siteConfig.prefix}, storage: ${siteConfig.storageKey})`
-  );
+  if (__DEV_MODE__) {
+    console.log(
+      `[Darkly Suite] Gmail content script loaded (prefix: ${siteConfig.prefix}, storage: ${siteConfig.storageKey})`
+    );
+  }
 
   createContentScript(siteConfig, gmailPlugin);
 }

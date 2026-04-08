@@ -70,13 +70,11 @@ chrome.runtime.onMessageExternal.addListener((message, _sender, sendResponse) =>
   return false;
 });
 
-// Set up alarm for schedule checking (sunrise/sunset, time-based)
-chrome.alarms.create(config.alarmName, { periodInMinutes: 1 });
-
+// Forward checkout poller alarms. (Schedule-mode alarm checking is not yet
+// implemented for browse-darkly's custom background worker; the schedule UI
+// in GeneralSection still saves preferences, but live alarm-driven theme
+// updates are deferred until browse-darkly migrates to createBackgroundWorker.)
 chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === config.alarmName) {
-    // TODO: Implement schedule checking
-  }
   if (alarm.name === checkoutPoller.alarmName) {
     checkoutPoller.handleAlarm();
   }
@@ -84,7 +82,9 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 
 // On fresh install, open the subscribe page (production only)
 chrome.runtime.onInstalled.addListener(async (details) => {
-  console.log(`[${config.productName}] Extension installed:`, details.reason);
+  if (__DEV_MODE__) {
+    console.log(`[${config.productName}] Extension installed:`, details.reason);
+  }
   if (details.reason === 'install') {
     if (typeof __DEV_MODE__ === 'undefined' || !__DEV_MODE__) {
       const result = await chrome.storage.sync.get(config.tokenKey);
@@ -98,4 +98,6 @@ chrome.runtime.onInstalled.addListener(async (details) => {
   }
 });
 
-console.log(`[${config.productName}] Background service worker initialized`);
+if (__DEV_MODE__) {
+  console.log(`[${config.productName}] Background service worker initialized`);
+}
