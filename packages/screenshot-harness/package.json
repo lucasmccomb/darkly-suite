@@ -1,6 +1,7 @@
 {
   "name": "@darkly/screenshot-harness",
   "version": "0.1.0",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "build:pages": "tsx src/build-pages.ts",

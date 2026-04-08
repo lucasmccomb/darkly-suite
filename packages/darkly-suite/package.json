@@ -1,6 +1,7 @@
 {
   "name": "darkly-suite-ext",
   "version": "1.0.0",
+  "license": "MIT",
   "description": "Bundle Chrome extension providing dark mode for Gmail, Sheets, Docs, and Drive",
   "private": true,
   "scripts": {

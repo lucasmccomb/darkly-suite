@@ -1,6 +1,7 @@
 {
   "name": "darkly-suite",
   "version": "1.0.0",
+  "license": "MIT",
   "private": true,
   "description": "Unified monorepo for Darkly for Gmail, Darkly for Sheets, Darkly for Docs, and Darkly Suite bundle",
   "scripts": {
