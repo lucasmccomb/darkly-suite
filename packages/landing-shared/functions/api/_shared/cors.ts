@@ -8,14 +8,24 @@ const GOOGLE_APP_ORIGINS = [
 // Chrome extension IDs are exactly 32 lowercase a-p characters
 const EXTENSION_ORIGIN_RE = /^chrome-extension:\/\/([a-p]{32})$/;
 
-function isAllowedExtension(origin: string, allowedExtensionIds?: string[]): boolean {
+function isAllowedExtension(
+  origin: string,
+  allowedExtensionIds?: string[],
+  environment?: string,
+): boolean {
   const match = origin.match(EXTENSION_ORIGIN_RE);
   if (!match) return false;
 
-  // No allowlist configured → permit all extensions (local development)
-  if (!allowedExtensionIds || allowedExtensionIds.length === 0) return true;
+  // Allowlist configured → only permit listed IDs
+  if (allowedExtensionIds && allowedExtensionIds.length > 0) {
+    return allowedExtensionIds.includes(match[1]);
+  }
 
-  return allowedExtensionIds.includes(match[1]);
+  // No allowlist + development → permit all extensions (local dev convenience)
+  if (environment === 'development') return true;
+
+  // No allowlist + production → fail closed
+  return false;
 }
 
 /** Derive allowed web origins from SITE_URL (e.g. "https://darklysuite.com" → bare + www). */
@@ -34,16 +44,26 @@ function getSiteOrigins(siteUrl: string): string[] {
  *   and extensions are allowed.
  * @param allowedExtensionIds - Parsed list of allowed Chrome extension IDs.
  *   Pass `parseExtensionIds(env.ALLOWED_EXTENSION_IDS)` from callers.
- *   When undefined/empty, all chrome-extension:// origins are allowed (dev mode).
+ *   When undefined/empty in production, all chrome-extension:// origins are rejected.
+ *   When undefined/empty in development, all chrome-extension:// origins are allowed.
+ * @param environment - The ENVIRONMENT env var. Pass `env.ENVIRONMENT` from callers.
+ *   "development" enables relaxed extension CORS when no allowlist is set.
+ *   Any other value (or undefined) requires the allowlist to be set.
  */
-export function corsHeaders(origin?: string, siteUrl?: string, allowedExtensionIds?: string[]): HeadersInit {
+export function corsHeaders(
+  origin?: string,
+  siteUrl?: string,
+  allowedExtensionIds?: string[],
+  environment?: string,
+): HeadersInit {
   const siteOrigins = siteUrl ? getSiteOrigins(siteUrl) : [];
   const allowedOrigins = [...siteOrigins, ...GOOGLE_APP_ORIGINS];
   const defaultOrigin = siteOrigins[0] ?? GOOGLE_APP_ORIGINS[0];
 
   const isAllowed =
     origin &&
-    (allowedOrigins.includes(origin) || isAllowedExtension(origin, allowedExtensionIds));
+    (allowedOrigins.includes(origin) ||
+      isAllowedExtension(origin, allowedExtensionIds, environment));
 
   return {
     'Access-Control-Allow-Origin': isAllowed ? origin : defaultOrigin,
@@ -61,9 +81,19 @@ export function parseExtensionIds(envValue?: string): string[] | undefined {
     .filter((id) => id.length > 0);
 }
 
-export function handleOptions(request: Request, siteUrl?: string, allowedExtensionIds?: string[]): Response {
+export function handleOptions(
+  request: Request,
+  siteUrl?: string,
+  allowedExtensionIds?: string[],
+  environment?: string,
+): Response {
   return new Response(null, {
     status: 204,
-    headers: corsHeaders(request.headers.get('Origin') ?? undefined, siteUrl, allowedExtensionIds),
+    headers: corsHeaders(
+      request.headers.get('Origin') ?? undefined,
+      siteUrl,
+      allowedExtensionIds,
+      environment,
+    ),
   });
 }

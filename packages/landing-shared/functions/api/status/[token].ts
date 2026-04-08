@@ -8,13 +8,18 @@ import type { ProductId } from '../_shared/types.ts';
 type CFContext = EventContext<Env, string, unknown>;
 
 export const onRequestOptions: PagesFunction<Env> = async (context: CFContext) => {
-  return handleOptions(context.request, context.env.SITE_URL, parseExtensionIds(context.env.ALLOWED_EXTENSION_IDS));
+  return handleOptions(
+    context.request,
+    context.env.SITE_URL,
+    parseExtensionIds(context.env.ALLOWED_EXTENSION_IDS),
+    context.env.ENVIRONMENT,
+  );
 };
 
 export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
   const origin = context.request.headers.get('Origin') ?? undefined;
   const extIds = parseExtensionIds(context.env.ALLOWED_EXTENSION_IDS);
-  const headers: HeadersInit = { ...corsHeaders(origin, context.env.SITE_URL, extIds), 'Content-Type': 'application/json' };
+  const headers: HeadersInit = { ...corsHeaders(origin, context.env.SITE_URL, extIds, context.env.ENVIRONMENT), 'Content-Type': 'application/json' };
 
   // Rate limiting — 10 requests per 60-second window per IP
   const ip = getClientIp(context.request);

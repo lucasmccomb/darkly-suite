@@ -35,10 +35,23 @@ describe('corsHeaders', () => {
     }
   });
 
-  it('allows a chrome extension with valid 32-char ID (no allowlist = dev mode)', () => {
+  it('allows a chrome extension with valid 32-char ID when environment is development', () => {
+    const origin = 'chrome-extension://abcdefghijklmnopabcdefghijklmnop';
+    const headers = corsHeaders(origin, siteUrl, undefined, 'development') as Headers;
+    expect(headers['Access-Control-Allow-Origin']).toBe(origin);
+  });
+
+  it('rejects any chrome extension by default in production (no allowlist set)', () => {
     const origin = 'chrome-extension://abcdefghijklmnopabcdefghijklmnop';
     const headers = corsHeaders(origin, siteUrl) as Headers;
-    expect(headers['Access-Control-Allow-Origin']).toBe(origin);
+    expect(headers['Access-Control-Allow-Origin']).not.toBe(origin);
+    expect(headers['Access-Control-Allow-Origin']).toBe('https://darklysuite.com');
+  });
+
+  it('rejects any chrome extension in production with explicit production env', () => {
+    const origin = 'chrome-extension://abcdefghijklmnopabcdefghijklmnop';
+    const headers = corsHeaders(origin, siteUrl, undefined, 'production') as Headers;
+    expect(headers['Access-Control-Allow-Origin']).not.toBe(origin);
   });
 
   it('allows a chrome extension when its ID is in the allowlist', () => {
@@ -48,21 +61,39 @@ describe('corsHeaders', () => {
     expect(headers['Access-Control-Allow-Origin']).toBe(origin);
   });
 
+  it('allows allowlisted extension regardless of environment', () => {
+    const extensionId = 'abcdefghijklmnopabcdefghijklmnop';
+    const origin = `chrome-extension://${extensionId}`;
+    const headers = corsHeaders(origin, siteUrl, [extensionId], 'production') as Headers;
+    expect(headers['Access-Control-Allow-Origin']).toBe(origin);
+  });
+
   it('rejects a chrome extension when its ID is NOT in the allowlist', () => {
     const origin = 'chrome-extension://abcdefghijklmnopabcdefghijklmnop';
     const headers = corsHeaders(origin, siteUrl, ['differentextensionidhereplease']) as Headers;
     expect(headers['Access-Control-Allow-Origin']).not.toBe(origin);
   });
 
+  it('rejects a chrome extension not in allowlist even in development', () => {
+    const origin = 'chrome-extension://abcdefghijklmnopabcdefghijklmnop';
+    const headers = corsHeaders(
+      origin,
+      siteUrl,
+      ['differentextensionidhereplease'],
+      'development',
+    ) as Headers;
+    expect(headers['Access-Control-Allow-Origin']).not.toBe(origin);
+  });
+
   it('rejects an extension origin with invalid characters (not a-p)', () => {
     const origin = 'chrome-extension://zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz';
-    const headers = corsHeaders(origin, siteUrl) as Headers;
+    const headers = corsHeaders(origin, siteUrl, undefined, 'development') as Headers;
     expect(headers['Access-Control-Allow-Origin']).not.toBe(origin);
   });
 
   it('rejects an extension origin with wrong length', () => {
     const origin = 'chrome-extension://abcdefg';
-    const headers = corsHeaders(origin, siteUrl) as Headers;
+    const headers = corsHeaders(origin, siteUrl, undefined, 'development') as Headers;
     expect(headers['Access-Control-Allow-Origin']).not.toBe(origin);
   });
 
