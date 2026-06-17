@@ -1,4 +1,5 @@
 import type { Env } from './_shared/types.ts';
+import { isValidProduct } from './_shared/types.ts';
 import { verifyWebhookSignature, retrieveCheckoutSession, retrieveCustomer } from './_shared/stripe.ts';
 import { getProductPlanFromPriceId } from './_shared/products.ts';
 import { sendAdminEmail, sendUserEmail } from './_shared/email.ts';
@@ -132,6 +133,14 @@ async function handleCheckoutCompleted(env: Env, event: StripeEvent): Promise<vo
     return;
   }
 
+  // Ownership guard: skip checkout sessions that don't belong to Darkly Suite.
+  // The extension sets `product` in session metadata to a valid Darkly product ID.
+  // A foreign checkout (evoglyph, etc.) will have no metadata or a non-Darkly product.
+  if (!isValidProduct(product)) {
+    console.log(`Webhook: ignoring checkout session ${sessionId} — product '${product}' is not a Darkly product`);
+    return;
+  }
+
   const email = fullSession.customer_details?.email ?? null;
   const customerId = fullSession.customer ?? null;
   const subscriptionId = fullSession.subscription ?? null;
@@ -259,6 +268,26 @@ async function handleSubscriptionUpdated(env: Env, event: StripeEvent): Promise<
       .bind(subscriptionId)
       .first<{ email: string | null; product: string; plan: string }>();
 
+    // Ownership guard: skip notification for foreign subscriptions.
+    // Shape-robust price extraction: 2026-01-28.clover uses item.pricing.price_details.price;
+    // legacy shape uses item.price.id.
+    if (!license) {
+      const updItems = subscription.items as {
+        data?: Array<{
+          pricing?: { price_details?: { price?: string } };
+          price?: { id?: string };
+        }>;
+      } | undefined;
+      const updFirstItem = updItems?.data?.[0];
+      const updPriceId = updFirstItem?.pricing?.price_details?.price ?? updFirstItem?.price?.id;
+      const priceMatchesDarkly = updPriceId ? getProductPlanFromPriceId(env, updPriceId) !== null : false;
+
+      if (!priceMatchesDarkly) {
+        console.log(`Webhook: ignoring ${subscriptionId} — not a Darkly product`);
+        return;
+      }
+    }
+
     const email = license?.email ?? 'unknown';
     const product = license?.product ?? 'unknown';
     const plan = license?.plan ?? 'unknown';
@@ -283,6 +312,26 @@ async function handleSubscriptionDeleted(env: Env, event: StripeEvent): Promise<
   )
     .bind(subscriptionId)
     .first<{ email: string | null; product: string; plan: string }>();
+
+  // Ownership guard: ignore events for subscriptions that don't belong to Darkly Suite.
+  // An event is ours iff EITHER a license row exists (common case) OR the price maps to
+  // a Darkly product (covers the admin-deleted-from-D1 fallback path).
+  // Shape-robust price extraction: API version 2026-01-28.clover moved price to
+  // item.pricing.price_details.price; legacy shape has item.price.id.
+  const items = subscription.items as {
+    data?: Array<{
+      pricing?: { price_details?: { price?: string } };
+      price?: { id?: string };
+    }>;
+  } | undefined;
+  const firstItem = items?.data?.[0];
+  const priceId = firstItem?.pricing?.price_details?.price ?? firstItem?.price?.id;
+  const priceMatchesDarkly = priceId ? getProductPlanFromPriceId(env, priceId) !== null : false;
+
+  if (!license && !priceMatchesDarkly) {
+    console.log(`Webhook: ignoring ${subscriptionId} — not a Darkly product`);
+    return;
+  }
 
   await env.DB.prepare(
     `UPDATE licenses SET status = 'inactive', stripe_status = 'active' WHERE stripe_subscription_id = ?`,
@@ -309,8 +358,6 @@ async function handleSubscriptionDeleted(env: Env, event: StripeEvent): Promise<
     }
 
     // Get product/plan by reverse-mapping the subscription's price ID
-    const items = subscription.items as { data?: Array<{ price?: { id?: string } }> } | undefined;
-    const priceId = items?.data?.[0]?.price?.id;
     if (priceId) {
       const match = getProductPlanFromPriceId(env, priceId);
       if (match) {
@@ -354,6 +401,15 @@ async function handlePaymentFailed(env: Env, event: StripeEvent): Promise<void> 
   )
     .bind(subscriptionId)
     .first<{ email: string | null; product: string; plan: string }>();
+
+  // Ownership guard: skip notification if this subscription is not ours.
+  // invoice.payment_failed doesn't carry line-item price data in the same way,
+  // so we rely solely on the D1 license row for ownership. A foreign sub will
+  // have no row → no email, no user notification.
+  if (!license) {
+    console.log(`Webhook: ignoring payment_failed for ${subscriptionId} — not a Darkly product`);
+    return;
+  }
 
   const email = license?.email ?? 'unknown';
   const product = license?.product ?? 'unknown';

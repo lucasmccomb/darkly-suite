@@ -482,6 +482,9 @@ describe('webhook — customer.subscription.updated', () => {
 
   it('sends notification when status changes to a problematic state', async () => {
     const env = createMockEnv();
+    const db = env.DB as unknown as MockD1Database;
+    // License row exists → this is a real Darkly subscription
+    db._statement.first.mockResolvedValueOnce({ email: 'user@example.com', product: 'gmail', plan: 'yearly' });
 
     // sendAdminEmail for the notification
     mockResendSuccess();
@@ -582,13 +585,16 @@ describe('webhook — customer.subscription.deleted', () => {
     mockResendSuccess();
 
     const env = createMockEnv();
+    const db = env.DB as unknown as MockD1Database;
+    // License row present → real Darkly sub → guard passes
+    db._statement.first.mockResolvedValueOnce({ email: 'cancel@example.com', product: 'gmail', plan: 'monthly' });
+
     const eventBody = makeWebhookEvent('customer.subscription.deleted', {
       id: 'sub_deleted',
     });
     const response = await callWebhook(eventBody, env);
 
     expect(response.status).toBe(200);
-    const db = env.DB as unknown as MockD1Database;
 
     // First call: SELECT license for notification context
     const selectSql = db.prepare.mock.calls[0][0] as string;
@@ -745,6 +751,283 @@ describe('webhook — handler errors', () => {
     expect(response.status).toBe(500);
     const body = await response.json() as { error: string };
     expect(body.error).toContain('Webhook handler failed');
+
+    consoleSpy.mockRestore();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Ownership guard tests — foreign subscriptions must be silently ignored
+// ---------------------------------------------------------------------------
+
+describe('webhook — ownership guard: foreign subscription.deleted', () => {
+  it('ignores foreign subscription.deleted (no license row, price not in Darkly map)', async () => {
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+    const env = createMockEnv();
+    // D1 first() returns null by default — no license row
+    const eventBody = makeWebhookEvent('customer.subscription.deleted', {
+      id: 'sub_evoglyph_001',
+      customer: 'cus_evoglyph_001',
+      items: { data: [{ price: { id: 'price_evoglyph_yearly' } }] }, // foreign price
+    });
+    const response = await callWebhook(eventBody, env);
+
+    expect(response.status).toBe(200);
+    // No email sent
+    expect(fetchMock).not.toHaveBeenCalled();
+    // No DB write (guard fired before UPDATE)
+    const db = env.DB as unknown as MockD1Database;
+    expect(db.prepare).toHaveBeenCalledTimes(1); // only the SELECT, not the UPDATE
+    // Skip log emitted
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('not a Darkly product'));
+
+    consoleSpy.mockRestore();
+  });
+
+  it('still emails when license row exists (real Darkly subscription — regression guard)', async () => {
+    const env = createMockEnv();
+    const db = env.DB as unknown as MockD1Database;
+    // License row present → this is a real Darkly sub
+    db._statement.first.mockResolvedValueOnce({ email: 'user@darklysuite.com', product: 'gmail', plan: 'yearly' });
+
+    mockResendSuccess();
+
+    const eventBody = makeWebhookEvent('customer.subscription.deleted', {
+      id: 'sub_darkly_real',
+    });
+    const response = await callWebhook(eventBody, env);
+
+    expect(response.status).toBe(200);
+    // Email was sent
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [emailUrl, emailOpts] = fetchMock.mock.calls[0];
+    expect(emailUrl).toBe('https://api.resend.com/emails');
+    const emailBody = JSON.parse(emailOpts?.body as string);
+    expect(emailBody.subject).toContain('Gmail');
+    expect(emailBody.subject).toContain('user@darklysuite.com');
+  });
+
+  it('still emails when license row absent but price maps to Darkly (admin-deleted fallback)', async () => {
+    // D1 first() returns null by default — license was admin-deleted from D1
+    // But the price IS a Darkly price → still ours
+
+    // retrieveCustomer fallback
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ id: 'cus_admin_del', email: 'admin-deleted@example.com', name: null, created: 1700000000 }),
+        { status: 200 },
+      ),
+    );
+
+    mockResendSuccess();
+
+    const env = createMockEnv();
+    const eventBody = makeWebhookEvent('customer.subscription.deleted', {
+      id: 'sub_darkly_no_row',
+      customer: 'cus_admin_del',
+      items: { data: [{ price: { id: 'price_sheets_yearly' } }] }, // real Darkly price from mock env
+    });
+    const response = await callWebhook(eventBody, env);
+
+    expect(response.status).toBe(200);
+    // Customer lookup + email both fired
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock.mock.calls[0][0]).toContain('/customers/cus_admin_del');
+    const emailBody = JSON.parse(fetchMock.mock.calls[1][1]?.body as string);
+    expect(emailBody.subject).toContain('Sheets');
+  });
+
+  it('ignores foreign subscription.deleted with new 2026-01-28.clover pricing shape', async () => {
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+    const env = createMockEnv();
+    // D1 first() returns null — no license row
+    const eventBody = makeWebhookEvent('customer.subscription.deleted', {
+      id: 'sub_foreign_clover',
+      customer: 'cus_foreign',
+      // New 2026-01-28.clover pricing shape — foreign price
+      items: {
+        data: [{
+          pricing: { price_details: { price: 'price_evoglyph_new_shape' } },
+        }],
+      },
+    });
+    const response = await callWebhook(eventBody, env);
+
+    expect(response.status).toBe(200);
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('not a Darkly product'));
+
+    consoleSpy.mockRestore();
+  });
+
+  it('still emails with new pricing shape when price maps to Darkly', async () => {
+    // D1 first() returns null — admin-deleted, but price maps via new shape
+
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ id: 'cus_clover', email: 'clover@example.com', name: null, created: 1700000000 }),
+        { status: 200 },
+      ),
+    );
+
+    mockResendSuccess();
+
+    const env = createMockEnv();
+    const eventBody = makeWebhookEvent('customer.subscription.deleted', {
+      id: 'sub_darkly_clover',
+      customer: 'cus_clover',
+      // New 2026-01-28.clover pricing shape — real Darkly price
+      items: {
+        data: [{
+          pricing: { price_details: { price: 'price_gmail_monthly' } }, // matches mock env
+        }],
+      },
+    });
+    const response = await callWebhook(eventBody, env);
+
+    expect(response.status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const emailBody = JSON.parse(fetchMock.mock.calls[1][1]?.body as string);
+    expect(emailBody.subject).toContain('Gmail');
+  });
+});
+
+describe('webhook — ownership guard: foreign subscription.updated', () => {
+  it('ignores foreign subscription.updated (no license row, price not in Darkly map)', async () => {
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+    const env = createMockEnv();
+    // D1 first() returns null by default
+
+    const eventBody = JSON.stringify({
+      id: `evt_${Date.now()}`,
+      type: 'customer.subscription.updated',
+      data: {
+        object: {
+          id: 'sub_foreign_upd',
+          status: 'canceled',
+          items: { data: [{ price: { id: 'price_evoglyph_foreign' } }] },
+        },
+        previous_attributes: { status: 'active' },
+      },
+    });
+
+    const response = await callWebhook(eventBody, env);
+
+    expect(response.status).toBe(200);
+    // No email sent
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('not a Darkly product'));
+
+    consoleSpy.mockRestore();
+  });
+
+  it('still emails when subscription.updated has a license row (regression guard)', async () => {
+    const env = createMockEnv();
+    const db = env.DB as unknown as MockD1Database;
+    // License row present — this is a real Darkly sub
+    db._statement.first.mockResolvedValueOnce({ email: 'real@example.com', product: 'sheets', plan: 'monthly' });
+
+    mockResendSuccess();
+
+    const eventBody = JSON.stringify({
+      id: `evt_${Date.now()}`,
+      type: 'customer.subscription.updated',
+      data: {
+        object: { id: 'sub_real_upd', status: 'canceled' },
+        previous_attributes: { status: 'active' },
+      },
+    });
+
+    const { header } = await generateWebhookSignature(eventBody, env.STRIPE_WEBHOOK_SECRET);
+    const request = new Request('https://darklysuite.com/api/webhook', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'stripe-signature': header },
+      body: eventBody,
+    });
+    const context = createMockContext({ request, env });
+    await onRequestPost(context);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [emailUrl] = fetchMock.mock.calls[0];
+    expect(emailUrl).toBe('https://api.resend.com/emails');
+  });
+});
+
+describe('webhook — ownership guard: foreign invoice.payment_failed', () => {
+  it('ignores foreign payment_failed (no license row for the subscription)', async () => {
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+    const env = createMockEnv();
+    // D1 first() returns null by default — no Darkly license for this sub
+    const eventBody = makeWebhookEvent('invoice.payment_failed', {
+      subscription: 'sub_foreign_payment',
+    });
+    const response = await callWebhook(eventBody, env);
+
+    expect(response.status).toBe(200);
+    // No email sent
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('not a Darkly product'));
+
+    consoleSpy.mockRestore();
+  });
+
+  it('still emails when payment_failed has a license row (regression guard)', async () => {
+    mockResendSuccess();
+    mockResendSuccess();
+
+    const env = createMockEnv();
+    const db = env.DB as unknown as MockD1Database;
+    db._statement.first.mockResolvedValueOnce({ email: 'dunning@example.com', product: 'docs', plan: 'yearly' });
+
+    const eventBody = makeWebhookEvent('invoice.payment_failed', {
+      subscription: 'sub_real_payment',
+    });
+    const response = await callWebhook(eventBody, env);
+
+    expect(response.status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const [adminEmailUrl] = fetchMock.mock.calls[0];
+    expect(adminEmailUrl).toBe('https://api.resend.com/emails');
+    const userEmailBody = JSON.parse(fetchMock.mock.calls[1][1]?.body as string);
+    expect(userEmailBody.to).toBe('dunning@example.com');
+  });
+});
+
+describe('webhook — ownership guard: foreign checkout.session.completed', () => {
+  it('ignores checkout session when product metadata is not a Darkly product', async () => {
+    // retrieveCheckoutSession returns evoglyph product in metadata
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          id: 'cs_foreign',
+          url: '',
+          metadata: { token: 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee', plan: 'yearly', product: 'evoglyph' },
+          customer: 'cus_foreign',
+          subscription: 'sub_foreign',
+          customer_details: { email: 'foreign@example.com' },
+          amount_total: 1999,
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+    const env = createMockEnv();
+    const eventBody = makeWebhookEvent('checkout.session.completed', { id: 'cs_foreign' });
+    const response = await callWebhook(eventBody, env);
+
+    expect(response.status).toBe(200);
+    // Only the retrieveCheckoutSession fetch (Stripe) — no trackDiscountUsage, no email
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    // No DB write
+    const db = env.DB as unknown as MockD1Database;
+    expect(db.prepare).not.toHaveBeenCalled();
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('not a Darkly product'));
 
     consoleSpy.mockRestore();
   });
