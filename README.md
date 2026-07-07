@@ -301,9 +301,9 @@ When both a standalone extension (e.g., Darkly for Gmail) and the Darkly Suite b
 
 ### Darkly Suite Bundle
 
-- **All three sites in one extension**: Gmail, Sheets, and Docs dark mode combined
-- **Per-site content scripts**: `content-gmail.js`, `content-sheets.js`, `content-docs.js`, plus `content-drive.js` (stub for future)
-- **Per-site preferences**: `ds_gmail_preferences`, `ds_sheets_preferences`, `ds_docs_preferences`
+- **All four sites in one extension**: Gmail, Sheets, Docs, and Drive dark mode combined
+- **Per-site content scripts**: `content-gmail.js`, `content-sheets.js`, `content-docs.js`, and `content-drive.js`
+- **Per-site preferences**: `ds_gmail_preferences`, `ds_sheets_preferences`, `ds_docs_preferences`, `ds_drive_preferences`
 - **Unified background worker**: Single `background.js` with message/alarm/install listener routing by URL
 - **Host permissions**: `mail.google.com`, `docs.google.com/spreadsheets`, `docs.google.com/document`, `drive.google.com`, `darklysuite.com`, `api.sunrise-sunset.org`
 - **Permissions**: `storage`, `alarms`, `offscreen`, `scripting`
