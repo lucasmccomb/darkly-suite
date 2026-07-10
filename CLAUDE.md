@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Unified pnpm workspace monorepo that builds **4 Chrome extensions** (Darkly for Gmail, Darkly for Sheets, Darkly for Docs, Darkly Suite bundle) from shared code, served by a **unified landing page and payment backend** at **darklysuite.com**.
+Unified pnpm workspace monorepo that builds **5 Chrome extensions** (Darkly for Gmail, Darkly for Sheets, Darkly for Docs, Darkly Suite bundle, Browse Darkly) from shared code, served by a **unified landing page and payment backend** at **darklysuite.com**.
 
 ## CRITICAL: CWS Launch Status Table (Session Start)
 
@@ -71,13 +71,18 @@ packages/
   site-gmail/            @darkly/site-gmail — Gmail-specific (InboxSDK, overrides)
   site-sheets/           @darkly/site-sheets — Sheets-specific (Waffle grid, overrides)
   site-docs/             @darkly/site-docs — Docs-specific (Kix canvas, overrides)
+  site-generic/          @darkly/site-generic — generic any-website engine for Browse Darkly
   gmail-darkly/          Individual Gmail extension
   sheets-darkly/         Individual Sheets extension
   docs-darkly/           Individual Docs extension
   darkly-suite/          Darkly Suite bundle extension
+  browse-darkly/         Browse Darkly extension (dark mode for every website)
   landing-shared/        @darkly/landing-shared — shared landing components & backend
   landing-suite/         darklysuite.com (Vite + React + Cloudflare Pages)
   landing-gmail/         gmaildarkly.com (Vite + React, marketing only)
+  landing-sheets/        sheetsdarkly.com (Vite + React, marketing only)
+  landing-docs/          docsdarkly.com (Vite + React, marketing only)
+  landing-browse/        browsedarkly.com (Vite + React, marketing only)
 ```
 
 ## Architecture: How Code Sharing Works
@@ -92,6 +97,7 @@ Each extension has a unique CSS prefix to prevent conflicts:
 | Darkly for Sheets | `sd` | `.sd-settings-toggle` | `sd_preferences` |
 | Darkly for Docs | `dd` | `.dd-settings-toggle` | `dd_preferences` |
 | Darkly Suite | `ds` | `.ds-settings-toggle` | `ds_gmail_preferences` |
+| Browse Darkly | `bd` | `.bd-settings-toggle` | `bd_preferences` |
 
 ### Three prefix resolution strategies:
 
@@ -106,6 +112,7 @@ gmail-darkly  ← @darkly/core + @darkly/site-gmail
 sheets-darkly ← @darkly/core + @darkly/site-sheets
 docs-darkly   ← @darkly/core + @darkly/site-docs
 darkly-suite  ← @darkly/core + all three @darkly/site-* packages
+browse-darkly ← @darkly/core + @darkly/site-generic
 ```
 
 ### Bundle CSS strategy:
@@ -234,13 +241,13 @@ Fix any errors immediately. Never commit code that doesn't pass all checks.
 ## Key Types
 
 ```typescript
-type SiteId = 'gmail' | 'sheets' | 'docs';
-type ProductId = 'gmail' | 'sheets' | 'docs' | 'suite';
+type SiteId = 'gmail' | 'sheets' | 'docs' | 'drive';
+type ProductId = 'gmail' | 'sheets' | 'docs' | 'suite' | 'browse';
 type Plan = 'monthly' | 'yearly' | 'lifetime';
 
 interface ProductConfig {
   productId: ProductId;
-  prefix: string;           // 'gd' | 'sd' | 'dd' | 'ds'
+  prefix: string;           // 'gd' | 'sd' | 'dd' | 'ds' | 'bd'
   storageKey: string;        // 'gd_preferences' | 'ds_gmail_preferences'
   tokenKey: string;          // 'gd_token' | 'ds_token'
   apiBase: string;           // 'https://darklysuite.com/api'
@@ -258,7 +265,7 @@ npx wrangler pages dev dist --d1=DB         # Test with D1 locally
 
 ## Payment System
 
-- Single Stripe account with 4 products × 3 plans = 12 prices
+- Single Stripe account with 5 products × 3 plans = 15 prices
 - Checkout flow: Extension → darklysuite.com/api/checkout → Stripe → webhook → D1 license
 - Suite license automatically grants access to individual product queries
 
@@ -358,7 +365,7 @@ When both a standalone extension and the bundle are installed:
 
 See `packages/landing-suite/wrangler.toml` for binding configuration. Required vars:
 - `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
-- 12× `STRIPE_PRICE_{PRODUCT}_{PLAN}` (e.g., `STRIPE_PRICE_GMAIL_YEARLY`)
-- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`
-- `ADMIN_EMAIL`, `SESSION_SECRET`
+- 15× `STRIPE_PRICE_{PRODUCT}_{PLAN}` (e.g., `STRIPE_PRICE_GMAIL_YEARLY`)
+- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
+- `ADMIN_EMAIL`
 - D1 binding: `DB`
