@@ -119,6 +119,46 @@ describe('createPreferencesManager', () => {
       warnSpy.mockRestore();
     });
 
+    it('does not start a queued save until the in-flight save settles (no interleaving)', async () => {
+      const manager = createPreferencesManager(mockConfig);
+
+      // Baseline save so storage has known state and the queue tail is settled.
+      await manager.save({ mode: 'dark' });
+      expect(chromeMock.storage.sync.set).toHaveBeenCalledTimes(1);
+
+      // The second save's write stays in flight until we release it.
+      let releaseSecondWrite!: () => void;
+      const secondWriteGate = new Promise<void>((resolve) => {
+        releaseSecondWrite = resolve;
+      });
+      chromeMock.storage.sync.set.mockImplementationOnce(async (items: Record<string, unknown>) => {
+        await secondWriteGate;
+        Object.assign(syncStorage, items);
+      });
+
+      const second = manager.save({ mode: 'schedule' });
+      const third = manager.save({ mode: 'light' });
+
+      // Flush the event loop: the second save reaches its (gated) write...
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(chromeMock.storage.sync.set).toHaveBeenCalledTimes(2);
+
+      // ...and the third save must NOT begin its read-modify-write while the
+      // second write is still in flight — interleaved save bodies are exactly
+      // the race the queue exists to prevent.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(chromeMock.storage.sync.set).toHaveBeenCalledTimes(2);
+
+      releaseSecondWrite();
+      await second;
+      await third;
+
+      // Once released, the third save proceeds and ordering holds.
+      expect(chromeMock.storage.sync.set).toHaveBeenCalledTimes(3);
+      const saved = syncStorage[mockConfig.storageKey] as BaseUserPreferences;
+      expect(saved.mode).toBe('light');
+    });
+
     it('preserves save ordering across a failed save', async () => {
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
       chromeMock.storage.sync.set.mockRejectedValueOnce(new Error('quota'));

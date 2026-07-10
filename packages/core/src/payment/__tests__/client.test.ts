@@ -278,7 +278,8 @@ describe('openPaymentPage', () => {
     // Let the rejected sendMessage promises settle through their catch handlers.
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(warnSpy).toHaveBeenCalled();
+    // One warn per rejected message (openTab + checkoutStarted).
+    expect(warnSpy).toHaveBeenCalledTimes(2);
     warnSpy.mockRestore();
   });
 });
