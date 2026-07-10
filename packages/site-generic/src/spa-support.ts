@@ -60,7 +60,9 @@ export class StylesheetProxy {
         ...args: Parameters<CSSStyleSheet['replace']>
       ) {
         const result = origReplace.apply(this, args);
-        result.then(() => enqueue(this));
+        // Settle both ways so the derived promise never floats: a rejected
+        // replace() is the caller's to handle, not ours to leave unhandled.
+        result.then(() => enqueue(this), () => {});
         return result;
       };
     }
