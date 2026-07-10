@@ -3,7 +3,7 @@
   "name": "Browse Darkly",
   "description": "Dark mode for every website — beautiful presets, per-site memory, and smart detection",
   "version": "1.0.0",
-  "permissions": ["sidePanel", "storage", "tabs", "activeTab", "alarms", "identity", "identity.email"],
+  "permissions": ["sidePanel", "storage", "tabs", "activeTab", "alarms"],
   "host_permissions": ["<all_urls>", "https://darklysuite.com/*", "https://api.sunrise-sunset.org/*"],
   "background": {
     "service_worker": "background.js"
