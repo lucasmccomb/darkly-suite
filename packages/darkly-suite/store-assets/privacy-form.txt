@@ -66,18 +66,18 @@ No Drive file content is read or modified.
 https://darklysuite.com/*:
 Communicates with the Darkly payment API to check license status. An anonymous device
 token (randomly generated UUID) is sent to verify whether the user has a paid license.
-No personal information is transmitted.
+Routine license checks transmit only this token. Starting a purchase or a purchase restore opens a Google sign-in page on darklysuite.com; the email address from that sign-in is stored server-side with the license record (see the personally identifiable information declaration).
 
 https://api.sunrise-sunset.org/*:
 Fetches sunrise and sunset times for the user's approximate location when they opt into
-sunrise/sunset scheduling. Only latitude and longitude coordinates are sent. This is a
+sunrise/sunset scheduling. Only approximate latitude and longitude coordinates are sent, rounded to 1 decimal place (~11 km) before the request. This is a
 public, free API with no authentication required.
 
 
 DATA USE DECLARATIONS
 ----------------------
 
-Personally identifiable information:  Not collected
+Personally identifiable information:  Collected (see details below)
 Health information:                   Not collected
 Financial and payment information:    Not collected
 Authentication information:           Not collected
@@ -87,6 +87,16 @@ Web history:                          Not collected
 User activity:                        Not collected
 Website content:                      Not collected
 
+Personally identifiable information details:
+  - Collected during the purchase and restore-purchase flows only
+  - Starting a purchase or restore opens darklysuite.com, where the user signs in
+    with Google; the email address from that sign-in is stored server-side in the
+    darklysuite.com license database, linked to the extension's anonymous device token
+  - Use purpose: Functionality - verifying and restoring the user's license
+  - Sold to third parties: No
+  - The extension itself never reads the email address; routine license checks send
+    only the anonymous device token
+
 Location details:
   - Collected with user opt-in only (sunrise/sunset scheduling feature)
   - Use purpose: Functionality --- calculating sunrise/sunset times
@@ -94,7 +104,8 @@ Location details:
   - Transmitted outside the extension: Yes --- approximate coordinates sent to the
     public sunrise-sunset.org API to retrieve sunrise/sunset times
   - Browser shows its own permission dialog before access is granted
-  - Coordinates are cached locally for up to 24 hours
+  - Coordinates are rounded to 1 decimal place (~11 km) before transmission
+  - Only the rounded coordinates are cached locally for up to 24 hours
 
 
 REMOTE CODE

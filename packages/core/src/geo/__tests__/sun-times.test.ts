@@ -38,6 +38,10 @@ afterEach(() => {
 
 const LAT = 40.7128;
 const LNG = -74.006;
+// Coordinates are rounded to 1 decimal place (~11 km) before any network
+// request or cache write, so only approximate location leaves the device.
+const ROUNDED_LAT = 40.7;
+const ROUNDED_LNG = -74;
 const SUNRISE_ISO = '2026-02-10T12:00:00+00:00';
 const SUNSET_ISO = '2026-02-10T22:30:00+00:00';
 
@@ -68,8 +72,48 @@ describe('getSunTimes', () => {
     expect(result!.sunrise).toEqual(new Date(SUNRISE_ISO));
     expect(result!.sunset).toEqual(new Date(SUNSET_ISO));
     expect(mockFetch).toHaveBeenCalledWith(
-      `https://api.sunrise-sunset.org/json?lat=${LAT}&lng=${LNG}&formatted=0`
+      `https://api.sunrise-sunset.org/json?lat=${ROUNDED_LAT}&lng=${ROUNDED_LNG}&formatted=0`
     );
+  });
+
+  it('rounds full-precision coordinates to 1 decimal place before sending to the API', async () => {
+    mockFetch.mockResolvedValue(makeApiResponse());
+
+    await getSunTimes(51.507351, -0.127758, CACHE_KEY);
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://api.sunrise-sunset.org/json?lat=51.5&lng=-0.1&formatted=0'
+    );
+    // Full-precision coordinates must never appear in the request URL
+    const requestedUrl = mockFetch.mock.calls[0][0] as string;
+    expect(requestedUrl).not.toContain('51.507351');
+    expect(requestedUrl).not.toContain('-0.127758');
+  });
+
+  it('never persists full-precision coordinates to the cache', async () => {
+    mockFetch.mockResolvedValue(makeApiResponse());
+
+    await getSunTimes(LAT, LNG, CACHE_KEY);
+
+    const cached = mockLocalSet.mock.calls[0][0][CACHE_KEY] as { lat: number; lng: number };
+    expect(cached.lat).toBe(ROUNDED_LAT);
+    expect(cached.lng).toBe(ROUNDED_LNG);
+  });
+
+  it('serves the cached result when full-precision input rounds to the cached coordinates', async () => {
+    mockLocalStorage[CACHE_KEY] = {
+      sunrise: SUNRISE_ISO,
+      sunset: SUNSET_ISO,
+      lat: ROUNDED_LAT,
+      lng: ROUNDED_LNG,
+      lastFetched: Date.now() - 1000,
+    };
+
+    // 40.7449, -74.026 also rounds to 40.7, -74 — should hit the cache
+    const result = await getSunTimes(40.7449, -74.026, CACHE_KEY);
+
+    expect(result).not.toBeNull();
+    expect(mockFetch).not.toHaveBeenCalled();
   });
 
   it('caches result in chrome.storage.local using parameterized key', async () => {
@@ -86,8 +130,8 @@ describe('getSunTimes', () => {
       lastFetched: number;
     };
     expect(cached).toMatchObject({
-      lat: LAT,
-      lng: LNG,
+      lat: ROUNDED_LAT,
+      lng: ROUNDED_LNG,
     });
     expect(cached.sunrise).toBeDefined();
     expect(cached.sunset).toBeDefined();
@@ -108,8 +152,8 @@ describe('getSunTimes', () => {
     mockLocalStorage[CACHE_KEY] = {
       sunrise: SUNRISE_ISO,
       sunset: SUNSET_ISO,
-      lat: LAT,
-      lng: LNG,
+      lat: ROUNDED_LAT,
+      lng: ROUNDED_LNG,
       lastFetched: Date.now() - 1000, // 1 second ago
     };
 
@@ -126,8 +170,8 @@ describe('getSunTimes', () => {
     mockLocalStorage[CACHE_KEY] = {
       sunrise: SUNRISE_ISO,
       sunset: SUNSET_ISO,
-      lat: LAT,
-      lng: LNG,
+      lat: ROUNDED_LAT,
+      lng: ROUNDED_LNG,
       lastFetched: Date.now() - 25 * 60 * 60 * 1000, // 25 hours ago
     };
 
@@ -212,8 +256,8 @@ describe('getSunTimes', () => {
     mockLocalStorage[gmailCacheKey] = {
       sunrise: SUNRISE_ISO,
       sunset: SUNSET_ISO,
-      lat: LAT,
-      lng: LNG,
+      lat: ROUNDED_LAT,
+      lng: ROUNDED_LNG,
       lastFetched: Date.now() - 1000,
     };
 

@@ -1,7 +1,11 @@
 /**
- * Tests for admin/licenses.ts — DELETE handler.
+ * Tests for admin/licenses.ts — POST (list/search) and DELETE handlers.
  *
- * Verifies license deletion with Stripe subscription cancellation
+ * The list/search endpoint is a POST with a JSON body so admin searches
+ * (which routinely contain customer email addresses) never appear in GET
+ * query strings or access logs (#670).
+ *
+ * Also verifies license deletion with Stripe subscription cancellation
  * and D1 foreign key cleanup.
  */
 
@@ -19,7 +23,7 @@ Object.defineProperty(globalThis, 'fetch', { value: fetchMock, writable: true })
 // Import handlers
 // ---------------------------------------------------------------------------
 
-import { onRequestDelete } from '../api/admin/licenses';
+import { onRequestDelete, onRequestGet, onRequestPost } from '../api/admin/licenses';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -54,6 +58,136 @@ function adminRequest(url: string, init?: RequestInit): Request {
 
 beforeEach(() => {
   fetchMock.mockReset();
+});
+
+describe('POST /api/admin/licenses (list/search)', () => {
+  it('returns 401 without admin session', async () => {
+    const request = new Request('https://darklysuite.com/api/admin/licenses', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ search: 'user@example.com' }),
+    });
+    const ctx = createMockContext({ request });
+    const response = await onRequestPost(ctx);
+    expect(response.status).toBe(401);
+  });
+
+  it('accepts the search term in the JSON body and applies it as a LIKE filter', async () => {
+    const { ctx, db } = createAdminContext(
+      adminRequest('https://darklysuite.com/api/admin/licenses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ search: 'user@example.com', sort: 'email', order: 'asc', page: 1 }),
+      }),
+    );
+
+    // Admin session check, then COUNT query
+    db._statement.first
+      .mockResolvedValueOnce({ id: 1, session_token: 'tok', email: 'admin@example.com', expires_at: '2099-01-01' })
+      .mockResolvedValueOnce({ total: 1 });
+    db._statement.all.mockResolvedValueOnce({
+      results: [{ id: 7, email: 'user@example.com', product: 'gmail', plan: 'yearly', status: 'active' }],
+      success: true,
+    });
+
+    const response = await onRequestPost(ctx);
+    expect(response.status).toBe(200);
+
+    const body = await response.json() as { licenses: unknown[]; total: number; page: number };
+    expect(body.total).toBe(1);
+    expect(body.page).toBe(1);
+    expect(body.licenses).toHaveLength(1);
+
+    // The email search must be bound as a LIKE parameter…
+    const bindCalls = db._statement.bind.mock.calls.flat();
+    expect(bindCalls).toContain('%user@example.com%');
+    // …and must never have been part of the request URL
+    expect(ctx.request.url).not.toContain('user');
+  });
+
+  it('applies status/plan/product filters from the body', async () => {
+    const { ctx, db } = createAdminContext(
+      adminRequest('https://darklysuite.com/api/admin/licenses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'active', plan: 'yearly', product: 'gmail' }),
+      }),
+    );
+
+    db._statement.first
+      .mockResolvedValueOnce({ id: 1, session_token: 'tok', email: 'admin@example.com', expires_at: '2099-01-01' })
+      .mockResolvedValueOnce({ total: 0 });
+
+    const response = await onRequestPost(ctx);
+    expect(response.status).toBe(200);
+
+    const countSql = db.prepare.mock.calls[1][0] as string;
+    expect(countSql).toContain('l.status = ?');
+    expect(countSql).toContain('l.plan = ?');
+    expect(countSql).toContain('l.product = ?');
+
+    const bindCalls = db._statement.bind.mock.calls.flat();
+    expect(bindCalls).toContain('active');
+    expect(bindCalls).toContain('yearly');
+    expect(bindCalls).toContain('gmail');
+  });
+
+  it('returns defaults (page 1, no filters) for an empty or malformed body', async () => {
+    const { ctx, db } = createAdminContext(
+      adminRequest('https://darklysuite.com/api/admin/licenses', {
+        method: 'POST',
+      }),
+    );
+
+    db._statement.first
+      .mockResolvedValueOnce({ id: 1, session_token: 'tok', email: 'admin@example.com', expires_at: '2099-01-01' })
+      .mockResolvedValueOnce({ total: 0 });
+
+    const response = await onRequestPost(ctx);
+    expect(response.status).toBe(200);
+
+    const body = await response.json() as { page: number; limit: number };
+    expect(body.page).toBe(1);
+    expect(body.limit).toBe(50);
+
+    const countSql = db.prepare.mock.calls[1][0] as string;
+    expect(countSql).not.toContain('WHERE');
+  });
+
+  it('returns 405 for GET — the retired query-string list endpoint (#670)', async () => {
+    const { ctx } = createAdminContext(
+      adminRequest('https://darklysuite.com/api/admin/licenses?search=user%40example.com'),
+    );
+
+    const response = await onRequestGet(ctx);
+    expect(response.status).toBe(405);
+    // RFC 9110 §15.5.6: a 405 must advertise the supported methods
+    expect(response.headers.get('Allow')).toBe('POST, DELETE, PATCH');
+
+    const body = await response.json() as { error: string };
+    expect(body.error).toContain('POST');
+  });
+
+  it('whitelists the sort column (rejects SQL injection via sort)', async () => {
+    const { ctx, db } = createAdminContext(
+      adminRequest('https://darklysuite.com/api/admin/licenses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sort: 'created_at; DROP TABLE licenses' }),
+      }),
+    );
+
+    db._statement.first
+      .mockResolvedValueOnce({ id: 1, session_token: 'tok', email: 'admin@example.com', expires_at: '2099-01-01' })
+      .mockResolvedValueOnce({ total: 0 });
+
+    const response = await onRequestPost(ctx);
+    expect(response.status).toBe(200);
+
+    const listSql = db.prepare.mock.calls[2][0] as string;
+    expect(listSql).toContain('ORDER BY l.created_at DESC');
+    expect(listSql).not.toContain('DROP TABLE');
+  });
 });
 
 describe('DELETE /api/admin/licenses', () => {

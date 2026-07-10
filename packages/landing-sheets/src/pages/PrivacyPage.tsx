@@ -14,7 +14,7 @@ export function PrivacyPage() {
             Back to home
           </Link>
           <h1 className="privacy-title">Privacy Policy</h1>
-          <p className="privacy-updated">Last updated: February 20, 2026</p>
+          <p className="privacy-updated">Last updated: July 10, 2026</p>
 
           <div className="privacy-content">
             <h2>Overview</h2>
@@ -23,21 +23,25 @@ export function PrivacyPage() {
               theme to Google Sheets. We are committed to protecting your privacy.
             </p>
             <p>
-              <strong>The short version:</strong> Darkly does not collect, store, or transmit any personal data.
-              All settings are stored locally on your device using Chrome&apos;s built-in storage API.
+              <strong>The short version:</strong> Darkly stores your settings locally on your device.
+              The only personal data we keep is the email address you sign in with when purchasing
+              or restoring a subscription, which is stored in our license database.
             </p>
 
             <h2>Data We Collect</h2>
             <p>
-              Darkly does not collect any personal information. We do not have user accounts, analytics,
-              tracking pixels, or any server-side data storage. Specifically:
+              Darkly does not use analytics, tracking pixels, or advertising identifiers. The one
+              piece of personal information we store is collected when you purchase or restore a
+              subscription: you sign in with Google on darklysuite.com, and the email address from
+              that sign-in is saved server-side in our license database, linked to the
+              extension&apos;s anonymous device token. Beyond that:
             </p>
             <ul>
               <li>No spreadsheet content is read, accessed, or stored</li>
               <li>No browsing history is collected</li>
-              <li>No personal identifiers are gathered</li>
+              <li>The extension itself never reads your email address or any other personal identifier</li>
               <li>No usage analytics or telemetry is sent</li>
-              <li>No cookies are set by Darkly</li>
+              <li>The extension sets no cookies; darklysuite.com sets session cookies when you sign in to the account portal</li>
               <li>No data is sold or shared with third parties</li>
             </ul>
 
@@ -63,7 +67,7 @@ export function PrivacyPage() {
             </p>
             <ul>
               <li>Used solely to calculate sunrise and sunset times via the public sunrise-sunset.org API</li>
-              <li>Sent only to sunrise-sunset.org as latitude/longitude coordinates</li>
+              <li>Rounded to 1 decimal place (~11 km) and sent only to sunrise-sunset.org as approximate latitude/longitude coordinates</li>
               <li>Never sent to Darkly&apos;s servers</li>
               <li>Stored locally in Chrome&apos;s built-in storage and cached for up to 24 hours</li>
               <li>Requested only with your explicit permission via the browser&apos;s permission dialog</li>
@@ -87,8 +91,10 @@ export function PrivacyPage() {
               </li>
               <li>
                 <strong>darklysuite.com</strong> — our payment API, used to validate your
-                license. An anonymous device token (randomly generated UUID) is sent to check license status.
-                No personal information is transmitted.
+                license. Routine license checks send only an anonymous device token (randomly generated
+                UUID). When you purchase or restore a subscription, you sign in with Google on
+                darklysuite.com and the email address from that sign-in is stored in our license
+                database alongside your license.
               </li>
               <li>
                 <strong>Stripe</strong> — payment processing. You are redirected to Stripe-hosted checkout.
@@ -100,8 +106,9 @@ export function PrivacyPage() {
 
             <h2>Data Security</h2>
             <p>
-              Since Darkly does not collect or transmit personal data, the security risk is minimal.
-              Your preferences are protected by Chrome&apos;s built-in storage security.
+              Your preferences are protected by Chrome&apos;s built-in storage security. The purchase
+              email in our license database is transmitted only over HTTPS, is never sold or shared,
+              and is used solely to manage your subscription.
             </p>
 
             <h2>Children&apos;s Privacy</h2>

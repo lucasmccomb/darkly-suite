@@ -42,16 +42,14 @@ export function AdminLicensesPage() {
 
   const fetchLicenses = useCallback(async () => {
     setLoading(true)
-    const params = new URLSearchParams()
-    if (search) params.set('search', search)
-    if (status) params.set('status', status)
-    if (plan) params.set('plan', plan)
-    if (product) params.set('product', product)
-    params.set('sort', sort)
-    params.set('order', order)
-    params.set('page', page.toString())
-
-    const res = await fetch(`/api/admin/licenses?${params}`, { credentials: 'same-origin' })
+    // POST with a JSON body — the search term is routinely a customer email
+    // and must never travel in a GET query string (#670).
+    const res = await fetch('/api/admin/licenses', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ search, status, plan, product, sort, order, page }),
+    })
     if (res.ok) {
       setData(await res.json())
     }

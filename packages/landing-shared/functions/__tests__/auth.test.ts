@@ -480,7 +480,7 @@ describe('auth/callback — OAuth callback flow', () => {
     expect(emailBody.text).toContain('nosubscription@example.com');
   });
 
-  it('redirects to /api/checkout with email for checkout flow', async () => {
+  it('redirects to /api/checkout with the email in a short-lived cookie, never in the URL', async () => {
     const idToken = createFakeJwt({
       iss: 'https://accounts.google.com',
       sub: '999',
@@ -519,14 +519,25 @@ describe('auth/callback — OAuth callback flow', () => {
     expect(location).toContain('token=12345678-1234-4123-8123-123456789abc');
     expect(location).toContain('plan=yearly');
     expect(location).toContain('product=sheets');
-    expect(location).toContain('email=buyer%40example.com');
+    // PII must never ride the URL (#670) — it lands in browser history,
+    // Referer headers, and edge access logs.
+    expect(location).not.toContain('email');
+    expect(location).not.toContain('buyer');
 
     // Should NOT have inserted any sessions into DB
     const db = context.env.DB as unknown as MockD1Database;
     expect(db.prepare).not.toHaveBeenCalled();
 
+    // The verified email travels in a short-lived HttpOnly cookie scoped
+    // to the checkout endpoint instead.
+    const setCookie = response.headers.get('Set-Cookie')!;
+    expect(setCookie).toContain('darkly_checkout_email=buyer%40example.com');
+    expect(setCookie).toContain('HttpOnly');
+    expect(setCookie).toContain('Path=/api/checkout');
+    expect(setCookie).toContain('Max-Age=300');
+
     // Should clear the OAuth state cookie
-    const setCookie = response.headers.get('Set-Cookie');
+    expect(setCookie).toContain('darkly_oauth_state=;');
     expect(setCookie).toContain('Max-Age=0');
   });
 
