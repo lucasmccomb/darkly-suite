@@ -6,13 +6,17 @@ import { createCheckoutSession } from './_shared/stripe.ts';
 import { getPriceId } from './_shared/products.ts';
 import { parseCookie } from './admin/_shared/auth.ts';
 
+const CHECKOUT_EMAIL_COOKIE = 'darkly_checkout_email';
+const CLEAR_CHECKOUT_EMAIL_COOKIE =
+  `${CHECKOUT_EMAIL_COOKIE}=; HttpOnly; Secure; SameSite=Lax; Path=/api/checkout; Max-Age=0`;
+
 /**
  * Read the checkout prefill email from the short-lived HttpOnly cookie set by
  * /api/auth/callback. Email is deliberately NOT accepted via the query string:
  * PII in URLs lands in browser history, Referer headers, and access logs (#670).
  */
 function readCheckoutEmail(request: Request): string | null {
-  const raw = parseCookie(request.headers.get('Cookie'), 'darkly_checkout_email');
+  const raw = parseCookie(request.headers.get('Cookie'), CHECKOUT_EMAIL_COOKIE);
   if (!raw) return null;
 
   try {
@@ -37,7 +41,25 @@ export const onRequestOptions: PagesFunction<Env> = async (context: CFContext) =
   );
 };
 
+/**
+ * Read-then-always-clear: the prefill cookie is strictly one-time-use. If it
+ * arrived on this request, it is expired on EVERY exit — success or error —
+ * so a failed checkout can never leak a previously verified email into a
+ * later checkout in the same browser (which would lock the Stripe email field).
+ */
 async function handleCheckout(context: CFContext): Promise<Response> {
+  const response = await processCheckout(context);
+
+  if (parseCookie(context.request.headers.get('Cookie'), CHECKOUT_EMAIL_COOKIE) !== null) {
+    const headers = new Headers(response.headers);
+    headers.append('Set-Cookie', CLEAR_CHECKOUT_EMAIL_COOKIE);
+    return new Response(response.body, { status: response.status, headers });
+  }
+
+  return response;
+}
+
+async function processCheckout(context: CFContext): Promise<Response> {
   const origin = context.request.headers.get('Origin') ?? undefined;
   const extIds = parseExtensionIds(context.env.ALLOWED_EXTENSION_IDS);
   const headers = corsHeaders(origin, context.env.SITE_URL, extIds, context.env.ENVIRONMENT);
@@ -116,18 +138,10 @@ async function handleCheckout(context: CFContext): Promise<Response> {
       customerEmail: email ?? undefined,
     });
 
-    const responseHeaders = new Headers(headers);
-    responseHeaders.set('Location', session.url);
-    // The prefill email cookie is one-time use — clear it on the redirect
-    // to Stripe so it cannot linger in the browser.
-    responseHeaders.append(
-      'Set-Cookie',
-      'darkly_checkout_email=; HttpOnly; Secure; SameSite=Lax; Path=/api/checkout; Max-Age=0',
-    );
-
+    // Cookie clearing happens in handleCheckout, uniformly for every exit.
     return new Response(null, {
       status: 303,
-      headers: responseHeaders,
+      headers: { ...headers, Location: session.url },
     });
   } catch (err) {
     console.error('[checkout] Failed to create checkout session:', err);

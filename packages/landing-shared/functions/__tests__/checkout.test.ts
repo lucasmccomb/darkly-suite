@@ -344,6 +344,65 @@ describe('checkout — email prefill (short-lived cookie, never the URL)', () =>
     expect(body).not.toContain('customer_email');
   });
 
+  it('clears the checkout email cookie on a validation-error exit (read-then-always-clear)', async () => {
+    // A failed checkout must not leave the prefill cookie alive: within its
+    // 300s Max-Age a later checkout in the same browser would inherit the
+    // previous user's verified email and lock the Stripe email field.
+    const context = createMockContext({
+      request: new Request(
+        `https://darklysuite.com/api/checkout?token=${validToken}&plan=weekly&product=gmail`,
+        { headers: { Cookie: 'darkly_checkout_email=user%40example.com' } },
+      ),
+    });
+
+    const response = await onRequestGet(context);
+    expect(response.status).toBe(400);
+
+    const setCookie = response.headers.get('Set-Cookie')!;
+    expect(setCookie).toContain('darkly_checkout_email=;');
+    expect(setCookie).toContain('Max-Age=0');
+  });
+
+  it('clears the checkout email cookie on a Stripe-failure (500) exit', async () => {
+    fetchMock.mockResolvedValueOnce(new Response('Internal server error', { status: 500 }));
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+    const context = createMockContext({
+      request: new Request(
+        `https://darklysuite.com/api/checkout?token=${validToken}&plan=yearly&product=gmail`,
+        { headers: { Cookie: 'darkly_checkout_email=user%40example.com' } },
+      ),
+    });
+
+    const response = await onRequestGet(context);
+    expect(response.status).toBe(500);
+
+    const setCookie = response.headers.get('Set-Cookie')!;
+    expect(setCookie).toContain('darkly_checkout_email=;');
+    expect(setCookie).toContain('Max-Age=0');
+
+    consoleSpy.mockRestore();
+  });
+
+  it('does not emit a clearing Set-Cookie when no checkout email cookie was sent', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ id: 'cs_nocookie', url: 'https://checkout.stripe.com/cs_nocookie' }),
+        { status: 200 },
+      ),
+    );
+
+    const context = createMockContext({
+      request: new Request(
+        `https://darklysuite.com/api/checkout?token=${validToken}&plan=yearly&product=gmail`,
+      ),
+    });
+
+    const response = await onRequestGet(context);
+    expect(response.status).toBe(303);
+    expect(response.headers.get('Set-Cookie')).toBeNull();
+  });
+
   it('ignores a malformed checkout email cookie instead of forwarding it to Stripe', async () => {
     fetchMock.mockResolvedValueOnce(
       new Response(
