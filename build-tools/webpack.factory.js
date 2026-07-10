@@ -12,6 +12,7 @@
 
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
+const { ThirdPartyLicensesPlugin } = require('./collect-licenses');
 
 /**
  * @param {object} options
@@ -76,6 +77,9 @@ function createDarklyWebpackConfig(options) {
       new CopyPlugin({
         patterns: [...defaultCopyPatterns, ...copyPatterns],
       }),
+      // Emit THIRD-PARTY-LICENSES.txt so every extension build ships the
+      // license texts of its bundled production dependencies (#671).
+      new ThirdPartyLicensesPlugin(packageDir),
     ],
   };
 }

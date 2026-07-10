@@ -1,6 +1,7 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { ThirdPartyLicensesPlugin } = require('../../build-tools/collect-licenses');
 
 const PREFIX = 'bd';
 
@@ -84,5 +85,8 @@ module.exports = {
       filename: 'sidepanel.html',
       chunks: ['sidepanel'],
     }),
+    // Emit THIRD-PARTY-LICENSES.txt with the license texts of all bundled
+    // production dependencies (#671).
+    new ThirdPartyLicensesPlugin(__dirname),
   ],
 };
