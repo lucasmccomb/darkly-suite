@@ -31,6 +31,19 @@ function asPositiveInt(value: unknown, fallback: number): number {
 }
 
 /**
+ * GET /api/admin/licenses — retired (#670).
+ * The list/search endpoint moved to POST so email search terms never travel
+ * in query strings. The explicit 405 keeps stale clients from silently
+ * falling back to the leaky pattern.
+ */
+export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
+  const unauthorized = await requireAdmin(context.request, context.env.DB)
+  if (unauthorized) return unauthorized
+
+  return errorResponse(405, 'Use POST /api/admin/licenses with a JSON body')
+}
+
+/**
  * POST /api/admin/licenses
  * Body: { search?, status?, plan?, product?, sort?, order?, page?, limit? }
  * Returns paginated licenses for the admin dashboard.

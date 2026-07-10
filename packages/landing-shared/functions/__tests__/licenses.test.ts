@@ -23,7 +23,7 @@ Object.defineProperty(globalThis, 'fetch', { value: fetchMock, writable: true })
 // Import handlers
 // ---------------------------------------------------------------------------
 
-import { onRequestDelete, onRequestPost } from '../api/admin/licenses';
+import { onRequestDelete, onRequestGet, onRequestPost } from '../api/admin/licenses';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -152,6 +152,18 @@ describe('POST /api/admin/licenses (list/search)', () => {
 
     const countSql = db.prepare.mock.calls[1][0] as string;
     expect(countSql).not.toContain('WHERE');
+  });
+
+  it('returns 405 for GET — the retired query-string list endpoint (#670)', async () => {
+    const { ctx } = createAdminContext(
+      adminRequest('https://darklysuite.com/api/admin/licenses?search=user%40example.com'),
+    );
+
+    const response = await onRequestGet(ctx);
+    expect(response.status).toBe(405);
+
+    const body = await response.json() as { error: string };
+    expect(body.error).toContain('POST');
   });
 
   it('whitelists the sort column (rejects SQL injection via sort)', async () => {
