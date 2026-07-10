@@ -4,6 +4,27 @@ import { corsHeaders, handleOptions, parseExtensionIds } from './_shared/cors.ts
 import { checkRateLimit, getClientIp } from './_shared/rate-limit.ts';
 import { createCheckoutSession } from './_shared/stripe.ts';
 import { getPriceId } from './_shared/products.ts';
+import { parseCookie } from './admin/_shared/auth.ts';
+
+/**
+ * Read the checkout prefill email from the short-lived HttpOnly cookie set by
+ * /api/auth/callback. Email is deliberately NOT accepted via the query string:
+ * PII in URLs lands in browser history, Referer headers, and access logs (#670).
+ */
+function readCheckoutEmail(request: Request): string | null {
+  const raw = parseCookie(request.headers.get('Cookie'), 'darkly_checkout_email');
+  if (!raw) return null;
+
+  try {
+    const email = decodeURIComponent(raw);
+    // Light sanity check — the cookie is only ever written by our own OAuth
+    // callback; anything that does not look like an email is ignored rather
+    // than forwarded to Stripe.
+    return email.includes('@') && !/[\s;,]/.test(email) ? email : null;
+  } catch {
+    return null;
+  }
+}
 
 type CFContext = EventContext<Env, string, unknown>;
 
@@ -47,7 +68,7 @@ async function handleCheckout(context: CFContext): Promise<Response> {
   const token = url.searchParams.get('token');
   const plan = url.searchParams.get('plan');
   const product = url.searchParams.get('product') ?? 'gmail';
-  const email = url.searchParams.get('email');
+  const email = readCheckoutEmail(context.request);
 
   if (!token || !isValidToken(token)) {
     return new Response(
@@ -95,9 +116,18 @@ async function handleCheckout(context: CFContext): Promise<Response> {
       customerEmail: email ?? undefined,
     });
 
+    const responseHeaders = new Headers(headers);
+    responseHeaders.set('Location', session.url);
+    // The prefill email cookie is one-time use — clear it on the redirect
+    // to Stripe so it cannot linger in the browser.
+    responseHeaders.append(
+      'Set-Cookie',
+      'darkly_checkout_email=; HttpOnly; Secure; SameSite=Lax; Path=/api/checkout; Max-Age=0',
+    );
+
     return new Response(null, {
       status: 303,
-      headers: { ...headers, Location: session.url },
+      headers: responseHeaders,
     });
   } catch (err) {
     console.error('[checkout] Failed to create checkout session:', err);

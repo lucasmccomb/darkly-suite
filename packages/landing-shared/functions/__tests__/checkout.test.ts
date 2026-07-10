@@ -274,11 +274,59 @@ describe('checkout — POST handler', () => {
   });
 });
 
-describe('checkout — email prefill', () => {
-  it('passes customer_email to Stripe when email param is present', async () => {
+describe('checkout — email prefill (short-lived cookie, never the URL)', () => {
+  it('passes customer_email to Stripe when the checkout email cookie is present', async () => {
     fetchMock.mockResolvedValueOnce(
       new Response(
         JSON.stringify({ id: 'cs_email', url: 'https://checkout.stripe.com/cs_email' }),
+        { status: 200 },
+      ),
+    );
+
+    const context = createMockContext({
+      request: new Request(
+        `https://darklysuite.com/api/checkout?token=${validToken}&plan=yearly&product=gmail`,
+        { headers: { Cookie: 'darkly_checkout_email=user%40example.com' } },
+      ),
+    });
+
+    const response = await onRequestGet(context);
+    expect(response.status).toBe(303);
+
+    const body = (fetchMock.mock.calls[0] as [string, RequestInit])[1].body as string;
+    expect(body).toContain('customer_email=user%40example.com');
+
+    // The one-time cookie is cleared on the redirect to Stripe
+    const setCookie = response.headers.get('Set-Cookie')!;
+    expect(setCookie).toContain('darkly_checkout_email=;');
+    expect(setCookie).toContain('Max-Age=0');
+  });
+
+  it('does not include customer_email when the cookie is absent', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ id: 'cs_noemail', url: 'https://checkout.stripe.com/cs_noemail' }),
+        { status: 200 },
+      ),
+    );
+
+    const context = createMockContext({
+      request: new Request(
+        `https://darklysuite.com/api/checkout?token=${validToken}&plan=yearly&product=gmail`,
+      ),
+    });
+
+    const response = await onRequestGet(context);
+    expect(response.status).toBe(303);
+
+    const body = (fetchMock.mock.calls[0] as [string, RequestInit])[1].body as string;
+    expect(body).not.toContain('customer_email');
+  });
+
+  it('ignores an email query parameter — PII must not ride the URL (#670)', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ id: 'cs_qp', url: 'https://checkout.stripe.com/cs_qp' }),
         { status: 200 },
       ),
     );
@@ -293,13 +341,13 @@ describe('checkout — email prefill', () => {
     expect(response.status).toBe(303);
 
     const body = (fetchMock.mock.calls[0] as [string, RequestInit])[1].body as string;
-    expect(body).toContain('customer_email=user%40example.com');
+    expect(body).not.toContain('customer_email');
   });
 
-  it('does not include customer_email when email param is absent', async () => {
+  it('ignores a malformed checkout email cookie instead of forwarding it to Stripe', async () => {
     fetchMock.mockResolvedValueOnce(
       new Response(
-        JSON.stringify({ id: 'cs_noemail', url: 'https://checkout.stripe.com/cs_noemail' }),
+        JSON.stringify({ id: 'cs_bad', url: 'https://checkout.stripe.com/cs_bad' }),
         { status: 200 },
       ),
     );
@@ -307,6 +355,7 @@ describe('checkout — email prefill', () => {
     const context = createMockContext({
       request: new Request(
         `https://darklysuite.com/api/checkout?token=${validToken}&plan=yearly&product=gmail`,
+        { headers: { Cookie: 'darkly_checkout_email=not-an-email' } },
       ),
     });
 

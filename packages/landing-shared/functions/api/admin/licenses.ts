@@ -10,23 +10,54 @@ const SORT_COLUMNS: Record<string, string> = {
   email: 'l.email',
 }
 
+interface ListRequestBody {
+  search?: unknown
+  status?: unknown
+  plan?: unknown
+  product?: unknown
+  sort?: unknown
+  order?: unknown
+  page?: unknown
+  limit?: unknown
+}
+
+function asString(value: unknown, fallback = ''): string {
+  return typeof value === 'string' ? value : fallback
+}
+
+function asPositiveInt(value: unknown, fallback: number): number {
+  const parsed = typeof value === 'number' ? value : parseInt(asString(value, ''), 10)
+  return Number.isFinite(parsed) && parsed >= 1 ? Math.floor(parsed) : fallback
+}
+
 /**
- * GET /api/admin/licenses?search=&status=&plan=&product=&sort=created_at&order=desc&page=1&limit=50
+ * POST /api/admin/licenses
+ * Body: { search?, status?, plan?, product?, sort?, order?, page?, limit? }
  * Returns paginated licenses for the admin dashboard.
+ *
+ * This is deliberately a POST with a JSON body rather than a GET with query
+ * params: admins routinely search by customer email, and PII in query strings
+ * lands in access logs and URL-capturing infrastructure (#670).
  */
-export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
+export const onRequestPost: PagesFunction<Env> = async (context: CFContext) => {
   const unauthorized = await requireAdmin(context.request, context.env.DB)
   if (unauthorized) return unauthorized
 
-  const url = new URL(context.request.url)
-  const search = url.searchParams.get('search') ?? ''
-  const status = url.searchParams.get('status') ?? ''
-  const plan = url.searchParams.get('plan') ?? ''
-  const product = url.searchParams.get('product') ?? ''
-  const sortParam = url.searchParams.get('sort') ?? 'created_at'
-  const orderParam = url.searchParams.get('order') ?? 'desc'
-  const page = Math.max(1, parseInt(url.searchParams.get('page') ?? '1', 10))
-  const limit = Math.min(100, Math.max(1, parseInt(url.searchParams.get('limit') ?? '50', 10)))
+  let body: ListRequestBody = {}
+  try {
+    body = (await context.request.json()) as ListRequestBody
+  } catch {
+    body = {} // Missing/malformed body — fall back to defaults
+  }
+
+  const search = asString(body.search)
+  const status = asString(body.status)
+  const plan = asString(body.plan)
+  const product = asString(body.product)
+  const sortParam = asString(body.sort, 'created_at')
+  const orderParam = asString(body.order, 'desc')
+  const page = asPositiveInt(body.page, 1)
+  const limit = Math.min(100, asPositiveInt(body.limit, 50))
   const offset = (page - 1) * limit
 
   const sortColumn = SORT_COLUMNS[sortParam] ?? 'l.created_at'

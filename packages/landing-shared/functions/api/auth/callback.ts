@@ -87,10 +87,16 @@ function handleCheckoutFlow(
   checkoutUrl.searchParams.set('token', token)
   checkoutUrl.searchParams.set('plan', plan)
   checkoutUrl.searchParams.set('product', product)
-  checkoutUrl.searchParams.set('email', email)
 
   const responseHeaders = new Headers()
   responseHeaders.set('Location', checkoutUrl.toString())
+  // Carry the id_token-verified email to /api/checkout in a short-lived
+  // HttpOnly cookie scoped to that endpoint — never as a query parameter,
+  // which would land in browser history, Referer headers, and access logs (#670).
+  responseHeaders.append(
+    'Set-Cookie',
+    `darkly_checkout_email=${encodeURIComponent(email)}; HttpOnly; Secure; SameSite=Lax; Path=/api/checkout; Max-Age=300`,
+  )
   // Clear the OAuth state cookie
   responseHeaders.append(
     'Set-Cookie',
