@@ -1,1 +1,1 @@
-export { onRequestGet, onRequestDelete, onRequestPatch } from '@darkly/landing-shared/functions/api/admin/licenses.ts';
+export { onRequestGet, onRequestPost, onRequestDelete, onRequestPatch } from '@darkly/landing-shared/functions/api/admin/licenses.ts';

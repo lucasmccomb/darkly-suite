@@ -161,6 +161,8 @@ describe('POST /api/admin/licenses (list/search)', () => {
 
     const response = await onRequestGet(ctx);
     expect(response.status).toBe(405);
+    // RFC 9110 §15.5.6: a 405 must advertise the supported methods
+    expect(response.headers.get('Allow')).toBe('POST, DELETE, PATCH');
 
     const body = await response.json() as { error: string };
     expect(body.error).toContain('POST');

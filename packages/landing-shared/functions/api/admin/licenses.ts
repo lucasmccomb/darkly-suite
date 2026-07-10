@@ -40,7 +40,17 @@ export const onRequestGet: PagesFunction<Env> = async (context: CFContext) => {
   const unauthorized = await requireAdmin(context.request, context.env.DB)
   if (unauthorized) return unauthorized
 
-  return errorResponse(405, 'Use POST /api/admin/licenses with a JSON body')
+  return new Response(
+    JSON.stringify({ error: 'Use POST /api/admin/licenses with a JSON body' }),
+    {
+      status: 405,
+      headers: {
+        'Content-Type': 'application/json',
+        // RFC 9110 §15.5.6 — a 405 must advertise the supported methods
+        Allow: 'POST, DELETE, PATCH',
+      },
+    },
+  )
 }
 
 /**
