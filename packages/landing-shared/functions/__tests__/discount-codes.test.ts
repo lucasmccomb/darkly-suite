@@ -501,6 +501,38 @@ describe('PATCH /api/admin/discount-codes', () => {
     );
   });
 
+  it('returns 400 on malformed JSON body', async () => {
+    const ctx = createAdminContext(
+      adminRequest('https://darklysuite.com/api/admin/discount-codes?id=promo_123', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{not valid json',
+      }),
+    );
+
+    const response = await onRequestPatch(ctx);
+    expect(response.status).toBe(400);
+    const body = await response.json() as { error: string };
+    expect(body.error).toContain('JSON');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('returns 400 when active is not a boolean', async () => {
+    const ctx = createAdminContext(
+      adminRequest('https://darklysuite.com/api/admin/discount-codes?id=promo_123', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ active: 'yes' }),
+      }),
+    );
+
+    const response = await onRequestPatch(ctx);
+    expect(response.status).toBe(400);
+    const body = await response.json() as { error: string };
+    expect(body.error).toContain('active');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it('rejects product scope updates (immutable — tied to coupon applies_to)', async () => {
     const ctx = createAdminContext(
       adminRequest('https://darklysuite.com/api/admin/discount-codes?id=promo_123', {

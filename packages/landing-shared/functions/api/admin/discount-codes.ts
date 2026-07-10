@@ -230,10 +230,19 @@ export const onRequestPatch: PagesFunction<Env> = async (context: CFContext) => 
   const promoId = url.searchParams.get('id')
   if (!promoId) return errorResponse(400, 'Missing ?id= parameter')
 
-  const body = (await context.request.json()) as { active?: boolean }
+  let body: { active?: unknown }
+  try {
+    body = (await context.request.json()) as { active?: unknown }
+  } catch {
+    return errorResponse(400, 'Request body must be valid JSON')
+  }
 
   if (body.active === undefined) {
     return errorResponse(400, 'No fields to update')
+  }
+
+  if (typeof body.active !== 'boolean') {
+    return errorResponse(400, 'active must be a boolean')
   }
 
   try {
