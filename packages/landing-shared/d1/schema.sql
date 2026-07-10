@@ -1,5 +1,19 @@
--- Darkly Suite — Unified D1 Schema
+-- Darkly Suite — Unified D1 Schema (CANONICAL)
 -- Supports: gmail, sheets, docs, suite, browse products
+--
+-- This is the single authoritative schema. The Cloudflare Pages Functions in
+-- packages/landing-shared/functions/** run against this database, and every
+-- landing-suite function route re-exports from @darkly/landing-shared, so this
+-- file is what production D1 must match. The former divergent copy at
+-- packages/landing-suite/d1/schema.sql is retired (it now points here).
+--
+-- Reconciliation (#679, 2026-07-10): folded the two drifted copies into one
+-- superset. From the shared copy: licenses.stripe_status, idx_licenses_email,
+-- user_sessions, webhook_events. From the suite copy: the discount_code_usages
+-- table (queried by functions/api/admin/licenses.ts) and the discount_codes
+-- active/max_uses/use_count columns (these mirror the Stripe promotion-code
+-- fields the admin discount-codes route manages; retained for superset
+-- fidelity even though no D1 query reads them directly).
 
 -- Migration (run once on production D1):
 -- UPDATE licenses SET status = 'inactive' WHERE status IN ('cancelled', 'expired', 'past_due');
@@ -32,6 +46,9 @@ CREATE TABLE IF NOT EXISTS discount_codes (
   discount_type TEXT NOT NULL CHECK (discount_type IN ('percent', 'fixed')),
   discount_value INTEGER NOT NULL,
   product TEXT,
+  active INTEGER NOT NULL DEFAULT 1,
+  max_uses INTEGER,
+  use_count INTEGER NOT NULL DEFAULT 0,
   stripe_coupon_id TEXT,
   stripe_promo_code_id TEXT,
   used_by_email TEXT,
@@ -42,6 +59,16 @@ CREATE TABLE IF NOT EXISTS discount_codes (
 );
 
 CREATE INDEX IF NOT EXISTS idx_discount_codes_code ON discount_codes(code);
+
+CREATE TABLE IF NOT EXISTS discount_code_usages (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  discount_code_id INTEGER NOT NULL REFERENCES discount_codes(id),
+  email TEXT,
+  license_id INTEGER REFERENCES licenses(id),
+  used_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_dcu_code_id ON discount_code_usages(discount_code_id);
 
 CREATE TABLE IF NOT EXISTS admin_sessions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
