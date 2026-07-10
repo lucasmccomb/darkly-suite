@@ -9,8 +9,11 @@ import { config } from './darkly.config';
 const payment = createPaymentClient(config);
 const checkoutPoller = createCheckoutPoller(config);
 
-// Initialize payment token on startup
-payment.initPayment();
+// Initialize payment token on startup — fire-and-forget; log failures
+// instead of leaving an unhandled rejection in the service worker.
+payment.initPayment().catch((err) => {
+  console.warn(`[${config.productName}] Failed to initialize payment token:`, err);
+});
 
 // Open side panel when toolbar icon is clicked (if user prefers side panel)
 // Default: popup opens. Side panel opened via "Open Settings" button in popup.
@@ -38,17 +41,25 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
 
   if (msg.type === 'checkoutStarted') {
-    checkoutPoller.start();
+    checkoutPoller.start().catch((err) => {
+      console.warn(`[${config.productName}] Failed to start checkout poller:`, err);
+    });
     return false;
   }
 
   if (msg.type === 'checkProStatus') {
-    payment.refreshProStatus().then((paid) => sendResponse({ paid }));
+    payment.refreshProStatus().then((paid) => sendResponse({ paid })).catch((err) => {
+      console.warn(`[${config.productName}] checkProStatus failed:`, err);
+      sendResponse({ paid: false });
+    });
     return true;
   }
 
   if (msg.type === 'getProStatus') {
-    payment.isPro().then((paid) => sendResponse({ paid }));
+    payment.isPro().then((paid) => sendResponse({ paid })).catch((err) => {
+      console.warn(`[${config.productName}] getProStatus failed:`, err);
+      sendResponse({ paid: false });
+    });
     return true;
   }
 
@@ -64,6 +75,9 @@ chrome.runtime.onMessageExternal.addListener((message, _sender, sendResponse) =>
         token: result[config.tokenKey] || null,
         productId: config.productId,
       });
+    }).catch((err) => {
+      console.warn(`[${config.productName}] getToken failed:`, err);
+      sendResponse({ token: null, productId: config.productId });
     });
     return true;
   }

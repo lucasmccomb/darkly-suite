@@ -82,6 +82,63 @@ describe('createPreferencesManager', () => {
       const savedArg = chromeMock.storage.sync.set.mock.calls[0][0];
       expect(savedArg).toHaveProperty('dd_preferences');
     });
+
+    it('rejects the caller when the underlying storage write fails', async () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      chromeMock.storage.sync.set.mockRejectedValueOnce(
+        new Error('MAX_WRITE_OPERATIONS_PER_MINUTE quota exceeded'),
+      );
+
+      const manager = createPreferencesManager(mockConfig);
+      await expect(manager.save({ mode: 'dark' })).rejects.toThrow(
+        'MAX_WRITE_OPERATIONS_PER_MINUTE',
+      );
+
+      warnSpy.mockRestore();
+    });
+
+    it('continues processing subsequent saves after one save fails (queue is not poisoned)', async () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      // First write rejects (realistic under chrome.storage.sync write quotas);
+      // the default mock implementation resumes for the next call.
+      chromeMock.storage.sync.set.mockRejectedValueOnce(
+        new Error('MAX_WRITE_OPERATIONS_PER_MINUTE quota exceeded'),
+      );
+
+      const manager = createPreferencesManager(mockConfig);
+      await expect(manager.save({ mode: 'dark' })).rejects.toThrow();
+
+      // The next save must still execute and persist.
+      await manager.save({ mode: 'light' });
+      expect(chromeMock.storage.sync.set).toHaveBeenCalledTimes(2);
+      const saved = syncStorage[mockConfig.storageKey] as BaseUserPreferences;
+      expect(saved.mode).toBe('light');
+
+      // The failure was logged rather than silently swallowed.
+      expect(warnSpy).toHaveBeenCalled();
+      warnSpy.mockRestore();
+    });
+
+    it('preserves save ordering across a failed save', async () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      chromeMock.storage.sync.set.mockRejectedValueOnce(new Error('quota'));
+
+      const manager = createPreferencesManager(mockConfig);
+      const first = manager.save({ mode: 'dark' });
+      const second = manager.save({ mode: 'schedule' });
+      const third = manager.save({ mode: 'light' });
+
+      await expect(first).rejects.toThrow('quota');
+      await second;
+      await third;
+
+      // Saves after the failure ran in order; the last one wins.
+      const saved = syncStorage[mockConfig.storageKey] as BaseUserPreferences;
+      expect(saved.mode).toBe('light');
+      expect(chromeMock.storage.sync.set).toHaveBeenCalledTimes(3);
+
+      warnSpy.mockRestore();
+    });
   });
 
   describe('onChange', () => {

@@ -49,7 +49,11 @@ export function createSiteWorker(config: ProductConfig): SiteWorkerHandlers {
   const prefs = createPreferencesManager(config);
   const sunCacheKey = sunCacheKeyFrom(config.storageKey);
 
-  payment.initPayment();
+  // Fire-and-forget token bootstrap — log failures instead of leaving an
+  // unhandled rejection in the service worker.
+  payment.initPayment().catch((err) => {
+    console.warn(`[${config.productName}] Failed to initialize payment token:`, err);
+  });
 
   async function getScheduleStatus(): Promise<{ shouldBeDark: boolean }> {
     const current = await prefs.load();
@@ -221,7 +225,10 @@ export function createBackgroundWorker(config: ProductConfig): void {
 
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (message.type === 'getScheduleStatus') {
-      worker.getScheduleStatus().then(sendResponse);
+      worker.getScheduleStatus().then(sendResponse).catch((err) => {
+        console.warn(`[${config.productName}] getScheduleStatus failed:`, err);
+        sendResponse({ shouldBeDark: false });
+      });
       return true;
     }
 
@@ -241,17 +248,26 @@ export function createBackgroundWorker(config: ProductConfig): void {
         } else {
           sendResponse(null);
         }
+      }).catch((err) => {
+        console.warn(`[${config.productName}] getSunTimes failed:`, err);
+        sendResponse(null);
       });
       return true;
     }
 
     if (message.type === 'getProStatus') {
-      worker.getProStatus().then(sendResponse);
+      worker.getProStatus().then(sendResponse).catch((err) => {
+        console.warn(`[${config.productName}] getProStatus failed:`, err);
+        sendResponse({ paid: false });
+      });
       return true;
     }
 
     if (message.type === 'getLocation') {
-      worker.getLocation().then(sendResponse);
+      worker.getLocation().then(sendResponse).catch((err) => {
+        console.warn(`[${config.productName}] getLocation failed:`, err);
+        sendResponse({ error: err instanceof Error ? err.message : 'Failed to get location' });
+      });
       return true;
     }
 
@@ -261,7 +277,9 @@ export function createBackgroundWorker(config: ProductConfig): void {
     }
 
     if (message.type === 'checkoutStarted') {
-      checkoutPoller.start();
+      checkoutPoller.start().catch((err) => {
+        console.warn(`[${config.productName}] Failed to start checkout poller:`, err);
+      });
       return false;
     }
 
@@ -271,12 +289,17 @@ export function createBackgroundWorker(config: ProductConfig): void {
     if (message.type === 'getToken') {
       worker.getToken().then((token) => {
         sendResponse({ token, productId: config.productId });
+      }).catch((err) => {
+        console.warn(`[${config.productName}] getToken failed:`, err);
+        sendResponse({ token: null, productId: config.productId });
       });
       return true;
     }
 
     if (message.type === 'checkoutComplete') {
-      checkoutPoller.start();
+      checkoutPoller.start().catch((err) => {
+        console.warn(`[${config.productName}] Failed to start checkout poller:`, err);
+      });
       sendResponse({ ok: true });
       return true;
     }
@@ -303,7 +326,9 @@ export function createBackgroundWorker(config: ProductConfig): void {
         // Start checkout poller immediately — the user is being directed to the
         // subscribe page, so payment may complete soon. Without this, the poller
         // only starts when subscribing from the in-app paywall (checkoutStarted).
-        checkoutPoller.start();
+        checkoutPoller.start().catch((err) => {
+          console.warn(`[${config.productName}] Failed to start checkout poller:`, err);
+        });
       }
       await worker.setupAlarm();
     }

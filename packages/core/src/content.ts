@@ -239,7 +239,11 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
         const now = Date.now();
         if (now - lastCheck < 5_000) return;
         lastCheck = now;
-        payment.refreshProStatus();
+        // Fire-and-forget revalidation — log failures instead of surfacing
+        // an unhandled rejection in the host page.
+        payment.refreshProStatus().catch((err) => {
+          console.warn(`[${config.productName}] Failed to refresh Pro status:`, err);
+        });
       };
       document.addEventListener('visibilitychange', handleVisibility);
       payment.onPaymentStatusChange((paid) => {
@@ -258,7 +262,11 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
         const now = Date.now();
         if (now - lastRevalidation < 30 * 60 * 1000) return;
         lastRevalidation = now;
-        payment.refreshProStatus();
+        // Fire-and-forget revalidation — log failures instead of surfacing
+        // an unhandled rejection in the host page.
+        payment.refreshProStatus().catch((err) => {
+          console.warn(`[${config.productName}] Failed to refresh Pro status:`, err);
+        });
       });
     }
 
