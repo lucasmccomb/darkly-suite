@@ -40,6 +40,37 @@ export const onRequestPost: PagesFunction<Env> = async (context: CFContext) => {
 
   const event: StripeEvent = JSON.parse(rawBody);
 
+  // Idempotency guard: Stripe redelivers events, so claim event.id before
+  // processing. A duplicate delivery hits the PRIMARY KEY conflict (0 rows
+  // written) and is acknowledged without re-running side effects (emails,
+  // license writes). A claim older than 1 hour is treated as orphaned — a
+  // correlated D1 failure can leave it behind when both the handler write
+  // AND the release DELETE fail — so the upsert reclaims it (1 row written)
+  // and Stripe's retry is re-processed. If the guard itself fails, log and
+  // continue processing — availability over strictness.
+  let isDuplicateEvent = false;
+  try {
+    const claim = await context.env.DB.prepare(
+      `INSERT INTO webhook_events (id) VALUES (?)
+       ON CONFLICT (id) DO UPDATE SET received_at = datetime('now')
+       WHERE received_at < datetime('now', '-1 hour')`,
+    )
+      .bind(event.id)
+      .run();
+    isDuplicateEvent = claim.meta?.changes === 0;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    console.error(`Webhook dedup guard error for ${event.id}: ${message}`);
+  }
+
+  if (isDuplicateEvent) {
+    console.log(`Webhook: ignoring duplicate delivery of event ${event.id}`);
+    return new Response(JSON.stringify({ received: true, duplicate: true }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   try {
     switch (event.type) {
       case 'checkout.session.completed':
@@ -64,10 +95,34 @@ export const onRequestPost: PagesFunction<Env> = async (context: CFContext) => {
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     console.error(`Webhook handler error for ${event.type}: ${message}`);
+
+    // Release the dedup claim so Stripe's retry of this failed event is
+    // re-processed instead of short-circuited as a duplicate.
+    try {
+      await context.env.DB.prepare(`DELETE FROM webhook_events WHERE id = ?`)
+        .bind(event.id)
+        .run();
+    } catch (releaseErr) {
+      const releaseMessage = releaseErr instanceof Error ? releaseErr.message : 'Unknown error';
+      console.error(`Webhook dedup release error for ${event.id}: ${releaseMessage}`);
+    }
+
     return new Response(JSON.stringify({ error: 'Webhook handler failed' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
+  }
+
+  // Opportunistic retention: Stripe stops retrying after ~3 days, so claims
+  // older than 30 days serve no dedup purpose. Best-effort — a cleanup
+  // failure never affects event processing.
+  try {
+    await context.env.DB.prepare(
+      `DELETE FROM webhook_events WHERE received_at < datetime('now', '-30 days')`,
+    ).run();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    console.error(`Webhook dedup cleanup error: ${message}`);
   }
 
   return new Response(JSON.stringify({ received: true }), {
@@ -383,7 +438,18 @@ async function handleSubscriptionDeleted(env: Env, event: StripeEvent): Promise<
 
 async function handlePaymentFailed(env: Env, event: StripeEvent): Promise<void> {
   const invoice = event.data.object as Record<string, unknown>;
-  const subscriptionId = invoice.subscription as string | null;
+
+  // Shape-robust subscription extraction: API version 2026-01-28.clover moved
+  // the subscription reference to invoice.parent.subscription_details.subscription;
+  // legacy shape has it at the top-level invoice.subscription.
+  const parent = invoice.parent as
+    | { subscription_details?: { subscription?: string | null } | null }
+    | null
+    | undefined;
+  const subscriptionId =
+    (invoice.subscription as string | null | undefined) ??
+    parent?.subscription_details?.subscription ??
+    null;
 
   if (!subscriptionId) return;
 

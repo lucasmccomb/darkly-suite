@@ -329,6 +329,129 @@ describe('POST /api/admin/discount-codes', () => {
   });
 });
 
+describe('POST /api/admin/discount-codes — input validation', () => {
+  it('returns 400 on malformed JSON body', async () => {
+    const ctx = createAdminContext(
+      adminRequest('https://darklysuite.com/api/admin/discount-codes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{not valid json',
+      }),
+    );
+
+    const response = await onRequestPost(ctx);
+    expect(response.status).toBe(400);
+    const body = await response.json() as { error: string };
+    expect(body.error).toContain('JSON');
+    // Never reached Stripe
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('returns 400 when expires_at is not a parseable date', async () => {
+    const ctx = createAdminContext(
+      adminRequest('https://darklysuite.com/api/admin/discount-codes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          discount_type: 'percent',
+          discount_value: 50,
+          expires_at: 'not-a-date',
+        }),
+      }),
+    );
+
+    const response = await onRequestPost(ctx);
+    expect(response.status).toBe(400);
+    const body = await response.json() as { error: string };
+    expect(body.error).toContain('expires_at');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('returns 400 when expires_at is not a string', async () => {
+    const ctx = createAdminContext(
+      adminRequest('https://darklysuite.com/api/admin/discount-codes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          discount_type: 'percent',
+          discount_value: 50,
+          expires_at: 1798761600,
+        }),
+      }),
+    );
+
+    const response = await onRequestPost(ctx);
+    expect(response.status).toBe(400);
+    const body = await response.json() as { error: string };
+    expect(body.error).toContain('expires_at');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['zero', 0],
+    ['negative', -5],
+    ['non-integer', 1.5],
+    ['non-number', 'ten'],
+  ])('returns 400 when max_uses is invalid (%s)', async (_label, maxUses) => {
+    const ctx = createAdminContext(
+      adminRequest('https://darklysuite.com/api/admin/discount-codes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          discount_type: 'percent',
+          discount_value: 50,
+          max_uses: maxUses,
+        }),
+      }),
+    );
+
+    const response = await onRequestPost(ctx);
+    expect(response.status).toBe(400);
+    const body = await response.json() as { error: string };
+    expect(body.error).toContain('max_uses');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('accepts valid expires_at and max_uses and forwards them to Stripe (happy path)', async () => {
+    // Stripe createCoupon
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ id: 'coupon_valid', object: 'coupon' }), { status: 200 }),
+    );
+    // Stripe createPromotionCode
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ id: 'promo_valid', code: 'HAPPY25', object: 'promotion_code' }), { status: 200 }),
+    );
+
+    const expiresAt = '2027-01-01T00:00:00Z';
+    const ctx = createAdminContext(
+      adminRequest('https://darklysuite.com/api/admin/discount-codes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: 'HAPPY25',
+          discount_type: 'percent',
+          discount_value: 25,
+          expires_at: expiresAt,
+          max_uses: 10,
+        }),
+      }),
+    );
+
+    const response = await onRequestPost(ctx);
+    expect(response.status).toBe(201);
+
+    const body = await response.json() as { id: string; code: string };
+    expect(body.id).toBe('promo_valid');
+    expect(body.code).toBe('HAPPY25');
+
+    // Promo creation forwarded the validated fields (Stripe expects Unix seconds)
+    const promoBody = fetchMock.mock.calls[1][1]?.body as string;
+    const expectedUnix = Math.floor(new Date(expiresAt).getTime() / 1000).toString();
+    expect(promoBody).toContain(`expires_at=${expectedUnix}`);
+    expect(promoBody).toContain('max_redemptions=10');
+  });
+});
+
 describe('PATCH /api/admin/discount-codes', () => {
   it('returns 400 without id parameter', async () => {
     const ctx = createAdminContext(
@@ -376,6 +499,38 @@ describe('PATCH /api/admin/discount-codes', () => {
       expect.stringContaining('/promotion_codes/promo_123'),
       expect.objectContaining({ method: 'POST' }),
     );
+  });
+
+  it('returns 400 on malformed JSON body', async () => {
+    const ctx = createAdminContext(
+      adminRequest('https://darklysuite.com/api/admin/discount-codes?id=promo_123', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{not valid json',
+      }),
+    );
+
+    const response = await onRequestPatch(ctx);
+    expect(response.status).toBe(400);
+    const body = await response.json() as { error: string };
+    expect(body.error).toContain('JSON');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('returns 400 when active is not a boolean', async () => {
+    const ctx = createAdminContext(
+      adminRequest('https://darklysuite.com/api/admin/discount-codes?id=promo_123', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ active: 'yes' }),
+      }),
+    );
+
+    const response = await onRequestPatch(ctx);
+    expect(response.status).toBe(400);
+    const body = await response.json() as { error: string };
+    expect(body.error).toContain('active');
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('rejects product scope updates (immutable — tied to coupon applies_to)', async () => {

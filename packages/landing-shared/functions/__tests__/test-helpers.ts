@@ -29,7 +29,9 @@ export function createMockD1(): MockD1Database {
   const statement: MockD1PreparedStatement = {
     bind: jest.fn(),
     first: jest.fn().mockResolvedValue(null),
-    run: jest.fn().mockResolvedValue({ success: true }),
+    // Real D1 always returns meta.changes on a write — keep the mock faithful
+    // so tests exercise production code paths, not undefined-meta fallbacks.
+    run: jest.fn().mockResolvedValue({ success: true, meta: { changes: 1 } }),
     all: jest.fn().mockResolvedValue({ results: [], success: true }),
   };
 

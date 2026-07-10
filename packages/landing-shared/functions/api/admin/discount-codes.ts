@@ -129,7 +129,12 @@ export const onRequestPost: PagesFunction<Env> = async (context: CFContext) => {
   const unauthorized = await requireAdmin(context.request, context.env.DB)
   if (unauthorized) return unauthorized
 
-  const body = (await context.request.json()) as CreateCodeBody
+  let body: CreateCodeBody
+  try {
+    body = (await context.request.json()) as CreateCodeBody
+  } catch {
+    return errorResponse(400, 'Request body must be valid JSON')
+  }
 
   if (!body.discount_type || !['percent', 'fixed'].includes(body.discount_type)) {
     return errorResponse(400, 'discount_type must be "percent" or "fixed"')
@@ -154,6 +159,18 @@ export const onRequestPost: PagesFunction<Env> = async (context: CFContext) => {
 
   if (body.code && !/^[a-zA-Z0-9-]+$/.test(body.code.trim())) {
     return errorResponse(400, 'Code can only contain letters, numbers, and dashes')
+  }
+
+  if (body.expires_at != null) {
+    if (typeof body.expires_at !== 'string' || Number.isNaN(Date.parse(body.expires_at))) {
+      return errorResponse(400, 'expires_at must be a valid ISO 8601 date string')
+    }
+  }
+
+  if (body.max_uses != null) {
+    if (typeof body.max_uses !== 'number' || !Number.isInteger(body.max_uses) || body.max_uses <= 0) {
+      return errorResponse(400, 'max_uses must be a positive integer')
+    }
   }
 
   try {
@@ -213,10 +230,19 @@ export const onRequestPatch: PagesFunction<Env> = async (context: CFContext) => 
   const promoId = url.searchParams.get('id')
   if (!promoId) return errorResponse(400, 'Missing ?id= parameter')
 
-  const body = (await context.request.json()) as { active?: boolean }
+  let body: { active?: unknown }
+  try {
+    body = (await context.request.json()) as { active?: unknown }
+  } catch {
+    return errorResponse(400, 'Request body must be valid JSON')
+  }
 
   if (body.active === undefined) {
     return errorResponse(400, 'No fields to update')
+  }
+
+  if (typeof body.active !== 'boolean') {
+    return errorResponse(400, 'active must be a boolean')
   }
 
   try {
