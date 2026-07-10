@@ -97,15 +97,6 @@ export function PrivacyPage() {
               </li>
             </ul>
 
-            <h2>Chrome Identity &amp; License Recovery</h2>
-            <p>
-              If you are signed into Chrome, your Chrome account email may be used to automatically
-              recover your subscription if the local license token is lost (e.g., after a Chrome data
-              reset or reinstallation). This email is sent only to darklysuite.com for license
-              verification and is never stored beyond the existing license record. It is never used
-              for marketing, analytics, or shared with third parties.
-            </p>
-
             <h2>Data Security</h2>
             <p>
               Your preferences are protected by Chrome&apos;s built-in storage security. The purchase
