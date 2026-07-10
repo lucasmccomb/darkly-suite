@@ -43,12 +43,17 @@ export const onRequestPost: PagesFunction<Env> = async (context: CFContext) => {
   // Idempotency guard: Stripe redelivers events, so claim event.id before
   // processing. A duplicate delivery hits the PRIMARY KEY conflict (0 rows
   // written) and is acknowledged without re-running side effects (emails,
-  // license writes). If the guard itself fails, log and continue processing —
-  // availability over strictness.
+  // license writes). A claim older than 1 hour is treated as orphaned — a
+  // correlated D1 failure can leave it behind when both the handler write
+  // AND the release DELETE fail — so the upsert reclaims it (1 row written)
+  // and Stripe's retry is re-processed. If the guard itself fails, log and
+  // continue processing — availability over strictness.
   let isDuplicateEvent = false;
   try {
     const claim = await context.env.DB.prepare(
-      `INSERT INTO webhook_events (id) VALUES (?) ON CONFLICT (id) DO NOTHING`,
+      `INSERT INTO webhook_events (id) VALUES (?)
+       ON CONFLICT (id) DO UPDATE SET received_at = datetime('now')
+       WHERE received_at < datetime('now', '-1 hour')`,
     )
       .bind(event.id)
       .run();
@@ -106,6 +111,18 @@ export const onRequestPost: PagesFunction<Env> = async (context: CFContext) => {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
+  }
+
+  // Opportunistic retention: Stripe stops retrying after ~3 days, so claims
+  // older than 30 days serve no dedup purpose. Best-effort — a cleanup
+  // failure never affects event processing.
+  try {
+    await context.env.DB.prepare(
+      `DELETE FROM webhook_events WHERE received_at < datetime('now', '-30 days')`,
+    ).run();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    console.error(`Webhook dedup cleanup error: ${message}`);
   }
 
   return new Response(JSON.stringify({ received: true }), {

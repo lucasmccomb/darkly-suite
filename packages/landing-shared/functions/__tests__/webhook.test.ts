@@ -721,9 +721,11 @@ describe('webhook — invoice.payment_failed', () => {
 
     expect(response.status).toBe(200);
     const db = env.DB as unknown as MockD1Database;
-    // Only the dedup guard touched the DB — no license UPDATE, no SELECT
-    expect(db.prepare).toHaveBeenCalledTimes(1);
-    expect(db.prepare.mock.calls[0][0] as string).toContain('webhook_events');
+    // Only the dedup guard + retention cleanup touched the DB — no license
+    // UPDATE, no SELECT
+    expect(db.prepare).toHaveBeenCalledTimes(2);
+    expect(db.prepare.mock.calls[0][0] as string).toContain('INSERT INTO webhook_events');
+    expect(db.prepare.mock.calls[1][0] as string).toContain('DELETE FROM webhook_events WHERE received_at <');
   });
 
   it('resolves the subscription from the 2026-01-28.clover nested shape (invoice.parent.subscription_details)', async () => {
@@ -765,6 +767,8 @@ describe('webhook — invoice.payment_failed', () => {
 
 describe('webhook — event-id deduplication', () => {
   it('claims the event id in webhook_events before processing', async () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
     const env = createMockEnv();
     const eventBody = makeWebhookEvent('some.unknown.event', { id: 'noop' });
     const response = await callWebhook(eventBody, env);
@@ -774,6 +778,40 @@ describe('webhook — event-id deduplication', () => {
     const dedupSql = db.prepare.mock.calls[0][0] as string;
     expect(dedupSql).toContain('INSERT INTO webhook_events');
     expect(dedupSql).toContain('ON CONFLICT');
+    // Stale claims (orphaned by a correlated D1 failure where both the
+    // handler write AND the release DELETE failed) are reclaimable: the
+    // upsert refreshes received_at when the existing claim is >1 hour old,
+    // so Stripe's later retries re-process instead of short-circuiting.
+    expect(dedupSql).toContain('DO UPDATE SET received_at');
+    expect(dedupSql).toContain("'-1 hour'");
+
+    // Normal processing exercises the production guard path — no fail-open
+    expect(consoleSpy).not.toHaveBeenCalledWith(expect.stringContaining('dedup'));
+
+    consoleSpy.mockRestore();
+  });
+
+  it('processes an event whose stale claim was reclaimed (D1 reports changes=1)', async () => {
+    // Real D1 returns meta.changes=1 both for a fresh claim AND when the
+    // upsert reclaimed a claim older than 1 hour (verified against SQLite
+    // upsert semantics: fresh insert → 1, fresh duplicate → 0, stale
+    // reclaim → 1). Either way the event must be processed.
+    mockResendSuccess();
+    mockResendSuccess();
+
+    const env = createMockEnv();
+    const db = env.DB as unknown as MockD1Database;
+    db._statement.run.mockResolvedValueOnce({ success: true, meta: { changes: 1 } });
+    db._statement.first.mockResolvedValueOnce({ email: 'reclaimed@example.com', product: 'gmail', plan: 'yearly' });
+
+    const eventBody = makeWebhookEvent('invoice.payment_failed', { subscription: 'sub_reclaimed' });
+    const response = await callWebhook(eventBody, env);
+
+    expect(response.status).toBe(200);
+    // Side effects ran — the event was NOT treated as a duplicate
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const userEmailBody = JSON.parse(fetchMock.mock.calls[1][1]?.body as string);
+    expect(userEmailBody.to).toBe('reclaimed@example.com');
   });
 
   it('short-circuits a duplicate event id with 200 and runs no side effects', async () => {
@@ -788,7 +826,8 @@ describe('webhook — event-id deduplication', () => {
     const response = await callWebhook(eventBody, env);
 
     expect(response.status).toBe(200);
-    // No emails re-sent, no license UPDATE — only the dedup INSERT ran
+    // No emails re-sent, no license UPDATE, no retention cleanup —
+    // only the dedup INSERT ran
     expect(fetchMock).not.toHaveBeenCalled();
     expect(db.prepare).toHaveBeenCalledTimes(1);
   });
@@ -858,7 +897,47 @@ describe('webhook — event-id deduplication', () => {
     expect(response.status).toBe(500);
     const db = env.DB as unknown as MockD1Database;
     const sqls = db.prepare.mock.calls.map((c) => c[0] as string);
-    expect(sqls.some((s) => s.includes('DELETE FROM webhook_events'))).toBe(true);
+    // The by-id release DELETE (distinct from the age-based retention cleanup)
+    expect(sqls.some((s) => s.includes('DELETE FROM webhook_events WHERE id = ?'))).toBe(true);
+
+    consoleSpy.mockRestore();
+  });
+
+  it('prunes webhook_events rows older than 30 days after successful processing', async () => {
+    const env = createMockEnv();
+    const eventBody = makeWebhookEvent('some.unknown.event', { id: 'noop' });
+    const response = await callWebhook(eventBody, env);
+
+    expect(response.status).toBe(200);
+    const db = env.DB as unknown as MockD1Database;
+    const sqls = db.prepare.mock.calls.map((c) => c[0] as string);
+    const cleanupSql = sqls.find((s) => s.includes('DELETE FROM webhook_events WHERE received_at <'));
+    expect(cleanupSql).toBeDefined();
+    expect(cleanupSql).toContain("'-30 days'");
+  });
+
+  it('does not let retention cleanup failure affect event processing', async () => {
+    mockResendSuccess();
+    mockResendSuccess();
+
+    const env = createMockEnv();
+    const db = env.DB as unknown as MockD1Database;
+    db._statement.first.mockResolvedValueOnce({ email: 'cleanup@example.com', product: 'gmail', plan: 'yearly' });
+    // run() call order: [0] dedup claim, [1] past_due UPDATE, [2] retention cleanup
+    db._statement.run
+      .mockResolvedValueOnce({ success: true, meta: { changes: 1 } })
+      .mockResolvedValueOnce({ success: true, meta: { changes: 1 } })
+      .mockRejectedValueOnce(new Error('cleanup failed'));
+
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+    const eventBody = makeWebhookEvent('invoice.payment_failed', { subscription: 'sub_cleanup_err' });
+    const response = await callWebhook(eventBody, env);
+
+    expect(response.status).toBe(200);
+    // Side effects completed normally despite the cleanup failure
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('cleanup'));
 
     consoleSpy.mockRestore();
   });
@@ -917,7 +996,7 @@ describe('webhook — ownership guard: foreign subscription.deleted', () => {
     expect(fetchMock).not.toHaveBeenCalled();
     // No DB write (guard fired before UPDATE)
     const db = env.DB as unknown as MockD1Database;
-    expect(db.prepare).toHaveBeenCalledTimes(2); // dedup guard + SELECT, not the UPDATE
+    expect(db.prepare).toHaveBeenCalledTimes(3); // dedup guard + SELECT + retention cleanup, not the UPDATE
     // Skip log emitted
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('not a Darkly product'));
 
@@ -1163,10 +1242,11 @@ describe('webhook — ownership guard: foreign checkout.session.completed', () =
     expect(response.status).toBe(200);
     // Only the retrieveCheckoutSession fetch (Stripe) — no trackDiscountUsage, no email
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    // No DB write beyond the dedup guard
+    // No DB write beyond the dedup guard + retention cleanup
     const db = env.DB as unknown as MockD1Database;
-    expect(db.prepare).toHaveBeenCalledTimes(1);
-    expect(db.prepare.mock.calls[0][0] as string).toContain('webhook_events');
+    expect(db.prepare).toHaveBeenCalledTimes(2);
+    expect(db.prepare.mock.calls[0][0] as string).toContain('INSERT INTO webhook_events');
+    expect(db.prepare.mock.calls[1][0] as string).toContain('DELETE FROM webhook_events WHERE received_at <');
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('not a Darkly product'));
 
     consoleSpy.mockRestore();

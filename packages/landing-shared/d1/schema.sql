@@ -73,6 +73,8 @@ CREATE TABLE IF NOT EXISTS rate_limits (
 
 -- Webhook idempotency: Stripe redelivers events; the webhook handler claims
 -- each event.id here before processing so redeliveries run side effects once.
+-- Claims older than 1 hour are reclaimable (orphaned-claim recovery) and rows
+-- older than 30 days are pruned opportunistically by the handler.
 -- Migration (run once on production D1 BEFORE deploying the dedup guard):
 -- CREATE TABLE IF NOT EXISTS webhook_events (id TEXT PRIMARY KEY, received_at TEXT NOT NULL DEFAULT (datetime('now')));
 CREATE TABLE IF NOT EXISTS webhook_events (
