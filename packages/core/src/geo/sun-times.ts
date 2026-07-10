@@ -15,7 +15,19 @@ export interface SunTimes {
 }
 
 /**
+ * Round a coordinate to 1 decimal place (~11 km of precision).
+ * Only approximate location may leave the device — full-precision
+ * coordinates must never reach the network or the cache. This keeps the
+ * "approximate coordinates" privacy declaration accurate.
+ */
+function roundCoordinate(value: number): number {
+  return Math.round(value * 10) / 10;
+}
+
+/**
  * Get sunrise/sunset times for the given coordinates.
+ * Coordinates are rounded to 1 decimal place before any request or cache
+ * write, so only approximate location is transmitted to sunrise-sunset.org.
  * Cached in chrome.storage.local for 24 hours.
  * Cache key is parameterized to avoid conflicts between extensions.
  */
@@ -24,6 +36,9 @@ export async function getSunTimes(
   lng: number,
   cacheKey = 'darkly_sun_times_cache',
 ): Promise<SunTimes | null> {
+  lat = roundCoordinate(lat);
+  lng = roundCoordinate(lng);
+
   try {
     const result = await chrome.storage.local.get(cacheKey);
     const cached = result[cacheKey] as SunTimesCache | undefined;
