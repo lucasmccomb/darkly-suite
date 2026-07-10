@@ -62,17 +62,18 @@ function licenseIdentifier(pkg) {
   return 'UNKNOWN';
 }
 
-/** Find and read the LICENSE/LICENCE/NOTICE text shipped with a package. */
-function findLicenseText(dir) {
+/**
+ * Find and read the first file in `dir` whose name matches `namePattern`
+ * (sorted candidates, deterministic). Returns normalized text or null.
+ */
+function findAttributionFile(dir, namePattern) {
   let entries;
   try {
     entries = fs.readdirSync(dir);
   } catch {
     return null;
   }
-  const candidates = entries
-    .filter((entry) => /^licen[cs]e(\.|$|-)/i.test(entry) || /^licen[cs]e$/i.test(entry))
-    .sort();
+  const candidates = entries.filter((entry) => namePattern.test(entry)).sort();
   for (const candidate of candidates) {
     const filePath = path.join(dir, candidate);
     try {
@@ -84,6 +85,19 @@ function findLicenseText(dir) {
     }
   }
   return null;
+}
+
+/** Find and read the LICENSE/LICENCE text shipped with a package. */
+function findLicenseText(dir) {
+  return findAttributionFile(dir, /^licen[cs]e(\.|$|-)/i);
+}
+
+/**
+ * Find and read the NOTICE text shipped with a package. Apache-2.0 §4(d)
+ * requires reproducing a bundled dependency's NOTICE file in distributions.
+ */
+function findNoticeText(dir) {
+  return findAttributionFile(dir, /^notice(\.|$|-)/i);
 }
 
 /**
@@ -133,6 +147,7 @@ function collectThirdPartyLicenses(packageDir) {
           license: licenseIdentifier(depPkg),
           homepage: depPkg.homepage || (depPkg.repository && depPkg.repository.url) || null,
           text: findLicenseText(depDir),
+          notice: findNoticeText(depDir),
         });
       }
       visit(depDir);
@@ -151,6 +166,9 @@ function collectThirdPartyLicenses(packageDir) {
       entry.text ||
         `License text was not distributed with this package. See the package's repository for the full ${entry.license} license text.`,
     );
+    if (entry.notice) {
+      lines.push('', `NOTICE file for ${entry.name}@${entry.version}:`, '', entry.notice);
+    }
     return lines.join('\n');
   });
 
