@@ -70,3 +70,12 @@ CREATE TABLE IF NOT EXISTS rate_limits (
   count INTEGER NOT NULL DEFAULT 1,
   PRIMARY KEY(ip, endpoint, window_start)
 );
+
+-- Webhook idempotency: Stripe redelivers events; the webhook handler claims
+-- each event.id here before processing so redeliveries run side effects once.
+-- Migration (run once on production D1 BEFORE deploying the dedup guard):
+-- CREATE TABLE IF NOT EXISTS webhook_events (id TEXT PRIMARY KEY, received_at TEXT NOT NULL DEFAULT (datetime('now')));
+CREATE TABLE IF NOT EXISTS webhook_events (
+  id TEXT PRIMARY KEY,
+  received_at TEXT NOT NULL DEFAULT (datetime('now'))
+);

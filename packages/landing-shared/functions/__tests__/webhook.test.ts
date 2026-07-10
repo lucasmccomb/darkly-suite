@@ -131,8 +131,8 @@ describe('webhook — checkout.session.completed', () => {
     const db = env.DB as unknown as MockD1Database;
     expect(db.prepare).toHaveBeenCalled();
 
-    // The first prepare call should be the INSERT INTO licenses
-    const sql = db.prepare.mock.calls[0][0] as string;
+    // prepare[0] is the dedup guard; prepare[1] should be the INSERT INTO licenses
+    const sql = db.prepare.mock.calls[1][0] as string;
     expect(sql).toContain('INSERT INTO licenses');
     expect(sql).toContain('ON CONFLICT(token, product) DO UPDATE');
   });
@@ -275,8 +275,8 @@ describe('webhook — checkout.session.completed', () => {
     await callWebhook(eventBody, env);
 
     const db = env.DB as unknown as MockD1Database;
-    // Check that bind was called with '2099-12-31T23:59:59Z' as the expiresAt
-    const bindArgs = db._statement.bind.mock.calls[0];
+    // bind[0] is the dedup guard; check the licenses INSERT bind for expiresAt
+    const bindArgs = db._statement.bind.mock.calls[1];
     expect(bindArgs).toContain('2099-12-31T23:59:59Z');
   });
 
@@ -309,7 +309,7 @@ describe('webhook — checkout.session.completed', () => {
     await callWebhook(eventBody, env);
 
     const db = env.DB as unknown as MockD1Database;
-    const bindArgs = db._statement.bind.mock.calls[0];
+    const bindArgs = db._statement.bind.mock.calls[1];
     // Product should be 'gmail' (the default)
     expect(bindArgs[1]).toBe('gmail');
   });
@@ -456,7 +456,7 @@ describe('webhook — customer.subscription.updated', () => {
     await callWebhook(eventBody, env);
 
     const db = env.DB as unknown as MockD1Database;
-    const bindArgs = db._statement.bind.mock.calls[0];
+    const bindArgs = db._statement.bind.mock.calls[1];
     expect(bindArgs[0]).toBe('active');
     expect(bindArgs[1]).toBe('cancel_at_period_end');
     expect(bindArgs[2]).toBe('2026-03-15T00:00:00.000Z');
@@ -473,7 +473,7 @@ describe('webhook — customer.subscription.updated', () => {
     await callWebhook(eventBody, env);
 
     const db = env.DB as unknown as MockD1Database;
-    const bindArgs = db._statement.bind.mock.calls[0];
+    const bindArgs = db._statement.bind.mock.calls[1];
     expect(bindArgs[0]).toBe('active');
     expect(bindArgs[1]).toBe('active');
     expect(bindArgs[2]).toBeNull();
@@ -596,12 +596,12 @@ describe('webhook — customer.subscription.deleted', () => {
 
     expect(response.status).toBe(200);
 
-    // First call: SELECT license for notification context
-    const selectSql = db.prepare.mock.calls[0][0] as string;
+    // prepare[0] is the dedup guard; prepare[1]: SELECT license for notification context
+    const selectSql = db.prepare.mock.calls[1][0] as string;
     expect(selectSql).toContain('SELECT email, product, plan');
 
-    // Second call: UPDATE license status
-    const updateSql = db.prepare.mock.calls[1][0] as string;
+    // prepare[2]: UPDATE license status
+    const updateSql = db.prepare.mock.calls[2][0] as string;
     expect(updateSql).toContain("status = 'inactive'");
 
     // Verify email was sent
@@ -692,13 +692,13 @@ describe('webhook — invoice.payment_failed', () => {
 
     expect(response.status).toBe(200);
 
-    // First call: UPDATE stripe_status (license stays active for grace period)
-    const updateSql = db.prepare.mock.calls[0][0] as string;
+    // prepare[0] is the dedup guard; prepare[1]: UPDATE stripe_status (license stays active for grace period)
+    const updateSql = db.prepare.mock.calls[1][0] as string;
     expect(updateSql).toContain("stripe_status = 'past_due'");
     expect(updateSql).not.toContain("status = 'inactive'");
 
-    // Second call: SELECT license for notification
-    const selectSql = db.prepare.mock.calls[1][0] as string;
+    // prepare[2]: SELECT license for notification
+    const selectSql = db.prepare.mock.calls[2][0] as string;
     expect(selectSql).toContain('SELECT email, product, plan');
 
     // Verify both emails were sent (admin + user)
@@ -721,7 +721,146 @@ describe('webhook — invoice.payment_failed', () => {
 
     expect(response.status).toBe(200);
     const db = env.DB as unknown as MockD1Database;
-    expect(db.prepare).not.toHaveBeenCalled();
+    // Only the dedup guard touched the DB — no license UPDATE, no SELECT
+    expect(db.prepare).toHaveBeenCalledTimes(1);
+    expect(db.prepare.mock.calls[0][0] as string).toContain('webhook_events');
+  });
+
+  it('resolves the subscription from the 2026-01-28.clover nested shape (invoice.parent.subscription_details)', async () => {
+    // sendAdminEmail + sendUserEmail
+    mockResendSuccess();
+    mockResendSuccess();
+
+    const env = createMockEnv();
+    const db = env.DB as unknown as MockD1Database;
+    db._statement.first.mockResolvedValueOnce({ email: 'clover@example.com', product: 'gmail', plan: 'yearly' });
+
+    // 2026-01-28.clover invoice shape: no top-level `subscription` field —
+    // the reference lives at parent.subscription_details.subscription.
+    const eventBody = makeWebhookEvent('invoice.payment_failed', {
+      parent: {
+        subscription_details: { subscription: 'sub_clover_pd' },
+      },
+    });
+    const response = await callWebhook(eventBody, env);
+
+    expect(response.status).toBe(200);
+
+    // prepare[0] = dedup guard, prepare[1] = past_due UPDATE, prepare[2] = license SELECT
+    const updateSql = db.prepare.mock.calls[1][0] as string;
+    expect(updateSql).toContain("stripe_status = 'past_due'");
+    expect(db._statement.bind).toHaveBeenCalledWith('sub_clover_pd');
+
+    // Both notifications sent (admin + user)
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const userEmailBody = JSON.parse(fetchMock.mock.calls[1][1]?.body as string);
+    expect(userEmailBody.to).toBe('clover@example.com');
+    expect(userEmailBody.subject).toContain('Update your payment method');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Event-id deduplication — Stripe redelivers events; side effects run once
+// ---------------------------------------------------------------------------
+
+describe('webhook — event-id deduplication', () => {
+  it('claims the event id in webhook_events before processing', async () => {
+    const env = createMockEnv();
+    const eventBody = makeWebhookEvent('some.unknown.event', { id: 'noop' });
+    const response = await callWebhook(eventBody, env);
+
+    expect(response.status).toBe(200);
+    const db = env.DB as unknown as MockD1Database;
+    const dedupSql = db.prepare.mock.calls[0][0] as string;
+    expect(dedupSql).toContain('INSERT INTO webhook_events');
+    expect(dedupSql).toContain('ON CONFLICT');
+  });
+
+  it('short-circuits a duplicate event id with 200 and runs no side effects', async () => {
+    const env = createMockEnv();
+    const db = env.DB as unknown as MockD1Database;
+    // Duplicate delivery: the dedup INSERT hits the PK conflict → 0 rows written
+    db._statement.run.mockResolvedValueOnce({ success: true, meta: { changes: 0 } });
+    // If processing were (wrongly) to continue, this license row would trigger emails
+    db._statement.first.mockResolvedValueOnce({ email: 'dup@example.com', product: 'gmail', plan: 'yearly' });
+
+    const eventBody = makeWebhookEvent('invoice.payment_failed', { subscription: 'sub_dup' });
+    const response = await callWebhook(eventBody, env);
+
+    expect(response.status).toBe(200);
+    // No emails re-sent, no license UPDATE — only the dedup INSERT ran
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(db.prepare).toHaveBeenCalledTimes(1);
+  });
+
+  it('runs side effects exactly once across a redelivered event', async () => {
+    // First delivery — processed normally
+    mockResendSuccess();
+    mockResendSuccess();
+
+    const env = createMockEnv();
+    const db = env.DB as unknown as MockD1Database;
+    db._statement.first.mockResolvedValueOnce({ email: 'once@example.com', product: 'docs', plan: 'yearly' });
+
+    const eventBody = JSON.stringify({
+      id: 'evt_redelivered_once',
+      type: 'invoice.payment_failed',
+      data: { object: { subscription: 'sub_once' } },
+    });
+
+    let response = await callWebhook(eventBody, env);
+    expect(response.status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(2); // admin + user email
+
+    // Redelivery of the SAME event id — PK conflict, nothing written
+    fetchMock.mockClear();
+    db._statement.run.mockResolvedValueOnce({ success: true, meta: { changes: 0 } });
+
+    response = await callWebhook(eventBody, env);
+    expect(response.status).toBe(200);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('continues processing when the dedup guard itself errors (availability over strictness)', async () => {
+    mockResendSuccess();
+    mockResendSuccess();
+
+    const env = createMockEnv();
+    const db = env.DB as unknown as MockD1Database;
+    // Dedup INSERT fails (e.g. table missing, D1 hiccup) — must not block the event
+    db._statement.run.mockRejectedValueOnce(new Error('D1 unavailable'));
+    db._statement.first.mockResolvedValueOnce({ email: 'resilient@example.com', product: 'gmail', plan: 'yearly' });
+
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+    const eventBody = makeWebhookEvent('invoice.payment_failed', { subscription: 'sub_guard_err' });
+    const response = await callWebhook(eventBody, env);
+
+    expect(response.status).toBe(200);
+    // Side effects still ran despite the guard failure
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('dedup'));
+
+    consoleSpy.mockRestore();
+  });
+
+  it('releases the dedup claim when the handler fails so Stripe retries are re-processed', async () => {
+    const env = createMockEnv();
+
+    // retrieveCheckoutSession fails → handler throws → 500
+    fetchMock.mockRejectedValueOnce(new Error('Stripe API down'));
+
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+    const eventBody = makeWebhookEvent('checkout.session.completed', { id: 'cs_fail_retry' });
+    const response = await callWebhook(eventBody, env);
+
+    expect(response.status).toBe(500);
+    const db = env.DB as unknown as MockD1Database;
+    const sqls = db.prepare.mock.calls.map((c) => c[0] as string);
+    expect(sqls.some((s) => s.includes('DELETE FROM webhook_events'))).toBe(true);
+
+    consoleSpy.mockRestore();
   });
 });
 
@@ -778,7 +917,7 @@ describe('webhook — ownership guard: foreign subscription.deleted', () => {
     expect(fetchMock).not.toHaveBeenCalled();
     // No DB write (guard fired before UPDATE)
     const db = env.DB as unknown as MockD1Database;
-    expect(db.prepare).toHaveBeenCalledTimes(1); // only the SELECT, not the UPDATE
+    expect(db.prepare).toHaveBeenCalledTimes(2); // dedup guard + SELECT, not the UPDATE
     // Skip log emitted
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('not a Darkly product'));
 
@@ -1024,9 +1163,10 @@ describe('webhook — ownership guard: foreign checkout.session.completed', () =
     expect(response.status).toBe(200);
     // Only the retrieveCheckoutSession fetch (Stripe) — no trackDiscountUsage, no email
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    // No DB write
+    // No DB write beyond the dedup guard
     const db = env.DB as unknown as MockD1Database;
-    expect(db.prepare).not.toHaveBeenCalled();
+    expect(db.prepare).toHaveBeenCalledTimes(1);
+    expect(db.prepare.mock.calls[0][0] as string).toContain('webhook_events');
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('not a Darkly product'));
 
     consoleSpy.mockRestore();
