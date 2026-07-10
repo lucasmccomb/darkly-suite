@@ -65,7 +65,10 @@ chrome.runtime.onMessage.addListener(
         sendResponse({ shouldBeDark: false });
         return true;
       }
-      worker.getScheduleStatus().then(sendResponse);
+      worker.getScheduleStatus().then(sendResponse).catch((err) => {
+        console.warn('[Darkly Suite] getScheduleStatus failed:', err);
+        sendResponse({ shouldBeDark: false });
+      });
       return true;
     }
 
@@ -87,18 +90,27 @@ chrome.runtime.onMessage.addListener(
         } else {
           sendResponse(null);
         }
+      }).catch((err) => {
+        console.warn('[Darkly Suite] getSunTimes failed:', err);
+        sendResponse(null);
       });
       return true;
     }
 
     // Shared messages — use any worker (they all share the same payment/token)
     if (message.type === 'getProStatus') {
-      sharedWorker.getProStatus().then(sendResponse);
+      sharedWorker.getProStatus().then(sendResponse).catch((err) => {
+        console.warn('[Darkly Suite] getProStatus failed:', err);
+        sendResponse({ paid: false });
+      });
       return true;
     }
 
     if (message.type === 'getLocation') {
-      sharedWorker.getLocation().then(sendResponse);
+      sharedWorker.getLocation().then(sendResponse).catch((err) => {
+        console.warn('[Darkly Suite] getLocation failed:', err);
+        sendResponse({ error: err instanceof Error ? err.message : 'Failed to get location' });
+      });
       return true;
     }
 
@@ -110,7 +122,9 @@ chrome.runtime.onMessage.addListener(
     }
 
     if (message.type === 'checkoutStarted') {
-      checkoutPoller.start();
+      checkoutPoller.start().catch((err) => {
+        console.warn('[Darkly Suite] Failed to start checkout poller:', err);
+      });
       return false;
     }
 
@@ -120,12 +134,17 @@ chrome.runtime.onMessage.addListener(
     if (message.type === 'getToken') {
       sharedWorker.getToken().then((token) => {
         sendResponse({ token, productId: config.productId });
+      }).catch((err) => {
+        console.warn('[Darkly Suite] getToken failed:', err);
+        sendResponse({ token: null, productId: config.productId });
       });
       return true;
     }
 
     if (message.type === 'checkoutComplete') {
-      checkoutPoller.start();
+      checkoutPoller.start().catch((err) => {
+        console.warn('[Darkly Suite] Failed to start checkout poller:', err);
+      });
       sendResponse({ ok: true });
       return true;
     }
@@ -173,7 +192,9 @@ chrome.runtime.onInstalled.addListener(async (details) => {
       // Start checkout poller immediately — the user is being directed to the
       // subscribe page, so payment may complete soon. Without this, the poller
       // only starts when subscribing from the in-app paywall (checkoutStarted).
-      checkoutPoller.start();
+      checkoutPoller.start().catch((err) => {
+        console.warn('[Darkly Suite] Failed to start checkout poller:', err);
+      });
     }
     for (const worker of workers.values()) {
       await worker.setupAlarm();

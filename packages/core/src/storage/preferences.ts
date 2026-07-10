@@ -23,12 +23,21 @@ export function createPreferencesManager(config: ProductConfig): PreferencesMana
     // Serialize saves to prevent read-modify-write races when
     // the toggle is clicked rapidly — each save reads the result
     // of the previous one.
-    saveQueue = saveQueue.then(async () => {
+    const run = saveQueue.then(async () => {
       const current = await load();
       const merged = { ...current, ...prefs };
       await chrome.storage.sync.set({ [key]: merged });
     });
-    return saveQueue;
+    // Keep the queue alive when a save fails (chrome.storage.sync write
+    // quotas like MAX_WRITE_OPERATIONS_PER_MINUTE make this realistic
+    // under rapid toggling). Without recovery, one rejection would leave
+    // saveQueue permanently rejected and every subsequent save would
+    // silently never run. The caller still observes this save's rejection
+    // via the returned promise.
+    saveQueue = run.catch((err) => {
+      console.warn('[Darkly] Failed to save preferences:', err);
+    });
+    return run;
   }
 
   function onChange(

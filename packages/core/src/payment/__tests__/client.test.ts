@@ -265,6 +265,23 @@ describe('openPaymentPage', () => {
     const token = syncStorage[mockConfig.tokenKey] as string;
     expect(msg.url).toBe(`${mockConfig.apiBase}/auth/start?type=checkout&token=${token}&plan=lifetime&product=${mockConfig.productId}`);
   });
+
+  it('does not throw or leave an unhandled rejection when sendMessage rejects', async () => {
+    // Extension context invalidated / no receiver — the MV3 promise rejects.
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const reject = () =>
+      Promise.reject(new Error('The message port closed before a response was received.'));
+    // openPaymentPage sends two messages (openTab + checkoutStarted).
+    chromeMock.runtime.sendMessage.mockImplementationOnce(reject).mockImplementationOnce(reject);
+
+    await expect(client.openPaymentPage()).resolves.toBeUndefined();
+    // Let the rejected sendMessage promises settle through their catch handlers.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    // One warn per rejected message (openTab + checkoutStarted).
+    expect(warnSpy).toHaveBeenCalledTimes(2);
+    warnSpy.mockRestore();
+  });
 });
 
 describe('openManageSubscription', () => {

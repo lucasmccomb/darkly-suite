@@ -46,6 +46,15 @@ export interface PaymentClient {
 export function createPaymentClient(config: ProductConfig): PaymentClient {
   const { tokenKey, proCacheKey, apiBase } = config;
 
+  // chrome.runtime.sendMessage returns a promise in MV3; when used
+  // fire-and-forget its rejection (extension context invalidated, no
+  // receiver) must not become an unhandled rejection.
+  function sendMessageFireAndForget(message: { type: string; url?: string }): void {
+    chrome.runtime.sendMessage(message).catch((err) => {
+      console.warn('[Darkly] Failed to send message:', message.type, err);
+    });
+  }
+
   async function getToken(): Promise<string> {
     const result = await chrome.storage.sync.get(tokenKey);
     if (result[tokenKey]) return result[tokenKey];
@@ -138,22 +147,22 @@ export function createPaymentClient(config: ProductConfig): PaymentClient {
     const token = await getToken();
     const params = new URLSearchParams({ type: 'checkout', token, plan, product: config.productId });
     const url = `${apiBase}/auth/start?${params}`;
-    chrome.runtime.sendMessage({ type: 'openTab', url });
-    chrome.runtime.sendMessage({ type: 'checkoutStarted' });
+    sendMessageFireAndForget({ type: 'openTab', url });
+    sendMessageFireAndForget({ type: 'checkoutStarted' });
   }
 
   async function openRestorePurchase(): Promise<void> {
     const token = await getToken();
     const params = new URLSearchParams({ type: 'restore', token, product: config.productId });
     const url = `${apiBase}/auth/start?${params}`;
-    chrome.runtime.sendMessage({ type: 'openTab', url });
-    chrome.runtime.sendMessage({ type: 'checkoutStarted' });
+    sendMessageFireAndForget({ type: 'openTab', url });
+    sendMessageFireAndForget({ type: 'checkoutStarted' });
   }
 
   async function openManageSubscription(): Promise<void> {
     const token = await getToken();
     const url = `${apiBase}/portal?token=${token}&product=${config.productId}`;
-    chrome.runtime.sendMessage({ type: 'openTab', url });
+    sendMessageFireAndForget({ type: 'openTab', url });
   }
 
   async function refreshProStatus(): Promise<boolean> {

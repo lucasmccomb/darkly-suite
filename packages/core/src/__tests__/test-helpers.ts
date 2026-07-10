@@ -123,8 +123,14 @@ export function createMockChromeStorage() {
       clear: jest.fn(async () => true),
     },
     runtime: {
+      // Mirrors MV3 behavior: callback form invokes the callback,
+      // promise form (no callback) returns a promise.
       sendMessage: jest.fn((_message: unknown, callback?: (response: unknown) => void) => {
-        if (callback) callback(null);
+        if (callback) {
+          callback(null);
+          return undefined;
+        }
+        return Promise.resolve(null);
       }),
     },
   };
