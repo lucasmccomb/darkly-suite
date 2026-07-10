@@ -1,6 +1,6 @@
 # Darkly Suite
 
-> Unified monorepo for 4 Chrome extensions that bring dark mode to Google Workspace -- Gmail, Sheets, Docs, and a combined bundle -- built from shared code with a single payment backend.
+> Unified monorepo for 5 Chrome extensions that bring dark mode to Google Workspace and the rest of the web -- Gmail, Sheets, Docs, a combined bundle, and Browse Darkly for every website -- built from shared code with a single payment backend.
 
 **[darklysuite.com](https://darklysuite.com)** | **[gmaildarkly.com](https://gmaildarkly.com)**
 
@@ -72,6 +72,7 @@ Darkly Suite is a family of Chrome extensions providing dark mode for Google Wor
 | Darkly for Sheets | `docs.google.com/spreadsheets` | `sd` | Waffle grid observer, MutationObserver toolbar injection | MV3 |
 | Darkly for Docs | `docs.google.com/document` | `dd` | Kix canvas observer, forceColorSchemeLight | MV3 |
 | Darkly Suite | All three sites + Drive | `ds` | Combined: InboxSDK + Waffle + Kix, unified background worker | MV3 |
+| Browse Darkly | All websites (`<all_urls>`) | `bd` | Generic site engine (`@darkly/site-generic`), smart dark detection, per-site memory | MV3 |
 
 ## Repository Structure
 
@@ -81,13 +82,18 @@ packages/
   site-gmail/            @darkly/site-gmail — Gmail-specific (InboxSDK, sidebar, overrides)
   site-sheets/           @darkly/site-sheets — Sheets-specific (Waffle grid, toolbar, overrides)
   site-docs/             @darkly/site-docs — Docs-specific (Kix canvas, toolbar, overrides)
+  site-generic/          @darkly/site-generic — generic any-website engine for Browse Darkly
   gmail-darkly/          gmail-darkly — standalone Gmail extension (webpack build)
   sheets-darkly/         sheets-darkly — standalone Sheets extension (webpack build)
   docs-darkly/           docs-darkly — standalone Docs extension (webpack build)
   darkly-suite/          darkly-suite-ext — bundle extension for all three sites (webpack build)
+  browse-darkly/         browse-darkly — dark mode for every website (webpack build)
   landing-shared/        @darkly/landing-shared — shared landing components, backend functions, admin portal
   landing-suite/         @darkly/landing-suite — darklysuite.com (Vite + React + Cloudflare Pages)
   landing-gmail/         @darkly/landing-gmail — gmaildarkly.com (Vite + React, marketing only)
+  landing-sheets/        @darkly/landing-sheets — sheetsdarkly.com (Vite + React, marketing only)
+  landing-docs/          @darkly/landing-docs — docsdarkly.com (Vite + React, marketing only)
+  landing-browse/        @darkly/landing-browse — browsedarkly.com (Vite + React, marketing only)
 build-tools/             @darkly/build-tools — webpack factory + CSS prefix loader
 scripts/
   migrate-d1.sh          D1 database migration helper
@@ -137,6 +143,7 @@ Each extension has a unique CSS prefix to prevent class name and CSS variable co
 | Darkly for Sheets | `sd` | `.sd-settings-toggle` | `--sd-bg-primary` | `sd_preferences` |
 | Darkly for Docs | `dd` | `.dd-settings-toggle` | `--dd-bg-primary` | `dd_preferences` |
 | Darkly Suite | `ds` | `.ds-settings-toggle` | `--ds-bg-primary` | `ds_gmail_preferences` |
+| Browse Darkly | `bd` | `.bd-settings-toggle` | `--bd-bg-primary` | `bd_preferences` |
 
 All shared code is authored with the canonical `darkly-` prefix. Three resolution strategies transform it to the correct product prefix:
 
@@ -153,6 +160,7 @@ gmail-darkly  <-- @darkly/core + @darkly/site-gmail
 sheets-darkly <-- @darkly/core + @darkly/site-sheets
 docs-darkly   <-- @darkly/core + @darkly/site-docs
 darkly-suite  <-- @darkly/core + @darkly/site-gmail + @darkly/site-sheets + @darkly/site-docs
+browse-darkly <-- @darkly/core + @darkly/site-generic
 
 landing-suite <-- @darkly/landing-shared
 landing-gmail <-- @darkly/landing-shared
@@ -311,7 +319,7 @@ When both a standalone extension (e.g., Darkly for Gmail) and the Darkly Suite b
 
 ## Payment System
 
-- **Single Stripe account** with 4 products (Gmail, Sheets, Docs, Suite) x 3 plans (monthly, yearly, lifetime) = 12 prices
+- **Single Stripe account** with 5 products (Gmail, Sheets, Docs, Suite, Browse) x 3 plans (monthly, yearly, lifetime) = 15 prices
 - **Checkout flow**: Extension sends user to `darklysuite.com/api/checkout` with product/plan parameters, redirects to Stripe Checkout, webhook writes license to Cloudflare D1
 - **License verification**: Extensions call `/api/status` with a token; a Suite license automatically satisfies queries for individual products
 - **Rate limiting**: D1-based sliding window (10 requests per 60 seconds per IP)

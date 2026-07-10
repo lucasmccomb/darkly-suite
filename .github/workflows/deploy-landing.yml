@@ -32,6 +32,9 @@ on:
         type: boolean
         default: false
 
+permissions:
+  contents: read
+
 concurrency:
   group: deploy-landing-${{ github.ref }}
   cancel-in-progress: false
@@ -46,25 +49,37 @@ jobs:
       landing-docs: ${{ steps.changes.outputs.landing-docs }}
       landing-suite: ${{ steps.changes.outputs.landing-suite }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           fetch-depth: 2
+          persist-credentials: false
 
       - name: Determine which landing pages to deploy
         id: changes
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          DEPLOY_ALL: ${{ inputs.deploy-all }}
+          DEPLOY_GMAIL: ${{ inputs.deploy-gmail }}
+          DEPLOY_SHEETS: ${{ inputs.deploy-sheets }}
+          DEPLOY_DOCS: ${{ inputs.deploy-docs }}
+          DEPLOY_SUITE: ${{ inputs.deploy-suite }}
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            if [[ "${{ inputs.deploy-all }}" == "true" ]]; then
-              echo "landing-gmail=true" >> $GITHUB_OUTPUT
-              echo "landing-sheets=true" >> $GITHUB_OUTPUT
-              echo "landing-docs=true" >> $GITHUB_OUTPUT
-              echo "landing-suite=true" >> $GITHUB_OUTPUT
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            if [[ "$DEPLOY_ALL" == "true" ]]; then
+              {
+                echo "landing-gmail=true"
+                echo "landing-sheets=true"
+                echo "landing-docs=true"
+                echo "landing-suite=true"
+              } >> "$GITHUB_OUTPUT"
               exit 0
             fi
-            echo "landing-gmail=${{ inputs.deploy-gmail }}" >> $GITHUB_OUTPUT
-            echo "landing-sheets=${{ inputs.deploy-sheets }}" >> $GITHUB_OUTPUT
-            echo "landing-docs=${{ inputs.deploy-docs }}" >> $GITHUB_OUTPUT
-            echo "landing-suite=${{ inputs.deploy-suite }}" >> $GITHUB_OUTPUT
+            {
+              echo "landing-gmail=$DEPLOY_GMAIL"
+              echo "landing-sheets=$DEPLOY_SHEETS"
+              echo "landing-docs=$DEPLOY_DOCS"
+              echo "landing-suite=$DEPLOY_SUITE"
+            } >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -96,10 +111,12 @@ jobs:
             SUITE_CHANGED=true
           fi
 
-          echo "landing-gmail=$GMAIL_CHANGED" >> $GITHUB_OUTPUT
-          echo "landing-sheets=$SHEETS_CHANGED" >> $GITHUB_OUTPUT
-          echo "landing-docs=$DOCS_CHANGED" >> $GITHUB_OUTPUT
-          echo "landing-suite=$SUITE_CHANGED" >> $GITHUB_OUTPUT
+          {
+            echo "landing-gmail=$GMAIL_CHANGED"
+            echo "landing-sheets=$SHEETS_CHANGED"
+            echo "landing-docs=$DOCS_CHANGED"
+            echo "landing-suite=$SUITE_CHANGED"
+          } >> "$GITHUB_OUTPUT"
 
           echo "Deploy targets: gmail=$GMAIL_CHANGED sheets=$SHEETS_CHANGED docs=$DOCS_CHANGED suite=$SUITE_CHANGED (shared=$SHARED_CHANGED)"
 
@@ -112,13 +129,15 @@ jobs:
       contents: read
       deployments: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
         with:
           version: 9
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0 # zizmor: ignore[cache-poisoning]
         with:
           node-version: 20
           cache: pnpm
@@ -129,7 +148,7 @@ jobs:
         run: pnpm --filter @darkly/landing-gmail build
 
       - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -146,13 +165,15 @@ jobs:
       contents: read
       deployments: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
         with:
           version: 9
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0 # zizmor: ignore[cache-poisoning]
         with:
           node-version: 20
           cache: pnpm
@@ -163,7 +184,7 @@ jobs:
         run: pnpm --filter @darkly/landing-sheets build
 
       - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -180,13 +201,15 @@ jobs:
       contents: read
       deployments: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
         with:
           version: 9
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0 # zizmor: ignore[cache-poisoning]
         with:
           node-version: 20
           cache: pnpm
@@ -197,7 +220,7 @@ jobs:
         run: pnpm --filter @darkly/landing-docs build
 
       - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -214,13 +237,15 @@ jobs:
       contents: read
       deployments: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
         with:
           version: 9
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0 # zizmor: ignore[cache-poisoning]
         with:
           node-version: 20
           cache: pnpm
@@ -231,7 +256,7 @@ jobs:
         run: pnpm --filter @darkly/landing-suite build
 
       - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
