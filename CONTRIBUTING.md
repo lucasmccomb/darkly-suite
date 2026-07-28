@@ -1,6 +1,10 @@
 # Contributing to Darkly Suite
 
-Thanks for considering a contribution.
+This repository is published so the code can be read and evaluated. It is not open source (see [NOTICE](NOTICE)), and outside pull requests are not being accepted — please don't spend time on one.
+
+Security reports are the exception and are always welcome: see [SECURITY.md](SECURITY.md).
+
+The rest of this file documents how the project is built and tested, for anyone reading the source.
 
 ## Setup
 
@@ -30,7 +34,9 @@ pnpm -r test
 
 Tests live in `packages/core/src/**/__tests__/` and `packages/landing-shared/functions/__tests__/`.
 
-## Pull Requests
+## Pull request conventions
+
+These are the conventions this project follows internally:
 
 - One concern per PR
 - Include a brief test plan in the description

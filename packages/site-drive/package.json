@@ -1,7 +1,7 @@
 {
   "name": "@darkly/site-drive",
   "version": "1.0.0",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "description": "Google Drive-specific plugin with dashboard dark mode and CSS overrides",
   "private": true,
   "main": "src/index.ts",
