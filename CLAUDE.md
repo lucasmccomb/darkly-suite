@@ -273,6 +273,17 @@ npx wrangler pages dev dist --d1=DB         # Test with D1 locally
 
 The Stripe CLI (`stripe`) is installed and configured with sandbox/test mode keys. **Always use it directly** to verify, create, update, or manage Stripe resources — do NOT ask the user to do Stripe tasks you can accomplish yourself.
 
+#### ALWAYS pass `--project-name default`
+
+Darkly's Stripe account is **Eluketronic LLC** (`acct_1T04fqJ1nxcsVJaF`), stored as the CLI's `[default]` profile. But `~/.config/stripe/config.toml` sets `project-name = 'evoglyph'` at the top, so a **bare `stripe` command silently talks to the unrelated evoglyph account**. Every Darkly command needs the flag:
+
+```bash
+stripe products list --project-name default            # test mode
+stripe products list --project-name default --live     # live mode
+```
+
+Without it you get another account's data and may conclude Darkly's Stripe is unconfigured. It is configured — this flag is the whole difference. (A previous session lost time to exactly this and filed it as a launch blocker.)
+
 **Self-service first**: Attempt any Stripe-related task autonomously before asking the user. Only escalate if the CLI lacks the needed capability or the task requires live/production mode.
 
 #### Common operations:
