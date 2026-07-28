@@ -9,14 +9,11 @@ SITE_URL_GMAIL = "https://gmaildarkly.com"
 SITE_URL_SHEETS = "https://sheetsdarkly.com"
 SITE_URL_DOCS = "https://docsdarkly.com"
 SITE_URL_BROWSE = "https://browsedarkly.com"
-# All Stripe IDs (prices + products) are set as production secrets (live mode).
-# For local dev, use .dev.vars with sandbox values.
-# Browse Darkly prices (sandbox - not yet promoted to live secrets)
-STRIPE_PRICE_BROWSE_MONTHLY = "price_1T7556J1nxcsVJaFhV6STvI4"
-STRIPE_PRICE_BROWSE_YEARLY = "price_1T7557J1nxcsVJaFaMvxaVm4"
-STRIPE_PRICE_BROWSE_LIFETIME = "price_1T7558J1nxcsVJaF4luS4efN"
-STRIPE_PRODUCT_BROWSE = "prod_U5Fap9EQ9vgSvJ"
+# All Stripe IDs (prices + products) are set as production secrets, never committed.
+# For local dev, use .dev.vars with sandbox values. See .env.example for the full list.
 
+# database_id is an account-scoped identifier, not a credential — it is unusable
+# without Cloudflare account access, and wrangler requires it to bind D1 on deploy.
 [[d1_databases]]
 binding = "DB"
 database_name = "darkly-suite-db"
