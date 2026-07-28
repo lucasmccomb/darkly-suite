@@ -1,7 +1,7 @@
 {
   "name": "@darkly/site-sheets",
   "version": "1.0.0",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "description": "Google Sheets-specific plugin with Waffle grid integration and theme overrides",
   "private": true,
   "main": "src/index.ts",

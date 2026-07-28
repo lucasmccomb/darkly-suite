@@ -1,7 +1,7 @@
 {
   "name": "sheets-darkly",
   "version": "1.0.0",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "description": "Chrome extension providing dark mode for Google Sheets",
   "private": true,
   "scripts": {

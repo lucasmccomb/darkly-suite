@@ -1,7 +1,7 @@
 {
   "name": "@darkly/site-generic",
   "version": "1.0.0",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "description": "Generic dark mode engine for arbitrary websites",
   "private": true,
   "main": "src/index.ts",

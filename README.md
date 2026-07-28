@@ -430,4 +430,6 @@ Manual deploy uploads the pre-built `dist/` directory directly to Cloudflare's C
 
 ## License
 
-MIT © 2026 Lucas McComb. See [LICENSE](LICENSE) for details.
+Copyright © 2026 Lucas McComb. All rights reserved. This source is public so it can be read and evaluated as a work sample — it is not open source, and no right to use, modify, or redistribute it is granted. See [NOTICE](NOTICE).
+
+Third-party dependencies bundled into each extension keep their own licenses and are attributed in the `THIRD-PARTY-LICENSES.txt` that ships in every extension package.

@@ -1,7 +1,7 @@
 {
   "name": "@darkly/core",
   "version": "1.0.0",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "description": "Shared theme engine, storage, payment, and UI components for Darkly extensions",
   "private": true,
   "main": "src/index.ts",

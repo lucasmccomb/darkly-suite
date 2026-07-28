@@ -1,7 +1,7 @@
 {
   "name": "@darkly/site-gmail",
   "version": "1.0.0",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "description": "Gmail-specific plugin with InboxSDK integration and theme overrides",
   "private": true,
   "main": "src/index.ts",

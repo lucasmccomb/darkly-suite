@@ -1,0 +1,17 @@
+NOTICE
+
+Copyright (c) 2026 Lucas McComb. All rights reserved.
+
+The source for Darkly Suite is published publicly so it can be read
+and evaluated as a work sample. It is not open source.
+
+No license is granted to use, modify, distribute, or create
+derivative works from this code, in whole or in part, except as
+GitHub's Terms of Service permit for viewing and forking on
+github.com.
+
+Third-party dependencies bundled into the published extensions remain
+under their own licenses. Each extension ships a THIRD-PARTY-LICENSES.txt
+listing them; nothing in this notice affects those terms.
+
+For licensing enquiries: admin@darklysuite.com

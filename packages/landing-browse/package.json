@@ -1,7 +1,7 @@
 {
   "name": "@darkly/landing-browse",
   "version": "1.0.0",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "description": "Landing page for browsedarkly.com",
   "private": true,
   "type": "module",

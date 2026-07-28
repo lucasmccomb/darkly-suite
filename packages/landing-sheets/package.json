@@ -1,7 +1,7 @@
 {
   "name": "@darkly/landing-sheets",
   "version": "1.0.0",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "description": "Marketing landing page for sheetsdarkly.com",
   "private": true,
   "type": "module",
