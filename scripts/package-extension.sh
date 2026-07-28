@@ -27,7 +27,11 @@ pnpm --filter "$NAME" build
 OUT="$ROOT/dist-zips"; mkdir -p "$OUT"
 ZIP="$OUT/${DIR}-v${VERSION}.zip"
 rm -f "$ZIP"
-( cd "$PKG_DIR/dist" && zip -rX "$ZIP" . -x '*.DS_Store' >/dev/null )
+# Source maps are deliberately excluded: they would publish the full original
+# TypeScript source to anyone who downloads the extension, and they outweigh the
+# actual code (~6.6M of maps vs ~2.2M of build output). They stay in dist/ for
+# local debugging; they just never reach the store.
+( cd "$PKG_DIR/dist" && zip -rX "$ZIP" . -x '*.DS_Store' '*.map' >/dev/null )
 
 echo "Created ${ZIP#"$ROOT"/}  ($(du -h "$ZIP" | cut -f1))"
 unzip -l "$ZIP" | tail -1
