@@ -10,14 +10,14 @@ import type {
   ProductConfig,
 } from '@darkly/core';
 import { MiniControlPanel } from '@darkly/core';
+import type { KeyboardShortcutHandle } from '@inboxsdk/core';
 import { GmailSettingsPanel } from './ui/GmailSettingsPanel';
 import { getSDK } from './sdk/init';
 import { registerToolbarButton } from './sdk/toolbar-button';
-import { registerKeyboardShortcut } from './sdk/keyboard-shortcut';
+import { registerShortcutHelpEntry, registerToggleShortcut } from './sdk/keyboard-shortcut';
 import { mountSettingsPanel } from './sdk/sidebar-panel';
 
 let _config: ProductConfig | null = null;
-let _engine: ThemeEngine | null = null;
 let _openSettings: (() => void) | null = null;
 
 export const gmailPlugin: SitePlugin = {
@@ -29,9 +29,8 @@ export const gmailPlugin: SitePlugin = {
   // This string is available for programmatic reference if needed.
   overrideStyles: 'gmail-overrides.css',
 
-  async init(engine: ThemeEngine, config: ProductConfig): Promise<void> {
+  async init(_engine: ThemeEngine, config: ProductConfig): Promise<void> {
     _config = config;
-    _engine = engine;
   },
 
   async injectToolbarButton(opts: ToolbarButtonOpts): Promise<HTMLElement | null> {
@@ -60,11 +59,6 @@ export const gmailPlugin: SitePlugin = {
         MiniControlPanel,
       );
 
-      // Register keyboard shortcut
-      if (_engine) {
-        registerKeyboardShortcut(sdk, () => _engine!.toggle());
-      }
-
       // InboxSDK manages its own DOM — return null (no explicit element)
       return null;
     } catch (err) {
@@ -84,9 +78,30 @@ export const gmailPlugin: SitePlugin = {
     // No custom MutationObserver needed.
   },
 
-  registerKeyboardShortcuts(_handlers: KeyboardShortcutHandlers): void {
-    // Gmail keyboard shortcuts are registered inside injectToolbarButton
-    // via InboxSDK's Keyboard API.
+  registerKeyboardShortcuts(handlers: KeyboardShortcutHandlers): () => void {
+    // The listener is what actually toggles the theme, and it does not depend
+    // on InboxSDK — the shortcut keeps working even if the SDK fails to load.
+    const removeListener = registerToggleShortcut(handlers.toggleDarkMode);
+
+    // Listing the chord in Gmail's `?` help dialog is best effort: InboxSDK
+    // only displays it, it never invokes a callback.
+    let helpEntry: KeyboardShortcutHandle | null = null;
+    let torndown = false;
+    getSDK()
+      .then((sdk) => {
+        if (torndown) return;
+        helpEntry = registerShortcutHelpEntry(sdk);
+      })
+      .catch((err) => {
+        console.warn('[Darkly/Gmail] Could not list keyboard shortcut in Gmail help:', err);
+      });
+
+    return () => {
+      torndown = true;
+      removeListener();
+      helpEntry?.remove();
+      helpEntry = null;
+    };
   },
 };
 
