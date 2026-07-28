@@ -8,7 +8,7 @@
 
 | Extension | In Development | CWS In-Review | CWS Approved | Published | Version |
 |-----------|:-:|:-:|:-:|:-:|---------|
-| Darkly for Gmail | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | 1.0.1 |
+| Darkly for Gmail | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | 1.0.2 |
 | Darkly for Sheets | :white_check_mark: | | | | 1.0.0 |
 | Darkly for Docs | :white_check_mark: | | | | 1.0.0 |
 | Darkly Suite | :white_check_mark: | | | | 1.0.0 |
