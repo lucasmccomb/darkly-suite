@@ -45,6 +45,7 @@
   - [Dark Mode Strategy](#dark-mode-strategy)
   - [Build System](#build-system)
   - [Conflict Detection](#conflict-detection)
+- [System Map](#system-map)
 - [Extensions In Depth](#extensions-in-depth)
   - [Darkly for Gmail](#darkly-for-gmail)
   - [Darkly for Sheets](#darkly-for-sheets)
@@ -268,6 +269,14 @@ When both a standalone extension (e.g., Darkly for Gmail) and the Darkly Suite b
 | Darkly Suite (Gmail) | `ds-gmail` |
 | Darkly Suite (Sheets) | `ds-sheets` |
 | Darkly Suite (Docs) | `ds-docs` |
+
+## System Map
+
+An interactive [LikeC4](https://likec4.dev) map of the whole suite — extensions, shared engine, landing sites, licensing backend, and external services — with per-element prose and source links pinned to the commit it was generated from.
+
+[![Darkly Suite system map](docs/system-map/darkly-suite-map.png)](https://lem.work/projects/darkly-suite)
+
+GitHub cannot render the interactive version inline, so the image links to it on [lem.work/projects/darkly-suite](https://lem.work/projects/darkly-suite). To explore it locally, open [`docs/system-map/darkly-suite-map.html`](docs/system-map/darkly-suite-map.html) in a browser — the file is fully self-contained. A Gmail-focused view ships in the same file (`#/view/gmail/`); model sources and regeneration steps live in [`docs/system-map/`](docs/system-map/).
 
 ## Extensions In Depth
 
