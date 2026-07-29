@@ -327,17 +327,19 @@ When both a standalone extension (e.g., Darkly for Gmail) and the Darkly Suite b
 
 ## Testing
 
-**410 tests** across 2 test suites (21 test files):
+**495 tests** across 2 test suites (22 test files):
 
-**@darkly/core** (10 test files, 198 tests):
+**@darkly/core** (11 test files, 239 tests):
 - Theme engine, presets, contrast
 - Scheduler (time-based and sunrise/sunset)
 - Preferences storage
-- Payment gates, client, and checkout poller
+- Payment gates (including Pro-gating of shortcut actions), client, and checkout poller
+- Keyboard sequence matcher (two-key chords)
+- Panel rendering
 - Sun-times geolocation
 - Conflict detection
 
-**@darkly/landing-shared** (11 test files, 212 tests):
+**@darkly/landing-shared** (11 test files, 256 tests):
 - Stripe integration
 - Webhook processing (binary status model)
 - License status endpoint
