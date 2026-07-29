@@ -25,8 +25,38 @@ or view it embedded on [lem.work/projects/darkly-suite](https://lem.work/project
 cd docs/system-map
 npx -y likec4@1.59.2 build --output-single-file --base ./ -o out model
 mv out/index.html darkly-suite-map.html
-npx -y likec4@1.59.2 export png -o png model   # optional static exports
 ```
+
+### Static PNGs
+
+The full `index` view is too sprawling for a static image. For the README PNGs, temporarily add this container-level view to `model/views.c4`, export with `--light`, and flatten the transparent background onto white (GitHub dark mode renders transparency as a void):
+
+```
+view readme {
+  title "Darkly Suite — Overview"
+  include *
+  exclude element.kind = package
+  exclude element.kind = tool
+  include darkly_suite_product.ext_gmail, darkly_suite_product.ext_sheets, darkly_suite_product.ext_docs, darkly_suite_product.ext_suite_bundle, darkly_suite_product.ext_browse
+  include darkly_suite_product.web_darklysuite, darkly_suite_product.api_licensing, darkly_suite_product.web_gmaildarkly, darkly_suite_product.web_sheetsdarkly, darkly_suite_product.web_docsdarkly, darkly_suite_product.web_browsedarkly, darkly_suite_product.tool_screenshot_harness
+  autoLayout LeftRight
+}
+```
+
+```bash
+npx -y likec4@1.59.2 export png --light -f readme -f gmail -o png --flat model
+python3 - << 'PY'
+from PIL import Image
+Image.MAX_IMAGE_PIXELS = None
+for src, out in [('png/readme.png', 'darkly-suite-map.png'), ('png/gmail.png', 'darkly-for-gmail-map.png')]:
+    im = Image.open(src).convert('RGBA')
+    flat = Image.alpha_composite(Image.new('RGBA', im.size, (255,) * 4), im).convert('RGB')
+    flat = flat.resize((2200, round(im.size[1] * 2200 / im.size[0])), Image.LANCZOS)
+    flat.save(out, optimize=True)
+PY
+```
+
+Do not commit the `readme` view — the interactive artifact ships exactly two views.
 
 One post-build patch is required: the LikeC4 viewer hides edge labels while panning/zooming and at low zoom, which reads as flicker. Append this before the final `</body>` of the built HTML:
 
