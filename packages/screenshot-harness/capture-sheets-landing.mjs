@@ -35,8 +35,13 @@ const OUTPUT_DIR = path.resolve(__dirname, 'output/sheets-landing');
 const FINAL_DIR_SCREENSHOTS = path.resolve(__dirname, '../landing-sheets/public/images/screenshots');
 const FINAL_DIR_SETUP = path.resolve(__dirname, '../landing-sheets/public/images/setup');
 
-const GOOGLE_EMAIL = 'ibmclucas';
-const GOOGLE_PASSWORD = 'y@c1YcDFkg9^ADsnl';
+const GOOGLE_EMAIL = process.env.DARKLY_CAPTURE_GOOGLE_EMAIL;
+const GOOGLE_PASSWORD = process.env.DARKLY_CAPTURE_GOOGLE_PASSWORD;
+if (!GOOGLE_EMAIL || !GOOGLE_PASSWORD) {
+  console.error('Missing DARKLY_CAPTURE_GOOGLE_EMAIL / DARKLY_CAPTURE_GOOGLE_PASSWORD env vars.');
+  console.error('Use a dedicated throwaway Google account for screenshot capture, never a personal one.');
+  process.exit(1);
+}
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
