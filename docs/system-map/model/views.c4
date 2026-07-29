@@ -5,22 +5,22 @@ views {
     include darkly_suite_product.**
     exclude element.kind = file
     exclude darkly_suite_product
-    autoLayout LeftRight
+    autoLayout TopBottom
   }
   view gmail {
     title "Darkly for Gmail — System Map"
     include workspace_user
     include darkly_suite_product.ext_gmail
     include darkly_suite_product.ext_gmail.*
-    include darkly_suite_product.siteng__gmail_plugin
-    include darkly_suite_product.core__content_bootstrap
-    include darkly_suite_product.core__theme_engine
-    include darkly_suite_product.core__theme_presets
-    include darkly_suite_product.core__preferences_store
-    include darkly_suite_product.core__payment_client
-    include darkly_suite_product.core__background_worker
-    include darkly_suite_product.core__sun_scheduler
-    include darkly_suite_product.core__landing_bridge
+    include darkly_suite_product.site_plugins.siteng__gmail_plugin
+    include darkly_suite_product.core_engine.core__content_bootstrap
+    include darkly_suite_product.core_engine.core__theme_engine
+    include darkly_suite_product.core_engine.core__theme_presets
+    include darkly_suite_product.core_engine.core__preferences_store
+    include darkly_suite_product.core_engine.core__payment_client
+    include darkly_suite_product.core_engine.core__background_worker
+    include darkly_suite_product.core_engine.core__sun_scheduler
+    include darkly_suite_product.core_engine.core__landing_bridge
     include darkly_suite_product.web_gmaildarkly
     include darkly_suite_product.web_gmaildarkly.lmkt__gmail_site_app
     include darkly_suite_product.web_darklysuite
