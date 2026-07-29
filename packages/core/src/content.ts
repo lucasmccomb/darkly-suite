@@ -5,6 +5,7 @@ import { SystemThemeDetector } from './theme/detector';
 import { createTransitionManager } from './theme/transitions';
 import { createPreferencesManager } from './storage/preferences';
 import { createPaymentClient } from './payment/client';
+import { gateProAction } from './payment/gates';
 import { createSettingsModal, createMiniPanel } from './inject/panels';
 import type { PanelHandle } from './inject/panels';
 import type { BaseUserPreferences } from './storage/types';
@@ -213,10 +214,19 @@ export function createContentScript(config: ProductConfig, sitePlugin?: SitePlug
         await injectFab(config, { onClick: showSettings });
       }
 
-      // Register keyboard shortcuts on both editor and dashboard pages
+      // Register keyboard shortcuts on both editor and dashboard pages.
+      //
+      // The toggle is Pro-only and is gated here, at the one place every
+      // extension's shortcuts are wired, rather than inside ThemeEngine —
+      // theme CSS ships in the manifest, so setting the attribute is all it
+      // takes to unlock dark mode, and nothing else guards this path (the
+      // applyMode call above is already inside the `if (proStatus)` branch).
+      // A blocked press opens settings so the shortcut reads as locked rather
+      // than broken, matching how the toolbar button treats non-Pro users.
+      // openSettings stays ungated — it is how a free user reaches the paywall.
       if (sitePlugin.registerKeyboardShortcuts) {
         sitePlugin.registerKeyboardShortcuts({
-          toggleDarkMode: () => engine.toggle(),
+          toggleDarkMode: gateProAction(proStatus, () => engine.toggle(), showSettings),
           openSettings: showSettings,
         });
       }
