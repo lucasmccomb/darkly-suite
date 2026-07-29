@@ -56,7 +56,7 @@ for src, out in [('png/readme.png', 'darkly-suite-map.png'), ('png/gmail.png', '
 PY
 ```
 
-Do not commit the `readme` view — the interactive artifact ships exactly two views.
+Do not commit the `readme` view — the interactive artifact ships exactly two views. Keep the four grouping containers (`core_engine`, `site_plugins`, `landing_shared_lib`, `repo_tooling`) out of the overview's include list: their lifted component relations flood the static render with edge labels.
 
 One post-build patch is required: the LikeC4 viewer hides edge labels while panning/zooming and at low zoom, which reads as flicker. Append this before the final `</body>` of the built HTML:
 
