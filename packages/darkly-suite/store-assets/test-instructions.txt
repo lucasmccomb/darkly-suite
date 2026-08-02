@@ -1,10 +1,10 @@
-1. Install extension and open mail.google.com
-2. Darkly icon appears in toolbar - click to see upgrade prompt
-3. Click "Subscribe Now" to open Stripe checkout
-4. Enter promo code CWSREVIEWSUITE2026 for free access
-5. Test card: 4242 4242 4242 4242, any future exp, any CVC
-6. Return to Gmail, click Darkly icon to toggle dark mode
-7. Open docs.google.com/spreadsheets - verify dark mode
-8. Open docs.google.com/document - verify dark mode
-9. Open drive.google.com - verify dark mode
-10. Confirm settings persist across all four apps
+1. Install and open mail.google.com
+2. Click the Darkly toolbar icon for the upgrade prompt
+3. Select the Lifetime plan, click Subscribe Now
+4. Enter promo code CWSREVIEWSUITE2026 at checkout
+5. Total is $0.00; no card requested. Complete checkout.
+6. In Gmail, click Darkly to toggle dark mode
+7. Open docs.google.com/spreadsheets, verify dark mode
+8. Open docs.google.com/document, verify dark mode
+9. Open drive.google.com, verify dark mode
+10. Settings and license persist across all four apps

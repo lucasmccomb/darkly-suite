@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Darkly Suite",
-  "description": "Dark mode for Gmail, Sheets, Docs, and Drive with OS theme sync, sunset scheduling, and unified settings. One extension, four Google apps.",
+  "description": "Dark mode for Gmail, Sheets, Docs, and Drive with OS sync, sunset scheduling, and unified settings. One extension for four apps.",
   "version": "1.0.0",
   "permissions": ["storage", "alarms", "offscreen", "scripting"],
   "host_permissions": [
